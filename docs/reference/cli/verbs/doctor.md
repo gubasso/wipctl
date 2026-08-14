@@ -10,28 +10,17 @@ wipctl doctor
 
 ## Contract
 
-- One line per manifest item, prefixed `ok`, `warn`, or `miss`, naming the tool, the version
-  found, and `required` or `optional — <view served>; fallback: <fallback>`. A `miss` line MUST
-  be followed by an indented remediation line naming what to install or configure.
+- One line per manifest item, prefixed `ok`, `warn`, or `miss`, naming the tool, the version found, and `required` or `optional — <view served>; fallback: <fallback>`. A `miss` line MUST be followed by an indented remediation line naming what to install or configure.
 - Exits non-zero when a required item is missing; optional absences alone exit 0.
 - Three probe classes:
   1. presence with a version floor;
   2. environment — a UTF-8 locale, 24-bit colour capability;
-  3. behavioural — feed a tool known input and check the output (a tool that emits escape
-     sequences with colour disabled fails pipe safety and MUST be treated as absent).
-- One shared probe set serves `doctor` and every verb's entry preflight: a probe MUST only
-  report; only `doctor` aggregates and exits non-zero; a rendering verb MUST take its declared
-  fallback and announce the degradation in exactly one stderr line.
+  3. behavioural — feed a tool known input and check the output (a tool that emits escape sequences with colour disabled fails pipe safety and MUST be treated as absent).
+- One shared probe set serves `doctor` and every verb's entry preflight: a probe MUST only report; only `doctor` aggregates and exits non-zero; a rendering verb MUST take its declared fallback and announce the degradation in exactly one stderr line.
 
 ## The dependency manifest
 
-The manifest is part of this reference page and of the shipped documentation: the required set
-(the language runtime or none, per implementation), and per optional entry its version floor, the
-view it serves, and its declared fallback. The baseline manifest holds one optional entry: the
-JSON Schema draft 2020-12 instance checker, probed by `validate`, presence-only, with the named
-skip `schemas: skipped — no instance checker on PATH` as its fallback. An implementation adding
-an optional rendering dependency MUST add its manifest row, its probe, and its fallback in the
-same change.
+The manifest is part of this reference page and of the shipped documentation: the required set (the language runtime or none, per implementation), and per optional entry its version floor, the view it serves, and its declared fallback. The baseline manifest holds one optional entry: the JSON Schema draft 2020-12 instance checker, probed by `validate`, presence-only, with the named skip `schemas: skipped — no instance checker on PATH` as its fallback. An implementation adding an optional rendering dependency MUST add its manifest row, its probe, and its fallback in the same change.
 
 ## Example
 

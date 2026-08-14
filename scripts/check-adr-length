@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Hold an ADR's filled body at or below 350 words (AGENTS.md). A decision
+# record that outgrows the limit is recording narrative rather than a decision.
+#
+# What counts: prose. The title heading, fenced blocks, and the template's own
+# unfilled placeholder comments are not the author's body text, so they are
+# stripped before counting.
+set -euo pipefail
+
+limit=350
+status=0
+
+for file in "$@"; do
+  [[ -f $file ]] || continue
+
+  words=$(
+    awk '
+      /^[[:space:]]*(```|~~~)/ { fence = !fence; next }
+      fence { next }
+      /^#[^#]/ { next }        # the title heading names the decision, it is not body
+      /^[[:space:]]*<!--/ { next }
+      { print }
+    ' "$file" | wc -w
+  )
+
+  if ((words > limit)); then
+    printf '%s: body is %s words, over the %s-word limit\n' \
+      "$file" "$words" "$limit" >&2
+    status=1
+  fi
+done
+
+if ((status != 0)); then
+  printf '\nTighten the record, or split the decision in two. Context that is not\n' >&2
+  printf 'load-bearing for the choice belongs in an explanation page.\n' >&2
+fi
+
+exit "$status"

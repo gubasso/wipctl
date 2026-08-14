@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# Reject inline bold and italics in markdown (AGENTS.md: "Use no bold and no
+# italics"). No formatter or linter can do this: dprint's emphasisKind and
+# strongKind only pick the delimiter, and markdownlint's MD036 fires only on a
+# whole emphasized paragraph, so a bold lead-in followed by prose passes it.
+#
+# Fence-aware by necessity: a `**/*.md` glob inside a fenced block, or a
+# `*ptr` in a code span, is not emphasis. Fenced blocks and inline code spans
+# are stripped before matching.
+#
+# Escape hatch: put `<!-- allow-emphasis: <reason> -->` on the line before, so
+# a genuine exception costs a sentence in the diff rather than becoming a habit.
+set -euo pipefail
+
+status=0
+
+for file in "$@"; do
+  [[ -f $file ]] || continue
+
+  while IFS=$'\t' read -r lineno text; do
+    printf '%s:%s: emphasis is not used in this repository — %s\n' \
+      "$file" "$lineno" "$text" >&2
+    status=1
+  done < <(
+    awk '
+      # Fenced blocks open and close on ``` or ~~~ at the start of a line
+      # (allowing the indent a list item gives them).
+      /^[[:space:]]*(```|~~~)/ { fence = !fence; next }
+      fence { next }
+
+      # An HTML comment line carrying the escape hatch exempts the NEXT line.
+      /<!--[[:space:]]*allow-emphasis:/ { exempt = NR + 1; next }
+
+      {
+        line = $0
+
+        # Inline code spans are not prose. Strip them before matching.
+        gsub(/`[^`]*`/, "", line)
+        # Link and image targets can hold underscores and asterisks.
+        gsub(/\]\([^)]*\)/, "]()", line)
+        # An escaped delimiter is a literal character, not a delimiter.
+        gsub(/\\\*/, "", line)
+        gsub(/\\_/, "", line)
+
+        if (NR == exempt) next
+
+        # Strong: **text** or __text__.
+        if (match(line, /\*\*[^*]+\*\*/) || match(line, /__[^_]+__/)) {
+          print NR "\t" substr(line, RSTART, RLENGTH)
+          next
+        }
+
+        # Emphasis with asterisks: *text*, where the delimiters are not part of
+        # a ** pair and the span does not start with whitespace (`a * b * c` is
+        # arithmetic, not emphasis).
+        if (match(line, /(^|[^*])\*[^*[:space:]][^*]*\*([^*]|$)/)) {
+          print NR "\t" substr(line, RSTART, RLENGTH)
+          next
+        }
+
+        # Emphasis with underscores. CommonMark does not treat intraword
+        # underscores as emphasis, so snake_case identifiers are safe only if
+        # both delimiters sit on a word boundary.
+        if (match(line, /(^|[^[:alnum:]_])_[^_[:space:]][^_]*_([^[:alnum:]_]|$)/)) {
+          print NR "\t" substr(line, RSTART, RLENGTH)
+          next
+        }
+      }
+    ' "$file"
+  )
+done
+
+if ((status != 0)); then
+  printf '\nConvert each span to inline code, a heading, or plain prose. A\n' >&2
+  # shellcheck disable=SC2016 # the backticks are literal markdown, not a substitution
+  printf 'deliberate exception takes `<!-- allow-emphasis: <reason> -->` on the\n' >&2
+  printf 'preceding line.\n' >&2
+fi
+
+exit "$status"

@@ -2,5 +2,90 @@
 name = "wipctl"
 version = "0.1.0"
 edition = "2024"
+rust-version = "1.97"
+authors = ["Gustavo Basso <gu@gubasso.xyz>"]
+description = "A planning method and the command that proves a project's plan record obeys it."
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/gubasso/wipctl"
+readme = "README.md"
+keywords = ["planning", "project-management", "kanban", "xp", "cli"]
+categories = ["command-line-utilities", "development-tools"]
+
+# Denylist, not an allowlist: robust against dropping future source files, and an
+# `include` allowlist would silently drop README and LICENSE under an SPDX license
+# expression. Re-check `cargo package --list` whenever a top-level artifact appears.
+exclude = [
+  "/docs",
+  "/.github",
+  "/.config",
+  "/scripts",
+  "/.draft",
+  "/deny.toml",
+  "/release-plz.toml",
+  "/dist-workspace.toml",
+  "/justfile",
+  "/flake.nix",
+  "/flake.lock",
+  "/.envrc",
+  "/.pre-commit-config.yaml",
+  "/.editorconfig",
+  "/install.sh",
+  "/uninstall.sh",
+  "/install-common.sh",
+  "/AGENTS.md",
+  "/CLAUDE.md",
+  "/.gitignore",
+  # Pins this repository's devshell, and would only surprise someone building the
+  # published package with their own toolchain.
+  "/rust-toolchain.toml",
+  # Lint and formatter configuration for this repository's own gates. None of it
+  # is read when the published crate is built, so it is weight in the tarball and
+  # a false signal to anyone reading the package.
+  "/_typos.toml",
+  "/committed.toml",
+  "/dprint.json",
+  "/dprint.markdown.json",
+  "/statix.toml",
+  "/clippy.toml",
+  "/.markdownlint-cli2.jsonc",
+  "/.markdownlint",
+]
 
 [dependencies]
+
+[dev-dependencies]
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = "symbols"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
+
+[lints.rust]
+unused_must_use = "deny"
+unsafe_code = "forbid"
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+unwrap_used = "warn"
+expect_used = "warn"
+
+# Scaffolding left behind by an unfinished change must not reach a commit.
+todo = "deny"
+dbg_macro = "deny"
+unimplemented = "deny"
+panic = "deny"
+
+# The process exits through `main`'s `ExitCode` and nowhere else.
+exit = "deny"
+
+wildcard_imports = "deny"
+implicit_clone = "warn"
+redundant_clone = "warn"
+unnecessary_wraps = "warn"
+needless_pass_by_value = "warn"

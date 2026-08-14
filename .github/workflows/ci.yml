@@ -1,0 +1,124 @@
+# CI for wipctl.
+#
+# Every job enters the project's pinned Nix devshell once (`nix develop --command
+# just ...`) and then calls a justfile recipe. The justfile prefixes each recipe
+# with `nix develop --command` itself, so CI passes `dev=''` to stop the devshell
+# being entered a second time per recipe.
+#
+# The gates themselves live in `.pre-commit-config.yaml` and the `justfile`;
+# nothing here re-implements a check. Adding a gate means adding a hook, not
+# editing this file.
+#
+# Hardening upgrade: pin each action to a full commit SHA and let Dependabot
+# raise the bumps. Left on major tags because unattended SHA pins rot.
+name: ci
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+# Least privilege: read the code, nothing else.
+permissions:
+  contents: read
+
+# One in-flight run per ref; a new push supersedes the old one.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Commit-stage gate: formatting, lints, editorconfig, spelling, markdown,
+  # secrets — whatever `.pre-commit-config.yaml` runs at the pre-commit stage.
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - name: Cache pre-commit environments
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+      - name: Cache cargo
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-lint-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+      - name: Lint
+        run: nix develop --command just dev='' lint
+
+  # Push-stage gate: dependency advisories and license policy
+  # (docs/reference/quality-gates.md, "Stage coverage" — both stages gate).
+  lint-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - name: Cache pre-commit environments
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+      - name: Cache cargo
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-lint-push-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+      - name: Push-stage gate
+        run: nix develop --command just dev='' lint-push
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - name: Cache cargo
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-test-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+      - name: Test
+        run: nix develop --command just dev='' test
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - name: Cache cargo
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-build-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+      - name: Build
+        run: nix develop --command just dev='' build-release

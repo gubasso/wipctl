@@ -1,0 +1,609 @@
+# All three hook types are installed, because the gates here must hold at both
+# the commit and the push stage: a companion tool or a `--no-verify` that skips
+# the commit hooks still meets the gate before anything is published
+# (docs/reference/quality-gates.md, "Stage coverage").
+default_install_hook_types: [pre-commit, commit-msg, pre-push]
+
+# A hook that names no `stages` inherits this, so the cheap tree-wide checks
+# — formatting, lints, editorconfig, spelling, markdown, secrets — run at BOTH
+# pre-commit and pre-push, which is what makes the push stage a real gate
+# rather than a smaller one. Without this line the default is every stage,
+# which would also drag them into commit-msg, where they are handed the message
+# file and match nothing. `committed` opts back into commit-msg explicitly.
+default_stages: [pre-commit, pre-push]
+
+repos:
+  # --- Housekeeping (auto-fix where possible) ---
+  #
+  # Deliberately left as a pre-commit-managed python env, not converted to
+  # `language: system` like the tool hooks below. These are not distributed
+  # tools with a devShell package behind them — they are ~12 small scripts
+  # inside one python package, and converting them would mean writing 12 local
+  # stanzas and hand-carrying each upstream `types`, `args` and
+  # `pass_filenames`. That is 12 chances to silently drop a selector, bought
+  # for nothing: the env is pure python, has no binary to link wrongly, and costs
+  # about a second to build once.
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+        args: ['--maxkb=16384']
+      - id: check-case-conflict
+      - id: check-merge-conflict
+        args: ['--assume-in-merge']
+      - id: check-shebang-scripts-are-executable
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-yaml
+      - id: check-xml
+      - id: destroyed-symlinks
+      - id: detect-private-key
+      # - id: no-commit-to-branch
+
+  # Left managed: check-json5 is the one tool here with no nixpkgs package, so
+  # the devShell has nothing to provide. It is a pure-python console script
+  # over a single dependency (json5), with no binary to link wrongly, so the
+  # managed venv is cheap and correct. Packaging it locally would be the only
+  # way to convert this one, and it is not worth a derivation.
+  - repo: https://github.com/maresb/check-json5
+    rev: v1.0.1
+    hooks:
+      - id: check-json5
+        exclude: '[-.]lock\.json$'
+
+  # --- JSON / JSONC formatter: dprint (comment-safe autofix) ---
+  #
+  # dprint's json plugin formats JSON and JSONC (comments + trailing commas),
+  # which the stdlib-based pretty-format-json cannot. check-json5 above stays the
+  # syntax gate; dprint owns formatting. Config in the sibling `./dprint.json`
+  # (plugin version pinned there). `language: system`, so dprint is supplied by
+  # the project's flake devShell (`pkgs.dprint`) — do not install it out-of-band;
+  # the devShell is the single provider. pre-commit only — git push may strip
+  # PATH, and formatting is already applied by commit time.
+  - repo: local
+    hooks:
+      - id: dprint
+        name: dprint fmt (json/jsonc)
+        entry: dprint fmt
+        language: system
+        files: '\.(json|jsonc|json5)$'
+        pass_filenames: true
+        stages: [pre-commit]
+
+  # --- EditorConfig ---
+  #
+  # Local `language: system` off the devShell (`pkgs.editorconfig-checker`,
+  # which is 3.11.1 in nixpkgs — the same version this was pinned to). Upstream
+  # publishes only a `language: golang` id at this tag, with no `-system`
+  # variant, so the stanza is restated here rather than reused. Upstream's
+  # complete definition is `entry: editorconfig-checker` and nothing else: no
+  # args, no types, no pass_filenames. So the defaults it relies on are the
+  # defaults kept here — filenames are passed, and file selection stays
+  # `types: [file]` by omission. Everything below this line is ours, not
+  # upstream's.
+  - repo: local
+    hooks:
+      - id: editorconfig-checker
+        name: run editorconfig-checker
+        entry: editorconfig-checker
+        language: system
+        alias: ec
+        # This hook enforces only what no other formatter owns: charset, line
+        # endings, and trailing whitespace. Each disabled check below is
+        # disabled because a real formatter is already authoritative for it,
+        # and two authorities on one property is a gate that fails on correct
+        # output.
+        #
+        #   -disable-insert-final-newline: end-of-file-fixer owns it.
+        #   -disable-indent-size: rustfmt, dprint, taplo, nixfmt and shfmt each
+        #     own indentation for their own file type. The checker counts
+        #     left-padding without understanding syntax, so it rejects
+        #     rustfmt-stable output — a continued string literal aligned to its
+        #     opening quote lands on a non-multiple-of-4 column and is flagged.
+        #     indent_style (spaces vs tabs) is still checked, which no
+        #     formatter contradicts.
+        #   -disable-max-line-length: the only glob carrying a width is
+        #     [*.rs] = 100, mirroring rustfmt's max_width. rustfmt treats that
+        #     as a target, not a gate — it will not split a long string literal
+        #     or a long comment — so enforcing it here would fail lines rustfmt
+        #     deliberately left alone. The value stays in .editorconfig as the
+        #     declaration editors and rustfmt read.
+        args:
+          - -disable-insert-final-newline
+          - -disable-indent-size
+          - -disable-max-line-length
+          - '-exclude'
+          - 'LICENSE'
+        # Markdown is excluded: editorconfig-checker can't parse it — it flags
+        # fenced-code-block interiors and the odd-width ordered-list
+        # continuations CommonMark/dprint use (e.g. `1. ` -> 3 spaces), and
+        # defaults to indent_size=4 even when unset. Markdown formatting is
+        # owned by dprint + markdownlint-cli2 when those hooks are layered in.
+        exclude: '\.md$'
+
+  # --- Rust: format & lint (auto-fix) ---
+  - repo: local
+    hooks:
+      - id: cargo-fmt
+        name: cargo fmt
+        entry: cargo fmt --all
+        language: system
+        types: [rust]
+        pass_filenames: false
+
+      - id: clippy-fix
+        name: clippy auto-fix
+        entry: cargo clippy --fix --allow-dirty --allow-staged --all-features -- -W clippy::all
+        language: system
+        types: [rust]
+        pass_filenames: false
+
+      - id: clippy-strict
+        name: clippy gate
+        entry: cargo clippy --all-targets --all-features -- -D warnings
+        language: system
+        types: [rust]
+        pass_filenames: false
+
+      - id: taplo-format
+        name: taplo format
+        entry: taplo format
+        language: system
+        types: [toml]
+
+  # --- Tests (layered per the CLI testing pyramid) ---
+  #
+  # Uses cargo-nextest because it produces deterministic, token-efficient
+  # output (suppresses stdout/stderr from passing tests by default) and
+  # supports per-profile `default-filter` for clean test-kind layering.
+  #
+  # Test classification (CLI testing pyramid):
+  #   - Unit:        `src/` inline `#[cfg(test)] mod tests`. One function
+  #                  or module in isolation. kind(lib) for library crates;
+  #                  kind(bin) when unit tests live inside a [[bin]] target
+  #                  (binary-only crates with no [lib]).
+  #   - Integration: `tests/*.rs`  (kind=test). Tests the *seam* between
+  #                  components. The defining property is "tests the
+  #                  interaction between things," NOT "touches real
+  #                  things." A wrapper CLI exercising its argv contract
+  #                  against a recording stub / faked child is integration.
+  #   - E2E:         The whole product against real external systems
+  #                  (real subprocess, real network, real container). E2E
+  #                  belongs in CI ONLY — never pre-commit or pre-push:
+  #                  too slow, too dependent on host state, too flaky to
+  #                  gate local commits. Do NOT add an E2E hook here.
+  #   - Doc tests:   `///` doctests in library items. NOT runnable by
+  #                  nextest — covered by the separate `cargo test --doc`
+  #                  hook below.
+  #
+  # Tier-to-hook mapping (matches 08-testing-strategy.md § CI essentials):
+  #   - pre-commit: unit only            (sub-second budget)
+  #   - pre-push:   unit + integration   (single-digit-seconds budget)
+  #   - CI:         everything + E2E     (live in .github/workflows)
+  #
+  # The unit hook is therefore wired to BOTH `pre-commit` and `pre-push`
+  # stages: it's nearly free and guards against committed-but-not-tested
+  # changes (rebases, amends) reaching the remote.
+  #
+  # `--no-tests=warn` is load-bearing on a young crate. Since nextest 0.9.85 the
+  # default is `fail`: a run matching zero tests exits 4 (NO_TESTS_RUN), so a
+  # freshly scaffolded crate — or a profile whose `default-filter` legitimately
+  # selects nothing yet — could not commit at all. `warn` keeps the run green
+  # while still printing the no-op, so an over-narrow filter stays visible
+  # rather than silently passing forever (which `pass` would hide). There is no
+  # `.config/nextest.toml` key for this: it is a CLI flag (or NEXTEST_NO_TESTS).
+  #
+  # Requires:
+  #   - `cargo nextest` on PATH (cargo install --locked cargo-nextest)
+  #   - the sibling `.config/nextest.toml` at the repo root, defining the
+  #     `pre-commit` and `pre-push` profiles.
+  - repo: local
+    hooks:
+      - id: cargo-nextest-unit
+        name: cargo nextest (unit tests)
+        entry: cargo nextest run --profile pre-commit --all-features --no-tests=warn
+        language: system
+        types: [rust]
+        pass_filenames: false
+        stages: [pre-commit, pre-push]
+
+      - id: cargo-nextest-integration
+        name: cargo nextest (integration tests)
+        entry: cargo nextest run --profile pre-push --all-features --no-tests=warn
+        language: system
+        types_or: [rust, toml]
+        pass_filenames: false
+        stages: [pre-push]
+
+      # Doctests need a library target, and `cargo test --doc` exits non-zero
+      # with "no library targets found" on a bin-only crate — so this gate
+      # cannot hold until `src/lib.rs` exists. nextest never runs doctests, so
+      # nothing else covers them; re-enable this in the same change that adds
+      # the lib target.
+      # - id: cargo-doc-tests
+      #   name: cargo test --doc (doctests)
+      #   entry: cargo test --doc --all-features
+      #   language: system
+      #   types_or: [rust, toml]
+      #   pass_filenames: false
+      #   stages: [pre-push]
+
+  # --- Spell check ---
+  #
+  # Both `typos` and `committed` are wired as local `language: system` hooks off
+  # the flake devShell, because neither of upstream's own ids can install on
+  # this project's platform:
+  #
+  #   - the default ids are `language: python` and pull a PyPI binary wheel
+  #     whose ELF interpreter is hard-coded to /lib64/ld-linux-x86-64.so.2. A
+  #     Nix host has no /lib64, so the wheel cannot exec — and the error names a
+  #     file that does exist, so it reads as a corrupt cache, not a linkage
+  #     problem.
+  #   - the `-src` ids are `language: rust`, and pre-commit builds them with
+  #     `cargo install --path .` at the repo root. Both repositories are Cargo
+  #     workspaces, so that root is a virtual manifest and the install fails
+  #     with "found a virtual manifest ... instead of a package manifest".
+  #     Verified against crate-ci/typos at v1.49.0.
+  #
+  # So the devShell supplies both binaries, exactly as it already does for
+  # dprint, taplo, nixfmt, shfmt and shellcheck: one provider, named in
+  # flake.nix. The upstream revs are pinned in the comments below so a future
+  # bump has something to compare against.
+  #
+  # typos is REPORT-ONLY here by construction. Upstream's default args are
+  # [--write-changes, --force-exclude], so anything that reuses them auto-fixes,
+  # and typos' auto-fix silently rewrites deliberate identifiers and error
+  # strings. Naming the entry explicitly means no default args are inherited at
+  # all. Fix real typos by hand; allowlist false positives in ./_typos.toml.
+  - repo: local
+    hooks:
+      - id: typos
+        name: typos (spelling, report-only)
+        entry: typos
+        language: system
+        types: [text]
+        # --force-exclude is carried in `args:` rather than folded into `entry:`
+        # above. The two are identical at runtime — pre-commit runs entry, then
+        # args, then filenames — but an explicit `args:` is the machine-visible
+        # form of the invariant this hook depends on: that it never inherits
+        # upstream's [--write-changes, --force-exclude] and therefore never
+        # auto-fixes. `cog bootstrap-audit`'s typos-args-explicit requirement
+        # reads exactly this key, so the property is checked rather than only
+        # asserted in a comment. --force-exclude keeps `exclude:` honoured for
+        # filenames pre-commit passes explicitly.
+        args: [--force-exclude]
+        # upstream: https://github.com/crate-ci/typos (v1.49.0)
+  # --- Commit message linting (commit-msg stage) ---
+  #
+  # Policy lives in ./committed.toml, which committed discovers at the repo
+  # root, so this stanza only wires the stage and the message file. Local
+  # `language: system` for the same platform reason given above the typos hook.
+  # `--commit-file` is upstream's own arg and is what makes the hook read the
+  # message pre-commit hands it rather than scanning history.
+  - repo: local
+    hooks:
+      - id: committed
+        name: committed (conventional commit message)
+        entry: committed
+        language: system
+        # Upstream's own args, carried over verbatim. --commit-file makes the
+        # tool read the message file pre-commit appends after these, rather
+        # than scanning history; --fixup and --wip let those two commit shapes
+        # through, since they are squashed before they land.
+        args: [--fixup, --wip, --commit-file]
+        stages: [commit-msg]
+        always_run: true
+        pass_filenames: true
+        # upstream: https://github.com/crate-ci/committed (v1.1.11)
+
+  # --- Secret scanning (both stages) ---
+  #
+  # `ripsecrets-system` is upstream's own sanctioned system variant: same
+  # entry, same args, same selectors as the default id, differing only in
+  # `language`. Reusing it rather than restating a local hook means upstream
+  # stays authoritative for `args: [--strict-ignore]`, `types: [text]` and
+  # `require_serial: true` — none of which are restated here, so none can drift
+  # out of sync on a future bump. nixpkgs `ripsecrets` is 0.1.11, matching the
+  # rev this repo was already pinned to.
+  #
+  # Upstream sets no `stages`, so this inherits `default_stages` and scans at
+  # both commit and push. That is deliberate for a secret scanner.
+  - repo: https://github.com/sirwart/ripsecrets
+    rev: v0.1.11
+    hooks:
+      - id: ripsecrets-system
+
+  # --- Heavy checks (pre-push only) ---
+  #
+  # `gitleaks-system` for the binary, but the entry IS overridden, unlike
+  # ripsecrets above, and the two differences are deliberate:
+  #
+  #   - Upstream's entry is `gitleaks git --pre-commit --redact --staged
+  #     --verbose`, which scans only what is staged. This hook runs at pre-push
+  #     to scan history, which is the thing a staged scan cannot see: a secret
+  #     committed earlier and about to be published. So `--pre-commit` and
+  #     `--staged` are dropped on purpose; `--redact` and `--verbose` are
+  #     upstream's and are carried over into `args:`.
+  #   - `pass_filenames: false` is restated because upstream omits it on the
+  #     `-system` id alone — the `gitleaks` and `gitleaks-docker` stanzas both
+  #     set it, so the omission reads as an upstream oversight rather than
+  #     intent. Left at its default, pre-commit would append every staged
+  #     filename as a stray positional argument to `gitleaks git`.
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks-system
+        entry: gitleaks git
+        args: [--redact, --verbose]
+        pass_filenames: false
+        stages: [pre-push]
+
+  # --- Unused dependency detection ---
+  #
+  # Local `language: system` off the devShell (`pkgs.cargo-machete`, 0.9.2 in
+  # nixpkgs, matching the pinned rev). Upstream publishes only a
+  # `language: rust` id, which pre-commit satisfies by building the tool from
+  # source into its own env. Its `types_or` and `pass_filenames` are carried
+  # over verbatim below — dropping `types_or` would run the whole-tree
+  # dependency scan on every commit touching any file at all.
+  - repo: local
+    hooks:
+      - id: cargo-machete
+        name: cargo-machete (unused dependencies)
+        entry: cargo machete
+        language: system
+        types_or: [cargo, cargo-lock]
+        pass_filenames: false
+        stages: [pre-push]
+        # upstream: https://github.com/bnjbvr/cargo-machete (v0.9.2)
+
+  - repo: local
+    hooks:
+      - id: cargo-audit
+        name: cargo audit
+        entry: cargo audit
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+
+      # Note: licenses check omitted; requires deny.toml with an allow-list.
+      # Add `licenses` to the check list after creating deny.toml in your project.
+      - id: cargo-deny
+        name: cargo deny
+        entry: cargo deny check advisories bans sources
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+  # --- Nix: format (auto-fix) + lint (gate) ---
+  #
+  # Every project carries a per-project flake devShell, so these run against its
+  # Nix sources. Tools come from that devShell (nix develop / direnv) and run as
+  # system hooks off PATH, like dprint/cargo-fmt. nixfmt (RFC 166, the
+  # nixpkgs-standard formatter) rewrites in place; statix and deadnix are
+  # report-only gates — fix by hand or allowlist. statix walks the tree itself,
+  # so its scope/ignore lives in the sibling `./statix.toml`. `nix flake check`
+  # evaluates the flake and is scoped to Nix changes, at the pre-push stage.
+  - repo: local
+    hooks:
+      - id: nixfmt
+        name: nixfmt (format)
+        entry: nixfmt
+        language: system
+        types: [nix]
+        stages: [pre-commit]
+      - id: statix
+        name: statix (nix anti-patterns)
+        entry: statix check
+        language: system
+        types: [nix]
+        pass_filenames: false
+        stages: [pre-commit]
+      - id: deadnix
+        name: deadnix (dead code)
+        entry: deadnix --fail
+        language: system
+        types: [nix]
+        stages: [pre-commit]
+      - id: nix-flake-check
+        name: nix flake check (eval)
+        entry: nix flake check
+        language: system
+        files: '\.nix$'
+        pass_filenames: false
+        stages: [pre-push]
+  # --- Prose rules no linter can express (local; before the formatter) ---
+  #
+  # AGENTS.md bans inline bold and italics, and caps an ADR body at 350 words.
+  # Neither is expressible in the tools already wired here: dprint's
+  # `emphasisKind`/`strongKind` only choose which delimiter is used, and
+  # markdownlint's MD036 fires only on a whole emphasized paragraph, so a bold
+  # lead-in followed by prose passes it. Hence two project-local scripts.
+  #
+  # These run BEFORE dprint deliberately: the emphasis check is fence-aware and
+  # reads the file as the author wrote it, so it should report on the author's
+  # own line numbers rather than on a reflowed paragraph.
+  #
+  # `language: system`; bash and awk come from the devShell like every other
+  # system hook. The escape hatch is `<!-- allow-emphasis: <reason> -->` on the
+  # preceding line, which makes an exception a recorded decision.
+  - repo: local
+    hooks:
+      - id: no-emphasis
+        name: no bold or italics (AGENTS.md prose rule)
+        entry: scripts/check-emphasis
+        language: system
+        files: '\.(md|markdown)$'
+        pass_filenames: true
+
+      - id: adr-length
+        name: ADR body at or below 350 words
+        entry: scripts/check-adr-length
+        language: system
+        # Only decision records. The hand-maintained index and the template are
+        # not records and are legitimately longer or shorter than the limit.
+        files: '^docs/decisions/ADR-[0-9]+.*\.md$'
+        pass_filenames: true
+
+  # --- Markdown: canonical format (dprint) + style gate (markdownlint) ---
+  #
+  # Universal overlay: every project carries docs/READMEs, so its markdown is
+  # formatted and linted everywhere — the same model as the shared Nix overlay.
+  # dprint owns canonical formatting; `markdown.textWrap: "never"` (in the sibling
+  # ./dprint.markdown.json) unwraps every soft-wrapped paragraph to one continuous
+  # physical line for small diffs and predictable LLM tokens. Explicit hard breaks
+  # (two trailing spaces / trailing `\`) are preserved, fenced code blocks are left
+  # unreflowed, and tables stay intact. markdownlint-cli2 gates style beyond what
+  # dprint enforces and autofixes the one thing dprint can't — ordered-list
+  # renumbering (MD029); rules live in the sibling ./.markdownlint-cli2.jsonc.
+  #
+  # A dedicated ./dprint.markdown.json + `--config` keeps this invocation
+  # independent of the type's own JSON dprint.json, and the `dprint-markdown` id
+  # never collides with the type's `dprint` hook.
+  #
+  # `language: system`, so dprint is supplied by the project's flake devShell
+  # (`pkgs.dprint`) — the same model as the json/nix hooks. Do not install it
+  # out-of-band; the devShell is the single provider. pre-commit only — git
+  # push may strip PATH and the format is already applied by commit time.
+  - repo: local
+    hooks:
+      - id: dprint-markdown
+        name: dprint fmt (markdown)
+        entry: dprint fmt --config dprint.markdown.json
+        language: system
+        files: '\.(md|markdown)$'
+        pass_filenames: true
+        stages: [pre-commit]
+
+  # --- Explicit relative links (ambiguity guard; pre-commit, local) ---
+  #
+  # A bare-filename relative link like [x](runbook.md) is ambiguous: the same
+  # basename can exist in many directories, so neither humans nor tools can tell
+  # which file is meant, and the link silently rots when a file moves. Require an
+  # explicit prefix: ./name, ../dir/name, or a multi-segment path dir/name.
+  # Fragment-only (#...), root-absolute (/...), and URL links pass. pygrep is
+  # built into pre-commit — no external dependency, no companion file.
+  - repo: local
+    hooks:
+      - id: no-bare-relative-links
+        name: inline markdown links must be explicit (./, ../, or a path)
+        language: pygrep
+        types: [markdown]
+        entry: '\]\((?!https?://|ftp://|mailto:|tel:|/|#|\.\.?/)[^)/\s:]+\.[A-Za-z0-9]+(?:#[^)]*)?\)'
+      - id: no-bare-relative-link-defs
+        name: markdown link definitions must be explicit (./, ../, or a path)
+        language: pygrep
+        types: [markdown]
+        entry: '^\s*\[[^\]]+\]:\s+(?!https?://|ftp://|mailto:|tel:|/|#|\.\.?/|<)[^\s/:#]+\.[A-Za-z0-9]+'
+
+  # --- Markdown lint (style gate + ordered-list renumber autofix) ---
+  #
+  # markdownlint-cli2 runs AFTER dprint. dprint owns all formatting; markdownlint
+  # flags issues dprint can't normalize (heading hierarchy, link integrity) AND
+  # autofixes ordered-list renumbering (MD029). The custom `relative-links` rule
+  # (report-only) verifies an explicit relative target actually resolves on disk,
+  # complementing the pygrep FORM guards above (form vs. existence). Configure via
+  # the sibling ./.markdownlint-cli2.jsonc. Uses the node variant.
+  #
+  # `additional_dependencies` rules out `language: system` (there would be no env
+  # to install the rule into), so this hook uses pre-commit's own node env. Add
+  # `language_version: system` when the project's node comes from a nix profile,
+  # mise, asdf or nvm — all under $HOME, which `lang_base.exe_exists` rejects, so
+  # pre-commit silently falls back to downloading a generic-glibc node (~150 MB
+  # per env, and one that cannot exec at all on a Nix host). Leave it unset when
+  # the project may have no node installed: `system` has nothing to point at
+  # then, while the downloaded runtime works. See
+  # `cog skill-refs path pre-commit/hook-language-resolution.md`.
+  #
+  # Both markdownlint entries therefore stay pre-commit-managed even though
+  # nixpkgs does package markdownlint-cli2. The blocker is not the linter, it
+  # is the custom rule: `markdownlint-rule-relative-links` is an npm package
+  # with no nixpkgs derivation, and `additional_dependencies` is the only
+  # mechanism that installs it. A `language: system` hook has no env to install
+  # it into, so converting would silently drop the relative-links rule — the
+  # on-disk existence check that the pygrep form guards above are paired with.
+  # `language_version: system` already makes the node itself come from the
+  # devShell, which is most of the benefit.
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.23.2
+    hooks:
+      - id: markdownlint-cli2
+        additional_dependencies: ['markdownlint-rule-relative-links']
+        # Load-bearing here: this project's node comes from the flake devShell
+        # (`pkgs.nodejs`). Without this line pre-commit probes for node via
+        # `lang_base.exe_exists`, which rejects any interpreter under $HOME —
+        # true for a user nix profile, mise, asdf or nvm — falls back to
+        # `default`, and downloads a generic-glibc node that cannot exec on a
+        # Nix host. `system` uses the node already on PATH.
+        language_version: system
+
+  # --- ADR heading shape (MD043; docs/decisions only) ---
+  #
+  # AGENTS.md fixes the shape of a decision record: the five sections of
+  # docs/decisions/template.md, and exactly one `Status`. MD043 is the check
+  # that holds it, and it is the one AGENTS.md doc rule a linter can enforce
+  # outright — the array is a complete ordered list, so a missing section, an
+  # extra one, a reordering, and a second `## Status` all fail by name.
+  #
+  # The wiring is forced by three facts about MD043: it is inert without a
+  # `headings` array; markdownlint scopes config by directory only, with no
+  # per-glob rule configuration; and `--config` sets a base that the discovered
+  # project config merges OVER. So the array lives in its own shape config and
+  # this entry chooses the files it applies to. The project
+  # ./.markdownlint-cli2.jsonc deliberately never names MD043 — an explicit
+  # `false` there would silently undo this while the hook still reported
+  # success. `alias` keeps this distinct from the tree-wide hook above.
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.23.2
+    hooks:
+      - id: markdownlint-cli2
+        alias: md-adr
+        name: markdownlint (decision record heading shape)
+        files: '^docs/decisions/(ADR-.*|template)\.md$'
+        args: ['--config', '.markdownlint/adr.markdownlint-cli2.jsonc']
+        additional_dependencies: ['markdownlint-rule-relative-links']
+        language_version: system
+
+  # --- Shell: lint + format ---
+  #
+  # The repository ships shell (scripts/, and the installer payload), and every
+  # shipped artifact owes a commit-gate hook (docs/reference/quality-gates.md),
+  # so the gate is wired before the payload grows rather than after.
+  #
+  # Both are `language: system` off the devShell (`pkgs.shellcheck`,
+  # `pkgs.shfmt`) rather than the usual hook repos, because both of those ship
+  # a prebuilt binary — shellcheck-py as a PyPI wheel, scop/pre-commit-shfmt as
+  # a downloaded upstream release — and neither can exec on a Nix host, the
+  # same linkage trap as typos above. The devShell already provides both, which
+  # is also this repository's stated model: one provider, named in flake.nix.
+  #
+  # `entry: shfmt -w` and nothing more, deliberately. shfmt reads .editorconfig
+  # natively, but ONLY while no parser or printer flag is given — pass even one
+  # and it silently ignores every EditorConfig file and reverts to its own
+  # defaults, the first of which is tabs. Verified with shfmt 3.13.1 against
+  # scripts/: bare `shfmt -d` is clean, while `-ci` or `-s` reintroduces a
+  # full-file retab diff. So the formatting options live in .editorconfig
+  # (indent_style, indent_size, switch_case_indent, shell_variant) and this
+  # entry carries only `-w`, which is a mode flag and does not disable
+  # resolution. `-ci` is not lost: `switch_case_indent = true` is its
+  # EditorConfig spelling. `-s` (simplify) is dropped outright — it has no
+  # EditorConfig property, and keeping it would cost correct indentation on
+  # every shell file in the repo to buy a style nicety.
+  - repo: local
+    hooks:
+      - id: shfmt
+        name: shfmt (format)
+        entry: shfmt -w
+        language: system
+        types: [shell]
+        stages: [pre-commit]
+
+      - id: shellcheck
+        name: shellcheck (static analysis)
+        entry: shellcheck
+        language: system
+        types: [shell]
+        require_serial: true
+        stages: [pre-commit]

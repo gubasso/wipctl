@@ -1,0 +1,30 @@
+// Heading shape for a decision record, per docs/decisions/template.md.
+//
+// The hook entry that names this file (`md-adr` in .pre-commit-config.yaml)
+// owns which documents it applies to; this file owns only the shape. It is an
+// overlay, not a replacement: every other rule still comes from the project
+// .markdownlint-cli2.jsonc, which markdownlint merges over this base. So MD043
+// is the only rule here, and MD043 appears in no other config in the tree.
+//
+// The leading `*` matches the varying `# ADR-NNNN: <title>` line — one heading
+// of any level and any text — which is also what lets one shape cover both a
+// record and the template it was copied from. The array is a complete ordered
+// list: a missing section, an extra section, a reordering, and a second
+// `## Status` each fail, and the failure names the heading it did not expect.
+//
+// The file name must end in a configuration name markdownlint recognises, so
+// `adr.markdownlint-cli2.jsonc` is loadable and `adr.jsonc` is not.
+{
+  "config": {
+    "MD043": {
+      "headings": [
+        "*",
+        "## Context and Problem Statement",
+        "## Considered Options",
+        "## Decision Outcome",
+        "## Consequences",
+        "## Status"
+      ]
+    }
+  }
+}

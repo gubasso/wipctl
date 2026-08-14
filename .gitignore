@@ -1,2 +1,23 @@
-/target
+# Project
 /.draft
+
+# markdownlint-cli2 deps, when run outside pre-commit
+node_modules/
+
+# --- cog gitignore (rust) ---
+# Rust
+/target/
+**/*.rs.bk
+*.pdb
+rustc-ice-*.txt
+**/mutants.out*/
+
+# OS / editor cruft
+.DS_Store
+.idea/
+.vscode/
+
+# Nix devshell
+.direnv/
+/result
+/result-*

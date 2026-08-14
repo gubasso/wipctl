@@ -1,0 +1,45 @@
+# cargo-deny policy: dependency advisories, license allowlist, bans, and sources.
+# Run by the push-stage gate.
+
+[graph]
+targets = []
+all-features = true
+
+[advisories]
+# These keys take a SCOPE, not a severity: all | workspace | transitive | none.
+# An advisory in scope is an error; severity is no longer configurable, and the
+# old `vulnerability` / `notice` / `severity-threshold` keys were removed
+# outright — naming one is a hard config error, not a no-op. Vulnerability
+# advisories are always denied regardless of what appears here.
+#
+# `workspace` rather than `all` on both: a crate this project depends on
+# directly is something it can act on, whereas an unmaintained crate several
+# levels down is not, and scoping to `all` would let a third party's neglect
+# block every push here. Waive a specific advisory in `ignore` with a reason.
+unmaintained = "workspace"
+unsound = "workspace"
+yanked = "warn"
+
+[licenses]
+allow = [
+  "MIT",
+  "Apache-2.0",
+  "Apache-2.0 WITH LLVM-exception",
+  "BSD-2-Clause",
+  "BSD-3-Clause",
+  "ISC",
+  "Zlib",
+  "Unicode-3.0",
+  "Unicode-DFS-2016",
+]
+
+[bans]
+multiple-versions = "warn"
+deny = [
+  # Prefer rustls, so a static build never needs a system OpenSSL.
+  { name = "openssl-sys" },
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"

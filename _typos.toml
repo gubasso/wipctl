@@ -1,0 +1,11 @@
+# typos allowlist. Add an entry only when typos' suggestion is wrong or
+# ambiguous — a term of art, a deliberate identifier, a non-English word. Real
+# typos are fixed in the source, not silenced here.
+#
+# This project's docs carry method vocabulary (lanes, epics, capture, drain,
+# WIP) that typos does not flag today; keep the list empty until it does.
+
+[default.extend-words]
+# `Nd` is the rendering placeholder for a count of days in a lane label
+# (`id  title  <bar>  Nd`), not a misspelling of `And`.
+Nd = "Nd"

@@ -1,0 +1,59 @@
+# EditorConfig for wipctl.
+#
+# Every block below names the tool that actually enforces it, because the
+# editorconfig-checker hook gates this file against the tree: a setting no
+# formatter owns is a rule that fights the formatter on the next commit.
+# insert_final_newline and trim_trailing_whitespace stay owned by the
+# end-of-file-fixer and trailing-whitespace hooks, so the checker is run with
+# -disable-insert-final-newline to keep that ownership single.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# rustfmt: tab_spaces = 4, max_width = 100.
+[*.rs]
+indent_style = space
+indent_size = 4
+max_line_length = 100
+
+# shfmt, which reads this file natively — so these two blocks are the single
+# home for shell formatting and the shfmt hook restates no printer flag.
+# Covers install.sh, uninstall.sh and install-common.sh at the repo root.
+[*.{sh,bash}]
+indent_style = space
+indent_size = 2
+switch_case_indent = true
+shell_variant = bash
+
+# The extension-less executables in scripts/ (publish, publish-dry, release).
+# The glob above matches on extension and never reaches them, so without this
+# block shfmt falls back to its tab default and reformats them on every commit.
+# The pre-commit hook selects them by shebang, but that only picks the file
+# list — shfmt resolves its options from this file independently.
+[scripts/*]
+indent_style = space
+indent_size = 2
+switch_case_indent = true
+shell_variant = bash
+
+[*.{json,json5,jsonc,yaml,yml,toml}]
+indent_style = space
+indent_size = 2
+
+# Every project carries a flake devShell, and the shared nix pre-commit overlay
+# formats it with nixfmt (RFC 166), which indents 2 spaces.
+[*.nix]
+indent_style = space
+indent_size = 2
+
+# Markdown is owned by dprint and markdownlint-cli2, and is excluded from the
+# editorconfig-checker hook, which misreads fenced-block interiors. Width is
+# off because dprint unwraps prose to one physical line; trailing whitespace is
+# preserved because two trailing spaces are a hard line break.
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = off

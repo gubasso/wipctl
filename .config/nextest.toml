@@ -1,0 +1,34 @@
+# cargo-nextest profiles. A non-default profile is inert until a caller selects it
+# with `--profile`, so each gate stage names the profile it wants.
+
+[profile.default]
+status-level = "pass"
+final-status-level = "fail"
+success-output = "never"
+failure-output = "immediate-final"
+
+# Commit stage: unit tests only, stop at the first failure.
+[profile.pre-commit]
+default-filter = "kind(lib) + kind(bin)"
+fail-fast = true
+status-level = "fail"
+final-status-level = "fail"
+success-output = "never"
+failure-output = "immediate-final"
+
+# Push stage: integration tests, run the whole suite before reporting.
+[profile.pre-push]
+default-filter = "kind(test)"
+fail-fast = false
+status-level = "fail"
+final-status-level = "fail"
+success-output = "never"
+failure-output = "immediate-final"
+
+[profile.ci]
+fail-fast = false
+retries = { backoff = "exponential", count = 2, delay = "1s", max-delay = "10s", jitter = true }
+status-level = "fail"
+final-status-level = "fail"
+success-output = "never"
+failure-output = "immediate-final"
