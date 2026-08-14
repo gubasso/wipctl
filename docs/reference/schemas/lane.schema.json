@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Lane file",
+  "description": "One lane of a project's plan record. The filename is the lane and sequence order is the human ranking within it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["lane", "stories"],
+  "properties": {
+    "lane": {
+      "description": "Must equal the file basename so a pasted fragment remains self-describing.",
+      "enum": ["backlog", "todo", "doing", "review", "closed"]
+    },
+    "stories": {
+      "description": "Ordered highest-priority first. Position is the ranking; there is no priority field.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/story" }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": ["lane"],
+        "properties": { "lane": { "const": "closed" } }
+      },
+      "then": {
+        "properties": {
+          "stories": {
+            "items": { "required": ["outcome", "closed"] }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "stories": {
+            "items": {
+              "allOf": [
+                { "not": { "required": ["outcome"] } },
+                { "not": { "required": ["closed"] } }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-[0-9a-f]{4}$",
+      "description": "The title's slug plus four lowercase hexadecimal characters. The id is the story document's filename stem. No consumer parses its interior."
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "story": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "points", "summary"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "type": {
+          "enum": ["story", "spike", "chore"],
+          "description": "The kind of work and the condition for the worked-example gate."
+        },
+        "points": {
+          "enum": [1, 2, 3],
+          "description": "Units of irreducible human judgment. Work above 3 must split."
+        },
+        "needs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/id" },
+          "uniqueItems": true,
+          "description": "Ids that must be closed before this story is eligible."
+        },
+        "epic": {
+          "$ref": "#/$defs/id",
+          "description": "Id of one epic document at <plan zone>/epics/<id>.md, where the zone is the directory this file lives two levels below. Ids are unique across stories and epics alike, so one id names one thing. Single-valued and never a sequencing fact."
+        },
+        "tags": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/slug" },
+          "uniqueItems": true,
+          "description": "Free board labels. Nothing gates on a tag."
+        },
+        "outcome": {
+          "enum": ["done", "cut", "reshaped"],
+          "description": "Required in closed.yml and forbidden elsewhere."
+        },
+        "closed": {
+          "type": "string",
+          "format": "date",
+          "description": "Required in closed.yml and forbidden elsewhere; used to derive velocity."
+        },
+        "succeeded_by": {
+          "$ref": "#/$defs/id",
+          "description": "Required when outcome is reshaped and forbidden otherwise."
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 60,
+          "maxLength": 400,
+          "pattern": "^[^\\n\\r\\t ][^\\n\\r]*[^\\n\\r\\t ]$",
+          "description": "One capped paragraph restating what this entry is, so a lane file answers without a file read per row. The story document stays the source of truth; this is a restatement of it and never a second specification. Double-quote it: an unquoted scalar carrying a colon is ambiguous under YAML. One line, no leading or trailing whitespace, because the record is parsed by a flat canonical subset."
+        },
+        "note": {
+          "type": "string",
+          "description": "Free prose about the entry's handling rather than about its subject — why it is parked, who is waiting on it, what a reader should know before picking it up. What the work is belongs in summary. Nothing parses it."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["outcome"],
+            "properties": { "outcome": { "const": "reshaped" } }
+          },
+          "then": { "required": ["succeeded_by"] },
+          "else": { "not": { "required": ["succeeded_by"] } }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Epic resolution",
+  "description": "One epic resolved into its execution plan. Authoritative for what serves the epic and what each entry waits on. Its ordering past the eligible set is the dependency graph's, not a schedule: a consumer takes any entry from `eligible` and asks again once that entry closes. Derived from the record on every call and stored nowhere, so a payload that disagrees with the record is stale rather than authoritative.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "closed_points", "total_points", "open", "eligible", "blocked"],
+  "properties": {
+    "id": { "$ref": "#/$defs/id" },
+    "closed_points": {
+      "description": "Points delivered. `done` delivers; `cut` contributes nothing; `reshaped` delivers through its successor.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "total_points": {
+      "description": "Points across every member, including a `cut` member — the total is what was promised.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "open": {
+      "description": "Members not yet in closed.yml, a reopened member included. Never a completion verdict: closed out is not done.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "eligible": {
+      "description": "Startable now, in the graph's order. Any one may be taken; the order among them is not a ranking this payload invents.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/entry" }
+    },
+    "blocked": {
+      "description": "Waiting on something, in the graph's order, each naming what it waits on.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/entry" }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-[0-9a-f]{4}$",
+      "description": "The title's slug plus four lowercase hexadecimal characters, shared across stories and epics so one id names one thing."
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "points", "lane", "path", "needs", "serves"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "type": { "enum": ["story", "spike", "chore"] },
+        "points": { "type": "integer", "minimum": 1, "maximum": 3 },
+        "lane": { "enum": ["backlog", "todo", "doing", "review", "closed"] },
+        "path": {
+          "description": "The story document, relative to the project root, so a consumer joins it to a root it already knows.",
+          "type": "string",
+          "pattern": "^[^/].*\\.md$"
+        },
+        "needs": {
+          "description": "The ids this entry is still waiting on. Empty on every eligible entry, by construction.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "serves": {
+          "description": "The epic this entry carries, or null when it carries none. A value other than the resolved epic marks a prerequisite from outside it, which is part of the work and never omitted.",
+          "oneOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+        },
+        "blocked_by_question": {
+          "description": "Present and true when an open question blocks this entry. Absent otherwise, because a false flag on every entry is noise.",
+          "const": true
+        }
+      }
+    }
+  }
+}

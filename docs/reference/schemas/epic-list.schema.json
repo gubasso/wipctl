@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Epic listing",
+  "description": "The epic ids a record holds, in id order, as `wipctl epic --json` emits them with no id named. It is a listing and not a rollup: it carries no points and no completion, because a bare invocation is a caller asking which epics exist rather than how they are going. The rollup is epics.schema.json and the single-epic resolution is epic.schema.json.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-[0-9a-f]{4}$",
+        "description": "The title's slug plus four lowercase hexadecimal characters, shared across stories and epics so one id names one thing."
+      }
+    }
+  }
+}

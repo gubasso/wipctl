@@ -1,0 +1,72 @@
+# Glossary
+
+Each term links to the page that owns its full definition. A term defined here in one line is
+defined there in full; this page never carries a rule of its own.
+
+- blocked — a derived condition, never a lane and never a field. Dependency-blocked through
+  `needs`; question-blocked through a `Blocks:` line.
+  [explanation/lanes-and-ranking.md](./explanation/lanes-and-ranking.md)
+- burned id — an id held by a tombstone. An entry claiming it is a validation failure.
+  [reference/record/ids.md](./reference/record/ids.md)
+- canonical YAML subset — the narrow YAML the record accepts: flat mappings, one nesting level,
+  one-line flow sequences for lists. [reference/record/lane-file.md](./reference/record/lane-file.md)
+- capture — writing a story document plus a pending fragment, without touching a lane file.
+  [explanation/concurrent-capture.md](./explanation/concurrent-capture.md)
+- chore — a work type whose outcome is upkeep; needs no worked example.
+  [explanation/stories-and-estimation.md](./explanation/stories-and-estimation.md)
+- current story — the topmost entry of `doing.yml`, or of `todo.yml` when `doing` is empty.
+  [reference/cli/verbs/next.md](./reference/cli/verbs/next.md)
+- cycle time — first entry into `doing` until close, read from the journal.
+  [reference/cli/verbs/flow.md](./reference/cli/verbs/flow.md)
+- drain — the act that lands pending fragments into lane files.
+  [reference/cli/verbs/land.md](./reference/cli/verbs/land.md)
+- drift — a fact a fragment states that the record has since outgrown; reported, never repaired.
+  [reference/record/pending-fragment.md](./reference/record/pending-fragment.md)
+- eligible — every id in `needs` is closed and no open question blocks the entry.
+  [explanation/lanes-and-ranking.md](./explanation/lanes-and-ranking.md)
+- epic — an end state no single story delivers: one document plus an `epic` field on entries.
+  [explanation/epics.md](./explanation/epics.md)
+- fragment — one file under `pending/` stating where a captured entry wants to land.
+  [reference/record/pending-fragment.md](./reference/record/pending-fragment.md)
+- host — the project that owns the documentation directory the zone lives in.
+  [explanation/host-integration.md](./explanation/host-integration.md)
+- id — `<slug>-<uid>`: the title's slug plus four lowercase hexadecimal characters. One id names
+  one thing, and no consumer parses its interior. [reference/record/ids.md](./reference/record/ids.md)
+- lane — one of `backlog`, `todo`, `doing`, `review`, `closed`. The file is the lane; the position
+  is the ranking. [reference/record/lane-file.md](./reference/record/lane-file.md)
+- legal ranking — an order satisfying R1 and R2.
+  [explanation/lanes-and-ranking.md](./explanation/lanes-and-ranking.md)
+- mint — allocating an id by generating it, reading nothing, locking nothing, waiting for nothing.
+  [reference/record/ids.md](./reference/record/ids.md)
+- needs — the ids an entry depends on; the only sequencing fact the record stores.
+  [reference/record/lane-file.md](./reference/record/lane-file.md)
+- plan zone — the directory holding the record.
+  [reference/record/zone-layout.md](./reference/record/zone-layout.md)
+- points — `1`, `2`, or `3`: units of irreducible human judgment, counting reviewer attention.
+  [explanation/stories-and-estimation.md](./explanation/stories-and-estimation.md)
+- project root — the directory holding `.wipctl.toml`.
+  [reference/record/config.md](./reference/record/config.md)
+- rework rounds — entries into `doing` beyond the first.
+  [reference/cli/verbs/flow.md](./reference/cli/verbs/flow.md)
+- review dwell — time between entry into and exit from `review`.
+  [reference/cli/verbs/flow.md](./reference/cli/verbs/flow.md)
+- spike — a work type whose outcome is a decision or a measurement, exited through a decision
+  record, a story revision, or a closed measurement.
+  [explanation/stories-and-estimation.md](./explanation/stories-and-estimation.md)
+- story — one vertical, demonstrable change, in one document.
+  [explanation/stories-and-estimation.md](./explanation/stories-and-estimation.md)
+- task — a checklist line inside a story; never a record of its own.
+  [explanation/stories-and-estimation.md](./explanation/stories-and-estimation.md)
+- tombstone — a journal whose last event targets `deleted`; the surviving trace of a deleted
+  entry. [reference/record/transition-journal.md](./reference/record/transition-journal.md)
+- transition event — one lane change: an instant, the lane left, and the lane entered.
+  [reference/record/transition-journal.md](./reference/record/transition-journal.md)
+- transition journal — one append-only stream per entry recording its transitions.
+  [reference/record/transition-journal.md](./reference/record/transition-journal.md)
+- velocity — points of accepted, closed work per iteration window, derived on every read.
+  [reference/cli/verbs/velocity.md](./reference/cli/verbs/velocity.md)
+- warning — a diagnostic that reaches the reader and never the exit code: one the repair can
+  resolve on request, or a drift the drain handles as stated.
+  [reference/validation/ownership-split.md](./reference/validation/ownership-split.md)
+- zone lock — the exclusive lock a writing verb holds from first read to last rename.
+  [reference/cli/conventions.md](./reference/cli/conventions.md)

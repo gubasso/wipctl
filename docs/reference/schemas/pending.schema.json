@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Pending fragment",
+  "description": "One captured entry waiting to land: the lane it claims, the position it wants, the instant the capture stated, and the entry itself. A fragment states a delta, never a copy of anything a lane file holds. The entry mirrors the lane entry's field definitions so the fragment can be checked single-file; the lane file page owns the definitions, and keeping this mirror in agreement with the lane schema is a review responsibility. Closing fields are forbidden because a capture is never a close.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["lane", "after", "captured", "entry"],
+  "properties": {
+    "lane": {
+      "enum": ["backlog", "todo"],
+      "description": "The planning lane the entry wants to land in. A work lane is excluded: landing there would be a transition, and a transition owes a journal event."
+    },
+    "after": {
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/id" }],
+      "description": "Land beneath the named entry, or at the bottom of the claimed lane when null. The target must be a landed entry; a fragment-only target is drift the drain reports."
+    },
+    "captured": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+      "description": "The instant the capture stated, RFC 3339 UTC with Z, second precision. The drain's ordering key; nothing reads a filesystem timestamp or repository history."
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "points", "summary"],
+      "description": "The entry as it will appear in the lane file, minus everything only a close may add.",
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "type": { "enum": ["story", "spike", "chore"] },
+        "points": { "enum": [1, 2, 3] },
+        "summary": {
+          "type": "string",
+          "minLength": 60,
+          "maxLength": 400,
+          "pattern": "^[^\\n\\r\\t ][^\\n\\r]*[^\\n\\r\\t ]$"
+        },
+        "needs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/id" },
+          "uniqueItems": true
+        },
+        "epic": { "$ref": "#/$defs/id" },
+        "tags": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/slug" },
+          "uniqueItems": true
+        },
+        "note": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-[0-9a-f]{4}$",
+      "description": "The title's slug plus four lowercase hexadecimal characters."
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    }
+  }
+}
