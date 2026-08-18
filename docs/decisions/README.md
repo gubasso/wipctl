@@ -66,6 +66,9 @@ The template is [template.md](./template.md). A filled record is `ADR-<number>-<
 - [ADR-0033](./ADR-0033-the-host-stays-unassumed.md) — the product assumes one thing of the host: a documentation directory exists
 - [ADR-0034](./ADR-0034-a-story-is-a-diff-a-durable-document-is-a-state.md) — a closing story's truth transfers to durable documents; the story freezes
 - [ADR-0035](./ADR-0035-an-amends-path-may-be-promised.md) — `new:` promises a document and exempts its path from the existence check
+- [ADR-0041](./ADR-0041-an-amends-item-may-carry-a-typed-rule-delta.md) — an `Amends` assertion may type a rule change: `ADDED`, `MODIFIED`, or `REMOVED` plus the rule id
+- [ADR-0042](./ADR-0042-a-story-has-no-done-when.md) — a story's closing condition is its `Acceptance`; `Done when` belongs to epics alone
+- [ADR-0043](./ADR-0043-the-inbound-heading-is-reads.md) — the inbound reference heading is `Reads`, symmetric with `Amends`
 - [ADR-0036](./ADR-0036-the-program-speaks-git-and-no-other-vcs.md) — the program speaks git in one opt-in place and no other version control ever
 - [ADR-0039](./ADR-0039-the-repository-is-self-contained.md) — every load-bearing fact lives in-repo; an outbound link is a citation and never a prerequisite
 

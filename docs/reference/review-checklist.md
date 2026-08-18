@@ -9,7 +9,7 @@ What a reviewer holds, including everything no gate can. Items marked `no gate` 
 - [ ] Every fixed heading is present, with an `Example` fence for a story or spike; the example demonstrates concrete reader-side behaviour (no gate on quality).
 - [ ] Durable facts live in their owning documents, not in the story (no gate on leanness).
 - [ ] No sentence narrates history — no "formerly", no "used to", no "this replaces", no provenance note (no gate).
-- [ ] References state claims and link to anchors, not line coordinates; `Governed by` names individual sources; every `new:` marker is genuinely a created document (no gate).
+- [ ] References state claims and link to anchors, not line coordinates; `Reads` names individual sources; every `new:` marker is genuinely a created document (no gate).
 - [ ] Acceptance assertions name tests; tasks are a checklist; every known trap has an escape.
 
 ## Changing the record
@@ -19,6 +19,7 @@ What a reviewer holds, including everything no gate can. Items marked `no gate` 
 - [ ] `doing` and `review` are clean; `todo` is eligible-first and dependency-ordered.
 - [ ] A close records outcome and date, appends to the bottom of `closed.yml`, and every transition went through `move` — the journal agrees with the lanes.
 - [ ] A `reshaped` successor carries the epic the work actually serves (no gate); the acceptance transfer happened (no gate).
+- [ ] A story that changed a rule the host identifies by id declared the typed delta under `Amends`, and the declared type matches the diff (no gate).
 - [ ] Only the repair reorders, only on request, and no hook invokes a writer.
 - [ ] A drain's drift report was read and each drift acted on (no gate); a landed record's ranking was settled by a person.
 

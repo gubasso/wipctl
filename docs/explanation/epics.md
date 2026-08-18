@@ -11,7 +11,7 @@ An epic is an end state no single story delivers: one document under `epics/`, p
 
 ## Completion is derived
 
-An epic is closed out when every entry carrying its id is in `closed.yml`. Closed out is not done: a cut member closes without delivering, which is why the document carries `Done when` — an observable end state, never "every member closed". The rollup shows delivered against promised (`cut` stays in the denominator); nothing derives a retirement decision, which is a review question asked alongside "is the charter still true". An empty epic — a document no entry has joined — is a legal first draft.
+An epic is closed out when every entry carrying its id is in `closed.yml`. Closed out is not done: a cut member closes without delivering, which is why the document carries `Done when` — an observable end state, never "every member closed". Where the host keeps rule ids, the sharpest end state is a set of rule ids whose verification commands all pass: the epic then never restates a specification's rules, it cites them, and doneness is decided by running the commands rather than by reading prose. The rollup shows delivered against promised (`cut` stays in the denominator); nothing derives a retirement decision, which is a review question asked alongside "is the charter still true". An empty epic — a document no entry has joined — is a legal first draft.
 
 ## When to open one
 

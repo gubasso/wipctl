@@ -49,7 +49,9 @@ Every cross-file rule the checker holds, grouped by subject. Class is failure un
 
 ## Amends paths
 
-In stories and epics alike: only the leading inline-code token of an `Amends` list item is a path; the path MUST be relative, MUST carry no `.` or `..` segment, and MUST resolve against the project root — unless its assertion opens with `new:`, which exempts existence and nothing else. `Governed by` paths are deliberately unchecked: a review responsibility, stated as such.
+In stories and epics alike: only the leading inline-code token of an `Amends` list item is a path; the path MUST be relative, MUST carry no `.` or `..` segment, and MUST resolve against the project root — unless its assertion opens with `new:`, which exempts existence and nothing else. `Reads` paths are deliberately unchecked: a review responsibility, stated as such.
+
+Where an `Amends` assertion carries a typed rule delta, the clause MUST be `ADDED`, `MODIFIED`, or `REMOVED` followed by exactly one inline-code token matching `[a-z0-9-]+:[a-z0-9-]+`; a clause naming a type with a missing or malformed id token is a failure. The check sees only declared clauses: whether a story that changed a rule declared one is a review responsibility.
 
 ## Pending
 
