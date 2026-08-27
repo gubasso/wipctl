@@ -5,8 +5,10 @@
 The unit of work is a story: one vertical, demonstrable change, in one document. Three types:
 
 - `story` — a change a reader can observe from their side; must show the outcome under `Example`.
-- `spike` — an investigation whose outcome is a decision or measurement; must show its outcome under `Example`, and exits through a decision record, a story revision, or a closed measurement.
+- `spike` — an investigation whose outcome is a decision or measurement; must show its outcome under `Example`, and exits through a recorded decision, a story revision, or a closed measurement.
 - `chore` — upkeep with no reader-facing outcome; needs no worked example.
+
+What a recorded decision looks like is the host's business, not this method's. A project keeping decision records writes one; a project keeping none records the decision in whatever durable document owns the area. What the exit requires is that the finding left the spike, because a spike whose outcome stays in the spike has not ended.
 
 Tasks live inside the story as a checklist and never become records of their own: a unit that may be any node of a tree is not a unit.
 

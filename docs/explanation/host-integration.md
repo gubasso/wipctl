@@ -8,7 +8,7 @@ The project root is the directory holding `.wipctl.toml`; `plan_dir` places the 
 
 ## Two directions of reference
 
-- `Reads` — inbound. The individual sources a work session must load before starting. Unchecked by the gate — entirely a review responsibility — because the right sources are a judgment about the host's documents.
+- `Reads` — inbound. The individual sources a work session must load before starting. Unchecked by the gate — entirely a review responsibility — because the right sources are a judgment about the host's documents. A host whose documentation method excludes a class of document from that load set, as several exclude decision records so a session reads the rule that binds rather than the argument that shaped it, excludes it here too: this method adds no constraint of its own and lifts none.
 - `Amends` — outbound. The documents the work must leave changed. Gated: each path is relative, carries no dot segments, and resolves against the project root — unless its assertion opens with `new:`, which promises a document the work will create and exempts existence for the life of the entry. Both directions may point anywhere in the project, not only the documentation directory.
 
 A host that keeps requirement-level specifications identifies each rule by an id of the shape `<domain>:<rule-slug>`. An `Amends` assertion may then carry a typed delta — `ADDED`, `MODIFIED`, or `REMOVED` plus the rule id in inline code — so rule-to-story traceability is one fixed-string search over the plan zone. The gate checks a declared clause's shape and never its presence, for the same reason `Reads` is unchecked: which host documents keep rule ids is a fact about the host.

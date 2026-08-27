@@ -9,7 +9,7 @@ What a reviewer holds, including everything no gate can. Items marked `no gate` 
 - [ ] Every fixed heading is present, with an `Example` fence for a story or spike; the example demonstrates concrete reader-side behaviour (no gate on quality).
 - [ ] Durable facts live in their owning documents, not in the story (no gate on leanness).
 - [ ] No sentence narrates history — no "formerly", no "used to", no "this replaces", no provenance note (no gate).
-- [ ] References state claims and link to anchors, not line coordinates; `Reads` names individual sources; every `new:` marker is genuinely a created document (no gate).
+- [ ] References state claims and link to anchors, not line coordinates; `Reads` names individual sources and honours whatever the host's documentation method keeps out of a session's load set; every `new:` marker is genuinely a created document (no gate).
 - [ ] Acceptance assertions name tests; tasks are a checklist; every known trap has an escape.
 
 ## Changing the record

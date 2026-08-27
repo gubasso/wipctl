@@ -4,7 +4,7 @@ How a story references what your project already has. Nothing here requires reor
 
 1. Confirm the root: `.wipctl.toml` sits at the project root, and `plan_dir` still describes where the zone actually is. A stale declaration fails validation naming both sides.
 2. Choose documents from what exists. A project keeping structured reference pages points stories at those; a project keeping a flat notes tree points stories at the notes. Both are correct: the method validates that a named path resolves, and nothing more.
-3. Write `Reads`. State the claim, not the coordinates: link to a stable heading anchor, never a line number; name the page that owns a rule rather than eleven records that shaped it; write `None.` when genuinely nothing must be loaded.
+3. Write `Reads`. State the claim, not the coordinates: link to a stable heading anchor, never a line number; name the page that owns a rule rather than eleven records that shaped it; write `None.` when genuinely nothing must be loaded. Where the host's documentation method rules a class of document out of a work session's load set, that exclusion binds here too — no gate reads a `Reads` path, so honouring it is review's.
 4. Write `Amends`. The three gated rules: the path is relative; it resolves against the root unless the assertion opens with `new:`; only the leading inline-code token is the path. Write `None` when the work changes no durable document. Where the work changes a rule the host identifies by id, type it, one rule per item:
 
    ```markdown

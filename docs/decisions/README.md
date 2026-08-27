@@ -69,6 +69,7 @@ The template is [template.md](./template.md). A filled record is `ADR-<number>-<
 - [ADR-0041](./ADR-0041-an-amends-item-may-carry-a-typed-rule-delta.md) — an `Amends` assertion may type a rule change: `ADDED`, `MODIFIED`, or `REMOVED` plus the rule id
 - [ADR-0042](./ADR-0042-a-story-has-no-done-when.md) — a story's closing condition is its `Acceptance`; `Done when` belongs to epics alone
 - [ADR-0043](./ADR-0043-the-inbound-heading-is-reads.md) — the inbound reference heading is `Reads`, symmetric with `Amends`
+- [ADR-0044](./ADR-0044-the-payload-names-no-documentation-method.md) — the shipped payload names no documentation method, so ADR-0033 fails a test rather than a reading
 - [ADR-0036](./ADR-0036-the-program-speaks-git-and-no-other-vcs.md) — the program speaks git in one opt-in place and no other version control ever
 - [ADR-0039](./ADR-0039-the-repository-is-self-contained.md) — every load-bearing fact lives in-repo; an outbound link is a citation and never a prerequisite
 

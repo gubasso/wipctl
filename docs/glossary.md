@@ -25,7 +25,7 @@ Each term links to the page that owns its full definition. A term defined here i
 - project root — the directory holding `.wipctl.toml`. [reference/record/config.md](./reference/record/config.md)
 - rework rounds — entries into `doing` beyond the first. [reference/cli/verbs/flow.md](./reference/cli/verbs/flow.md)
 - review dwell — time between entry into and exit from `review`. [reference/cli/verbs/flow.md](./reference/cli/verbs/flow.md)
-- spike — a work type whose outcome is a decision or a measurement, exited through a decision record, a story revision, or a closed measurement. [explanation/stories-and-estimation.md](./explanation/stories-and-estimation.md)
+- spike — a work type whose outcome is a decision or a measurement, exited through a recorded decision, a story revision, or a closed measurement. [explanation/stories-and-estimation.md](./explanation/stories-and-estimation.md)
 - story — one vertical, demonstrable change, in one document. [explanation/stories-and-estimation.md](./explanation/stories-and-estimation.md)
 - task — a checklist line inside a story; never a record of its own. [explanation/stories-and-estimation.md](./explanation/stories-and-estimation.md)
 - tombstone — a journal whose last event targets `deleted`; the surviving trace of a deleted entry. [reference/record/transition-journal.md](./reference/record/transition-journal.md)
