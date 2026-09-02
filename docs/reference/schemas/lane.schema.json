@@ -35,7 +35,8 @@
             "items": {
               "allOf": [
                 { "not": { "required": ["outcome"] } },
-                { "not": { "required": ["closed"] } }
+                { "not": { "required": ["closed"] } },
+                { "not": { "required": ["delivered"] } }
               ]
             }
           }
@@ -47,7 +48,7 @@
     "id": {
       "type": "string",
       "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-      "description": "The title's slug — id == slugify(title), always. The id is the story document's filename stem. No consumer parses its interior."
+      "description": "The title's slug, plus at most a qualifying postfix where that slug was taken. The id is the story document's filename stem. No consumer parses its interior."
     },
     "slug": {
       "type": "string",

@@ -25,3 +25,5 @@ Chosen option: recorded deletion with a burned id — the record never loses the
 Accepted
 
 Amended by ADR-0052 — a rename burns the old id the same way a deletion does, through a tombstone whose final event destination is `renamed`.
+
+Amended by ADR-0058 — a rename that frees no id burns nothing, because there is no stale reference to protect against.

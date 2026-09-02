@@ -66,6 +66,8 @@ plan: land <n> fragments
 plan: rename <old> to <new>
 plan: fix ranking
 plan: delete <id>
+plan: reconcile <n> changes
+plan: resolve <id> keeping <side>
 ```
 
 The plan repository's own hooks MUST run — never bypassed. A refused commit MUST leave the record written and exit 1 with `the record was written but the commit was refused; the paths are staged` — an abnormal state `doctor` helps diagnose, never a hidden one. Push is never part of the transaction; replication is [verbs/sync.md](./verbs/sync.md).

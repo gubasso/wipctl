@@ -7,7 +7,7 @@
 One `##` section per question:
 
 ```markdown
-## Q-may-a-position-name-a-fragment — May a fragment's position name another fragment?
+## Q-may-a-position-name-a-fragment — May a position name a fragment?
 
 Raised: 2026-08-14
 

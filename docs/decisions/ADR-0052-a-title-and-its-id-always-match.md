@@ -24,3 +24,5 @@ Chosen option: the invariant, held by one function and one verb. Slugification i
 Accepted
 
 Amends ADR-0024.
+
+Amended by ADR-0058 — an id is its title's slug plus at most a qualifying postfix, and a rename that frees no id burns nothing.

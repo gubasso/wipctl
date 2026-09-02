@@ -19,7 +19,9 @@ Every cross-file rule the checker holds, grouped by subject. Class is failure un
 
 - Every entry MUST have a story document at `stories/<id>.md`; the filename stem MUST equal the id.
 - Every story document MUST have an entry — or a pending fragment claiming its id. A document claimed by neither: `no entry and no fragment names this document`.
-- A story, epic, or initiative document's title line MUST open `# <id> —` with the id equal to the filename stem, and the title MUST slugify to the id — `id == slugify(title)` is an invariant, not a repetition ([../record/ids.md](../record/ids.md)). The heading gate proves the `##` sections and cannot see the H1, so this identity is the checker's.
+- A story, epic, or initiative document's title line MUST open `# <id> —` with the id equal to the filename stem, and the title MUST slugify to the id, or to the id minus its qualifying postfix — the one permitted difference ([../record/ids.md](../record/ids.md)). A title that agrees with its id in no other way is a failure. The heading gate proves the `##` sections and cannot see the H1, so this identity is the checker's.
+- A question heading MUST hold to the same rule behind its `Q-` prefix: the question text MUST slugify to the id's slug, or to that slug minus its qualifying postfix.
+- Where an id carries a qualifying postfix, the id without it MUST be held by a live artifact or by a tombstone. A postfix qualifying nothing is a failure naming the id and the free base slug ([../record/ids.md](../record/ids.md)) — the same condition the mint refuses, reported by the gate when an id reaches the record another way.
 - A `story` or `spike` MUST have a fenced block under its `Example` heading; a `chore` need not.
 
 ## Epics

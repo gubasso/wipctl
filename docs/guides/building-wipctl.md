@@ -30,7 +30,7 @@ Acceptance: lane/journal agreement fails when hand-edited; a reopened entry coun
 
 The mint's under-lock check against the live record and every tombstone, `new` with `--id`, the pending schema and rules in the checker and census, `ids`, completion wiring, then the drain: `land --report` and `land`, ordering by the stated instant with the full-id residual tie, drift vocabulary, all-or-nothing. Then `rename`, whose write set exercises everything above.
 
-Acceptance: a repeat capture is refused naming the holder; the drain lands identically on two machines; every drift class reports; a rename moves every reference, burns the old id, and is one commit.
+Acceptance: a repeat capture is refused naming the holder; the drain lands identically on two machines; every drift class reports; an ordinary rename moves every reference, burns the old id, and is one commit, while a rename resolving an id collision burns nothing.
 
 ## 6 — Sync between machines
 

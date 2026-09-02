@@ -42,7 +42,7 @@
     "id": {
       "type": "string",
       "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-      "description": "The title's slug, shared across stories, epics, initiatives, and questions, so one id names one thing."
+      "description": "The title's slug, plus at most a qualifying postfix where that slug was taken. Shared across stories, epics, initiatives, and questions, so one id names one thing."
     }
   }
 }

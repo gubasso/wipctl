@@ -1,6 +1,6 @@
 # Story, epic, and initiative documents
 
-One Markdown document per story under `stories/`, one per epic under `epics/`, one per initiative under `initiatives/`. The filename stem is the id; the title line repeats it: `# <id> — <short title>`. The title MUST slugify to the id ([ids.md](./ids.md)), so a document whose heading and filename have drifted apart is a failure, not a curiosity.
+One Markdown document per story under `stories/`, one per epic under `epics/`, one per initiative under `initiatives/`. The filename stem is the id; the title line repeats it: `# <id> — <short title>`. The title MUST slugify to the id, or to the id minus its qualifying postfix ([ids.md](./ids.md)), so a document whose heading and filename have drifted apart in any other way is a failure, not a curiosity.
 
 ## Story headings, in exact order
 

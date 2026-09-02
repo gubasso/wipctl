@@ -27,7 +27,15 @@ $XDG_RUNTIME_DIR/wipctl/
 
 The plan record is user data, so it lives under the data directory — back it up — not state and not cache. The cache keeps exactly the role it already has: disposable, rebuildable, authoritative for nothing. The checkout directory inside the slot is named `plan-repo`, explicitness over brevity.
 
-The base-directory specification gives `XDG_DATA_HOME`, `XDG_STATE_HOME`, and `XDG_CACHE_HOME` defaults to fall back to when they are unset or empty; each MUST be honoured. It gives `XDG_RUNTIME_DIR` no default path at all, and unset is ordinary in cron jobs, containers, and remote sessions with no session manager — exactly where agents run. Since the lock is the whole same-machine guarantee, an unstated fallback would be no lock at all in those environments. When `XDG_RUNTIME_DIR` is unset or empty, the lock directory MUST be `/tmp/wipctl-<uid>`, created mode `0700`, a warning MUST be printed naming the replacement, and `doctor` MUST report which of the two directories is in use.
+Each of `XDG_DATA_HOME`, `XDG_STATE_HOME`, and `XDG_CACHE_HOME` has a default the base-directory specification gives, and each MUST be honoured when the variable is unset or empty:
+
+```text
+XDG_DATA_HOME    $HOME/.local/share
+XDG_STATE_HOME   $HOME/.local/state
+XDG_CACHE_HOME   $HOME/.cache
+```
+
+A variable holding a relative path is invalid and MUST be treated as unset. It gives `XDG_RUNTIME_DIR` no default path at all, and unset is ordinary in cron jobs, containers, and remote sessions with no session manager — exactly where agents run. Since the lock is the whole same-machine guarantee, an unstated fallback would be no lock at all in those environments. When `XDG_RUNTIME_DIR` is unset or empty, the lock directory MUST be `/tmp/wipctl-<uid>`, created mode `0700`, a warning MUST be printed naming the replacement, and `doctor` MUST report which of the two directories is in use.
 
 ## The zone
 

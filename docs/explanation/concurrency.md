@@ -233,7 +233,7 @@ sync when leaving a machine fetch, reconcile, push; never force
 
 ## A note on ids
 
-Every id on this page is a slug and nothing else — `rate-limit-search`, never a random suffix. That is a consequence of everything above: a random suffix is what a mint draws when it cannot see the record it is writing into, which was true when every clone held its own copy. With one live record behind one lock, the mint reads before it writes, so a taken id is refused at capture time and the answer is to rephrase the title. The grammar and the checks are in [../reference/record/ids.md](../reference/record/ids.md).
+Every id on this page is a title's slug — `rate-limit-search`, never a random suffix. That is a consequence of everything above: a random suffix is what a mint draws when it cannot see the record it is writing into, which was true when every clone held its own copy. With one live record behind one lock, the mint reads before it writes, so a taken id is refused at capture time and the answer is to rephrase the title, or to keep it and choose a qualifying postfix. The grammar and the checks are in [../reference/record/ids.md](../reference/record/ids.md).
 
 ## A note on messages
 

@@ -24,3 +24,5 @@ Chosen option: one hidden TOML file at the root — one file marks the root, pla
 ## Status
 
 Accepted
+
+Amended by ADR-0046 — the root file declares `project_id` in place of `plan_dir`; one hidden TOML file still marks the root, and the plan repository carries its own `config.toml`.

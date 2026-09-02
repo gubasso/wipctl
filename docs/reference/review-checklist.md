@@ -21,7 +21,7 @@ What a reviewer holds, including everything no gate can. Items marked `no gate` 
 - [ ] A `reshaped` successor carries the epic the work actually serves (no gate).
 - [ ] The acceptance transfer happened in the same unit of review as the close — the story's assertions rewritten in the present tense into the amended documents, reviewed together even though no gate can span the two repositories (no gate). The code references are honest: the `branch` names the branch that carried the work, and `delivered` names the commit that landed it (no gate).
 - [ ] A story that changed a rule the host identifies by id declared the typed delta under `Amends`, and the declared type matches the diff (no gate).
-- [ ] A renamed entry is one reviewable act: the title and the id agree, the old id is burned by a `renamed` tombstone, every reference moved with it, and the rename is a dated line under `Revisions`.
+- [ ] A renamed artifact is one reviewable act: the title and the id agree, every reference moved with it, and the rename is a dated line under `Revisions` where the shape has one. The old id is burned by a `renamed` tombstone — unless the rename resolved an id collision, where the id was never freed and no tombstone is owed.
 - [ ] Only the repair reorders, only on request, and no hook invokes a writer.
 - [ ] A drain's drift report was read and each drift acted on (no gate); a landed record's ranking was settled by a person.
 - [ ] A sync conflict was decided by a person — `resolve` recorded the decision, and nobody merged by hand (no gate).

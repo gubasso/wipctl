@@ -25,7 +25,7 @@ The template is [template.md](./template.md). A filled record is `ADR-<number>-<
 ### Configuration and discovery
 
 - [ADR-0006](./ADR-0006-the-config-is-required-validated-and-has-no-defaults.md) — `.wipctl.toml` is required and validated, and no key has a default
-- [ADR-0007](./ADR-0007-the-config-is-toml-at-the-project-root.md) — one hidden TOML file marks the root and declares `plan_dir`
+- [ADR-0007](./ADR-0007-the-config-is-toml-at-the-project-root.md) — one hidden TOML file marks the root and declares the project's identity
 - [ADR-0008](./ADR-0008-the-plan-directory-is-discovered.md) — reading verbs walk upward to the config; `init` alone never walks
 - [ADR-0037](./ADR-0037-no-defaults-is-a-read-time-rule.md) — no defaults binds verbs reading the config; the scaffold generates a complete file the operator owns
 
@@ -59,18 +59,19 @@ The template is [template.md](./template.md). A filled record is `ADR-<number>-<
 ### Identity
 
 - [ADR-0026](./ADR-0026-a-counter-is-forbidden-where-allocation-is-concurrent.md) — no counter allocates a record id; the gate reports collisions between claimants in one record
-- [ADR-0027](./ADR-0027-an-entry-is-named-by-its-filename-stem.md) — an id is `<slug>-<uid>` and lives as the filename stem
-- [ADR-0051](./ADR-0051-the-slug-is-the-id.md) — the slug is the whole id, checked under the lock; nothing random is minted; supersedes ADR-0030
-- [ADR-0052](./ADR-0052-a-title-and-its-id-always-match.md) — `id == slugify(title)` is an invariant, and `rename` is the operation that changes both
+- [ADR-0027](./ADR-0027-an-entry-is-named-by-its-filename-stem.md) — an id lives as the filename stem of everything it names
+- [ADR-0051](./ADR-0051-the-slug-is-the-id.md) — the id is the title's slug, checked under the lock, disambiguated by a chosen postfix; nothing random is minted; supersedes ADR-0030
+- [ADR-0052](./ADR-0052-a-title-and-its-id-always-match.md) — a title and its id always match, and `rename` is the operation that changes either while holding them in agreement
+- [ADR-0058](./ADR-0058-a-qualifying-postfix-is-part-of-the-id.md) — a qualifying postfix is part of the id it disambiguates, and burning follows whether the id was freed; amends ADR-0024, ADR-0051, and ADR-0052
 
 ### Concurrent capture
 
 - [ADR-0028](./ADR-0028-a-concurrent-capture-is-a-lane-delta.md) — a capture is a story plus a pending fragment stating a lane delta
-- [ADR-0029](./ADR-0029-the-drain-orders-by-the-stated-instant.md) — the drain orders by the stated `captured` instant, ties broken on the uid
+- [ADR-0029](./ADR-0029-the-drain-orders-by-the-stated-instant.md) — the drain orders by the stated `captured` instant, ties broken on the full id
 - [ADR-0030](./ADR-0030-the-program-mints-the-identity.md) — `wipctl new` mints the id and writes both files itself
 - [ADR-0031](./ADR-0031-a-position-names-only-a-landed-entry.md) — `after` names a landed entry only; a fragment target is drift
 - [ADR-0032](./ADR-0032-landing-is-a-creation-not-a-transition.md) — landing writes no journal event; a journal begins at the first `move`
-- [ADR-0038](./ADR-0038-capture-disjointness-holds-outside-collision.md) — the no-conflict merge holds outside a uid collision; recovery is re-minting one side
+- [ADR-0038](./ADR-0038-capture-disjointness-holds-outside-collision.md) — the no-conflict merge holds outside an id collision; recovery is rephrasing and renaming one side
 
 ### Concurrency
 

@@ -90,7 +90,7 @@ Inputs: none.
    pushed the plan trunk
    ```
 
-2. Arriving at another, replicate again before taking work. Disjoint work — captures, transitions of different entries — reconciles by construction. The two genuine conflicts are reported, never merged: the same entry transitioned on both sides, decided by a person through `wipctl resolve <id> --keep here|remote`; and one slug minted on both sides, recovered by rephrasing one title and re-capturing it.
+2. Arriving at another, replicate again before taking work. Disjoint work — captures, transitions of different entries — reconciles by construction. The two genuine conflicts are reported, never merged: the same entry transitioned on both sides, decided by a person through `wipctl resolve <id> --keep here|remote`; and one slug minted on both sides, recovered with `wipctl rename` on the losing capture under a rephrased title, which moves its document and fragment together and leaves the id to the other.
 
 Outputs: none — both machines hold the same trunk.
 

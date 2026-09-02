@@ -35,7 +35,7 @@
           },
           "kind": {
             "enum": ["transition", "id"],
-            "description": "transition: the same entry transitioned on both sides, decided by `wipctl resolve`. id: two captures minted the same slug, recovered by rephrasing one title and re-capturing it."
+            "description": "transition: the same entry transitioned on both sides, decided by `wipctl resolve`. id: two captures minted the same slug, recovered by `wipctl rename` on the losing capture under a rephrased title, which frees no id because the surviving capture still holds it."
           },
           "here": {
             "$ref": "#/$defs/side",

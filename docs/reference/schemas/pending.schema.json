@@ -22,8 +22,8 @@
     "entry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "type", "points", "summary"],
-      "description": "The entry as it will appear in the lane file, minus everything only a close may add.",
+      "required": ["id", "type"],
+      "description": "The entry as it will appear in the lane file, minus everything only a close may add. Only id and type are required here, where the lane entry also requires points and summary: capture writes those two absent for the operator to fill, and the fragment is committed as captured, so a schema that required them would reject every capture at its own commit. The drain is what refuses an incomplete fragment, naming the file and the field.",
       "properties": {
         "id": { "$ref": "#/$defs/id" },
         "type": { "enum": ["story", "spike", "chore"] },
@@ -54,7 +54,7 @@
     "id": {
       "type": "string",
       "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-      "description": "The title's slug — id == slugify(title), always."
+      "description": "The title's slug, plus at most a qualifying postfix where that slug was taken."
     },
     "slug": {
       "type": "string",

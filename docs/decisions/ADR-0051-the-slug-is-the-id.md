@@ -24,3 +24,5 @@ Chosen option: the slug is the id, for every artifact kind. The grammar is the s
 Accepted
 
 Supersedes ADR-0030. Re-scopes ADR-0026 and ADR-0038; amends ADR-0029.
+
+Amended by ADR-0058 — a qualifying postfix is part of the id it disambiguates, not a departure from the slug.

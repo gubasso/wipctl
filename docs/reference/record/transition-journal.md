@@ -41,7 +41,7 @@ Lane files are authoritative for current state and are the reviewable diff. The 
 
 ## Tombstones
 
-A journal whose final event's destination is `deleted` or `renamed` is a tombstone. A deleted entry keeps nothing but its tombstone. A renamed entry travels whole to its new id — document, journal, fragment, history — and leaves a fresh one-line tombstone at the old id, whose event's destination is `renamed` (see [../cli/verbs/rename.md](../cli/verbs/rename.md)). A tombstone is exempt from the id-in-no-lane failure and from the lane-agreement invariant, and is held to every other journal rule. In either case the id the tombstone holds is burned; see [ids.md](./ids.md).
+A journal whose final event's destination is `deleted` or `renamed` is a tombstone. A deleted entry keeps nothing but its tombstone. A renamed entry travels whole to its new id — document, journal, fragment, history — and leaves a fresh one-line tombstone at the old id, whose event's destination is `renamed`, in every case but one: a rename resolving an id collision frees no id, because the surviving capture still holds it, and so leaves no tombstone (see [../cli/verbs/rename.md](../cli/verbs/rename.md)). A tombstone is exempt from the id-in-no-lane failure and from the lane-agreement invariant, and is held to every other journal rule. In either case the id the tombstone holds is burned; see [ids.md](./ids.md).
 
 ## What the journal does not record
 

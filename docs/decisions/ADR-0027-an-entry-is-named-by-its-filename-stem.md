@@ -26,3 +26,5 @@ Chosen option: `<slug>-<uid>` as the filename stem — readable words first, a c
 Accepted
 
 Amended by ADR-0038 — the gate catches claimants that coexist in one record; a same-path collision between clones surfaces as a version-control conflict instead.
+
+Amended by ADR-0051 — the stem is the title's slug alone, plus at most a qualifying postfix; the four-hex tail is gone, and the filename-as-identity rule is unchanged.

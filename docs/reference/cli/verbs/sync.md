@@ -15,7 +15,7 @@ wipctl sync [--json]
   - A capture on one side merges with anything on the other by construction — the capture wrote files named by an id nobody else was minting.
   - Different entries transitioned on each side: different entry blocks, different journal files. Combined.
   - The same entry transitioned on both sides: a semantic conflict, reported naming both sides, resolved by a person through `resolve` — never by whichever line won a textual merge.
-  - One slug minted on both sides: an id collision, reported naming both paths; the recovery is to rephrase one title and re-capture it, keeping that capture's document and fragment together as a pair.
+  - One slug minted on both sides: an id collision, reported naming both paths. The recovery is `rename` on the losing capture, under a rephrased title — it moves that capture's document and fragment together, which is what keeps the pair intact, and it is the one rename that leaves no tombstone, because the surviving capture still holds the id ([rename.md](./rename.md)).
 - A conflict MUST stop the push and MUST leave the local trunk unmodified; everything already committed locally stays committed. Exit 1, with each conflict reported.
 - A rejected push means another replica advanced meanwhile: fetch and reconcile again. The verb MUST NOT force-push, ever — plan history is append-only.
 - With nothing to do — no remote changes, nothing local to push — the verb says so and exits 0.
@@ -54,6 +54,7 @@ an id collision arriving from another machine                             exit 1
   wipctl: id rate-limit-the-search-endpoint is claimed twice
   wipctl:   here    stories/rate-limit-the-search-endpoint.md
   wipctl:   remote  stories/rate-limit-the-search-endpoint.md
-  wipctl: two captures minted the same slug; rephrase one title and
-          re-capture it, keeping its document and fragment together
+  wipctl: two captures minted the same slug; rephrase one and rename it —
+          'wipctl rename <id> "<new title>"' moves its document and
+          fragment together and leaves the id to the other
 ```
