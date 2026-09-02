@@ -6,11 +6,13 @@ Entry point for anyone — human or agent — working in this repository. `READM
 
 wipctl is two deliverables that ship together and are judged as one: a planning method, and the tooling that proves a project's plan record obeys it. Neither may be changed alone. The full statement of pillars and no-gos is `docs/explanation/charter.md`.
 
+The project plans with the method it ships. Its own plan record lives in the project's plan repository — resolved through `.wipctl.toml` at the root, per `docs/reference/record/resolution.md` — and not in this tree: a clone of this repository carries the identity, and the record is one attach away.
+
 ## The spec is normative
 
 `docs/reference/` is the complete, language-agnostic specification of the product, and this build conforms to it. Where the code and the reference disagree, the reference wins: the divergence is either a defect in the code or a deliberate change, and a deliberate change edits the reference — gated by an ADR when the choice is significant — in the same change as the behavior. This is a stated local exception to the usual rule that code beats prose for current behavior.
 
-The reference stays language-agnostic. It never names a programming language, a library, a package manager, or a concrete third-party tool as a requirement; it states the contract a capability satisfies, and any tool meeting the contract serves. Implementation choices belong in the code and its decision records, never in the reference pages. The one tool the reference names is git: the opt-in transition commit is specified against git and no other version control, per ADR-0036.
+The reference stays language-agnostic. It never names a programming language, a library, a package manager, or a concrete third-party tool as a requirement; it states the contract a capability satisfies, and any tool meeting the contract serves. Implementation choices belong in the code and its decision records, never in the reference pages. The one tool the reference names is git: it is the plan repository's replication substrate, specified against git and no other version control, per ADR-0048.
 
 ## The repository is self-contained
 

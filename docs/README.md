@@ -6,7 +6,7 @@ This tree is organised by reader need. A reader finishing a task starts in `guid
 
 ## Reference — the normative specification
 
-`reference/` is written so that a team holding nothing but this tree can build wipctl from scratch, in any language, honouring that language's own idioms. Nothing in it names a programming language, a library, or a concrete third-party tool as a requirement; where an external capability is needed, it states the contract that capability satisfies, and any tool meeting the contract serves. The one named tool is git: the opt-in transition commit is specified against git and no other version control, a recorded decision ([decisions/ADR-0036-the-program-speaks-git-and-no-other-vcs.md](./decisions/ADR-0036-the-program-speaks-git-and-no-other-vcs.md)).
+`reference/` is written so that a team holding nothing but this tree can build wipctl from scratch, in any language, honouring that language's own idioms. Nothing in it names a programming language, a library, or a concrete third-party tool as a requirement; where an external capability is needed, it states the contract that capability satisfies, and any tool meeting the contract serves. The one named tool is git: it is the plan repository's replication substrate, specified against git and no other version control, a recorded decision ([decisions/ADR-0048-git-is-the-replication-substrate.md](./decisions/ADR-0048-git-is-the-replication-substrate.md)).
 
 - [reference/record/](./reference/record/zone-layout.md) — the data model: the zone layout, every file format, every field, every bound. An implementer starts here, because every verb and every check is defined against the data model.
 - [reference/cli/](./reference/cli/conventions.md) — the command surface: global conventions and one contract page per verb under `reference/cli/verbs/`.
@@ -21,17 +21,18 @@ This tree is organised by reader need. A reader finishing a task starts in `guid
 
 - [explanation/charter.md](./explanation/charter.md) — what the product is for, its pillars, and its no-gos.
 - [explanation/overview.md](./explanation/overview.md) — the method in one page. A team lead starts here.
-- [explanation/stories-and-estimation.md](./explanation/stories-and-estimation.md), [explanation/lanes-and-ranking.md](./explanation/lanes-and-ranking.md), [explanation/epics.md](./explanation/epics.md), [explanation/transitions.md](./explanation/transitions.md), [explanation/concurrent-capture.md](./explanation/concurrent-capture.md) — why the record is shaped this way and how to think with it.
+- [explanation/stories-and-estimation.md](./explanation/stories-and-estimation.md), [explanation/lanes-and-ranking.md](./explanation/lanes-and-ranking.md), [explanation/epics.md](./explanation/epics.md), [explanation/initiatives.md](./explanation/initiatives.md), [explanation/transitions.md](./explanation/transitions.md), [explanation/concurrency.md](./explanation/concurrency.md) — why the record is shaped this way and how to think with it.
 - [explanation/host-integration.md](./explanation/host-integration.md) — the single assumption about an adopting project, and the reference doctrine that follows from it.
 - [explanation/architecture.md](./explanation/architecture.md) — the components a conforming implementation needs, by responsibility, never by code structure.
 
 ## Guides — task sequences
 
-- [guides/adopting.md](./guides/adopting.md) — scaffold a zone, fill the charter, land the first story, wire the gates.
+- [guides/adopting.md](./guides/adopting.md) — scaffold the identity and the plan repository, fill the charter, land the first story, prove the gates.
 - [guides/writing-a-story.md](./guides/writing-a-story.md) — from an itch to a gated entry.
 - [guides/running-an-epic.md](./guides/running-an-epic.md) — declare, populate, drive, and close out a goal larger than one story.
+- [guides/running-an-initiative.md](./guides/running-an-initiative.md) — declare, watch, and retire an end state larger than one epic.
 - [guides/wiring-host-docs.md](./guides/wiring-host-docs.md) — connect stories to the host's own documents.
-- [guides/parallel-sessions.md](./guides/parallel-sessions.md) — capture in concurrent sessions and drain the result.
+- [guides/parallel-sessions.md](./guides/parallel-sessions.md) — several agents on one record, and a second machine when you leave the first.
 - [guides/building-wipctl.md](./guides/building-wipctl.md) — the milestone sequence for building the product from zero, with per-milestone acceptance.
 
 ## Decisions

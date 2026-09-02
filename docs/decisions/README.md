@@ -14,6 +14,14 @@ The template is [template.md](./template.md). A filled record is `ADR-<number>-<
 - [ADR-0004](./ADR-0004-an-epic-is-a-field-and-a-document.md) — membership points entry to document; an epic never schedules anything
 - [ADR-0005](./ADR-0005-the-plan-record-stays-in-version-control.md) — plain files versioned with the project; no database, service, or per-user store
 
+### The plan repository
+
+- [ADR-0045](./ADR-0045-the-plan-record-lives-in-its-own-repository.md) — one live record per project, its own git repository at a user-level location; supersedes ADR-0005
+- [ADR-0046](./ADR-0046-a-project-is-identified-by-a-minted-slug.md) — `project_id` is a minted slug resolved through the attachment registry; supersedes ADR-0008
+- [ADR-0048](./ADR-0048-git-is-the-replication-substrate.md) — one plan trunk, push as backup, semantic reconciliation; supersedes ADR-0036
+- [ADR-0049](./ADR-0049-a-plan-change-and-a-code-change-are-no-longer-one-commit.md) — the accepted loss: explicit code references and a same-unit-of-review obligation
+- [ADR-0057](./ADR-0057-a-plan-mutation-is-always-committed.md) — one mutation, one commit, in the plan trunk's grammar; supersedes ADR-0022
+
 ### Configuration and discovery
 
 - [ADR-0006](./ADR-0006-the-config-is-required-validated-and-has-no-defaults.md) — `.wipctl.toml` is required and validated, and no key has a default
@@ -31,6 +39,7 @@ The template is [template.md](./template.md). A filled record is `ADR-<number>-<
 - [ADR-0014](./ADR-0014-a-derived-plan-may-be-cached-and-is-never-authoritative.md) — a cached epic plan is rewritten always and read back never
 - [ADR-0015](./ADR-0015-one-verb-resolves-one-epic-and-another-summarises-them-all.md) — `epics` rolls up, `epic <id>` resolves; a new question earns a new verb
 - [ADR-0016](./ADR-0016-an-optional-dependency-never-gates-output.md) — an optional dependency improves output and never gates it
+- [ADR-0050](./ADR-0050-every-message-teaches.md) — a diagnostic that names a failure without naming its resolution is unfinished
 
 ### Rendering
 
@@ -51,6 +60,8 @@ The template is [template.md](./template.md). A filled record is `ADR-<number>-<
 
 - [ADR-0026](./ADR-0026-a-counter-is-forbidden-where-allocation-is-concurrent.md) — no counter allocates a record id; the gate reports collisions between claimants in one record
 - [ADR-0027](./ADR-0027-an-entry-is-named-by-its-filename-stem.md) — an id is `<slug>-<uid>` and lives as the filename stem
+- [ADR-0051](./ADR-0051-the-slug-is-the-id.md) — the slug is the whole id, checked under the lock; nothing random is minted; supersedes ADR-0030
+- [ADR-0052](./ADR-0052-a-title-and-its-id-always-match.md) — `id == slugify(title)` is an invariant, and `rename` is the operation that changes both
 
 ### Concurrent capture
 
@@ -60,6 +71,11 @@ The template is [template.md](./template.md). A filled record is `ADR-<number>-<
 - [ADR-0031](./ADR-0031-a-position-names-only-a-landed-entry.md) — `after` names a landed entry only; a fragment target is drift
 - [ADR-0032](./ADR-0032-landing-is-a-creation-not-a-transition.md) — landing writes no journal event; a journal begins at the first `move`
 - [ADR-0038](./ADR-0038-capture-disjointness-holds-outside-collision.md) — the no-conflict merge holds outside a uid collision; recovery is re-minting one side
+
+### Concurrency
+
+- [ADR-0047](./ADR-0047-the-writer-lock-is-per-project-per-machine.md) — the transaction lock spans every checkout of a project on a machine; supersedes ADR-0025
+- [ADR-0053](./ADR-0053-taking-work-is-a-verb-of-its-own.md) — `start` reads and takes atomically; `next` stays read-only
 
 ### The host and the doctrine
 
@@ -73,10 +89,16 @@ The template is [template.md](./template.md). A filled record is `ADR-<number>-<
 - [ADR-0036](./ADR-0036-the-program-speaks-git-and-no-other-vcs.md) — the program speaks git in one opt-in place and no other version control ever
 - [ADR-0039](./ADR-0039-the-repository-is-self-contained.md) — every load-bearing fact lives in-repo; an outbound link is a citation and never a prerequisite
 
+### Initiatives
+
+- [ADR-0054](./ADR-0054-an-initiative-is-a-document-and-a-pointer.md) — one document plus a pointer from the epic; the ladder stops at three tiers; amends ADR-0004
+- [ADR-0055](./ADR-0055-an-epic-declares-its-initiative-in-its-document.md) — an `Initiative` section holding one id or `None`, first in the epic shape
+- [ADR-0056](./ADR-0056-an-initiative-is-reported-never-executed.md) — the decomposition is one row per member epic; execution stays the epic verb's answer
+
 ### Release and distribution
 
 - [ADR-0040](./ADR-0040-crates-io-trusted-publishing.md) — a release run mints its own registry credential; no publishing secret exists between releases
 
 ## Statuses
 
-`Ideation`, `Proposed`, `Accepted`, `Implemented`, `Deprecated`, `Superseded`, `Rejected`. Every record in this set is `Accepted`.
+`Ideation`, `Proposed`, `Accepted`, `Implemented`, `Deprecated`, `Superseded`, `Rejected`. Every record in this set is `Accepted` or `Superseded`; a superseded record keeps its body and names its successor under `Status`.

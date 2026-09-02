@@ -7,25 +7,27 @@ One YAML file per lane under `lanes/`. The file is the lane: there is no `status
 ```yaml
 lane: todo
 stories:
-  - id: rate-limit-the-search-endpoint-a7f3
+  - id: rate-limit-the-search-endpoint
     type: story
     points: 2
     summary: "Callers of the search endpoint are limited per token, and the limit is announced in the response headers rather than discovered by being cut off."
-    needs: [secure-session-storage-9c2e]
-    epic: session-hardening-c4d1
+    needs: [secure-session-storage]
+    epic: session-hardening
 ```
 
 `lane` MUST equal the file's basename. `stories` is a sequence ordered highest priority first; an empty lane MUST declare `stories: []`.
 
 ## Entry fields
 
-- `id` — REQUIRED. `<slug>-<uid>` per [ids.md](./ids.md). The id is the story document's filename stem; the agreement is checked in both directions. MUST be unique across every lane, every epic, and every tombstone.
+- `id` — REQUIRED. The title's slug per [ids.md](./ids.md). The id is the story document's filename stem; the agreement is checked in both directions. MUST be unique across every lane, every epic, every initiative, and every tombstone.
 - `type` — REQUIRED. `story`, `spike`, or `chore`. Decides the worked-example gate: a `story` or `spike` MUST carry a fenced block under its `Example` heading; a `chore` need not.
 - `points` — REQUIRED. `1`, `2`, or `3`. `1`: confirmation only — named tests settle acceptance, at most one unchanged contract involved. `2`: one judgment — an interface, name, message, or existing contract needs human reasoning. `3`: two judgments, or one hard to reverse, such as a schema or a security control. `4` is not a value; work above three splits along the judgments its acceptance already names.
 - `summary` — REQUIRED. MUST be one double-quoted line of 60 to 400 characters with no leading or trailing whitespace. A restatement of the story for a reader scanning the lane, never a second specification. The summary says what the work is; `note` says how the entry is being handled.
 - `needs` — OPTIONAL. One-line flow sequence of unique ids this entry depends on. The only sequencing fact the record stores.
-- `epic` — OPTIONAL. One id naming an existing document under `epics/`. A gated reference and a membership claim; never a dependency, never a sequencing fact.
+- `epic` — OPTIONAL. One id naming an existing document under `epics/`. A gated reference and a membership claim; never a dependency, never a sequencing fact. Membership above the epic is the epic document's own claim, never the entry's: an entry names its epic and nothing higher ([documents.md](./documents.md)).
 - `tags` — OPTIONAL. One-line flow sequence of unique slugs. Nothing gates on a tag.
+- `branch` — OPTIONAL. The code branch carrying the entry's work, in the host repository or wherever the work lives. A code reference the record states because plan and code no longer share commits; opaque to every check beyond shape, because the record cannot verify another repository.
+- `delivered` — OPTIONAL, `closed.yml` only. The commit that delivered the work, as its identifier in the host's version control. The same standing as `branch`: stated, searchable, and never verified.
 - `outcome` — REQUIRED in `closed.yml`, and MUST NOT appear elsewhere. `done`, `cut`, or `reshaped`.
 - `closed` — REQUIRED in `closed.yml`, and MUST NOT appear elsewhere. ISO date (`YYYY-MM-DD`); the velocity source.
 - `succeeded_by` — REQUIRED exactly when `outcome` is `reshaped`, and MUST NOT appear otherwise. One id.

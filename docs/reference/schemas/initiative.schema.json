@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Initiative decomposition",
+  "description": "One initiative decomposed into its member epics, as `wipctl initiative <id> --json` emits it. One row per member epic, each carrying the epic's own arithmetic; deliberately not an execution plan — entries are the epic verb's answer, and this payload never resolves them. Derived from the record on every call and stored nowhere, so a payload that disagrees with the record is stale rather than authoritative.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "closed_points", "total_points", "open", "epics"],
+  "properties": {
+    "id": { "$ref": "#/$defs/id" },
+    "closed_points": {
+      "description": "Points delivered across every member epic. The member epics' numbers summed; one implementation computes all three tiers.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "total_points": {
+      "description": "Points promised across every member epic, a cut member included.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "open": {
+      "description": "Members not yet closed, across every member epic. Never a completion verdict: closed out is not done.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "epics": {
+      "description": "One row per epic whose Initiative section names this document, in id order. Membership is searched from the epic documents; the initiative document holds no member list.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "closed_points", "total_points", "open"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "closed_points": { "type": "integer", "minimum": 0 },
+          "total_points": { "type": "integer", "minimum": 0 },
+          "open": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "The title's slug, shared across stories, epics, initiatives, and questions, so one id names one thing."
+    }
+  }
+}

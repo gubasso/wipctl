@@ -7,9 +7,10 @@ Declare, drive, and retire a goal larger than one story. Why an epic is shaped t
 Inputs: none.
 
 1. Apply the test first: open an epic when a split produced pieces whose shared end state is invisible from any one of them. Two stories rarely qualify. Do not open: a renamed story with one member; a container before the split exists; an epic carrying acceptance criteria; an epic per release or per quarter.
-2. Mint an id from the shared namespace and write `epics/<id>.md` in the epic shape. The document lists no members, carries no status, and has no parent.
-3. Write the end state, not a summary; make `Example` a simulation — what is true today against what is true at the end; make `Done when` observable, never "every member closed" — where the host keeps rule ids, cite the ids whose verification commands must pass.
-4. Put the id in each serving entry's `epic` field.
+2. Mint an id from the shared namespace — the title's slug — and write `epics/<id>.md` in the epic shape. The document lists no members and carries no status.
+3. Fill the `Initiative` section first: the id of the initiative this epic serves, or `None` — the section is never left empty, and a named id must resolve to a document under `initiatives/` ([running-an-initiative.md](./running-an-initiative.md)).
+4. Write the end state, not a summary; make `Example` a simulation — what is true today against what is true at the end; make `Done when` observable, never "every member closed" — where the host keeps rule ids, cite the ids whose verification commands must pass.
+5. Put the id in each serving entry's `epic` field.
 
 Outputs of this phase:
 

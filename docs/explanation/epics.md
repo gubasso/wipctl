@@ -7,7 +7,7 @@ An epic is an end state no single story delivers: one document under `epics/`, p
 1. One-way membership. Entries point at the epic; the document lists no members. A member list would be a second store of the same fact, drifting the moment an entry changes.
 2. Shared id space. Epic ids and entry ids draw from one namespace; one id names one thing.
 3. Gated reference. An entry's `epic` field must name an existing document — unlike a `tag`, which nothing gates.
-4. Never a dependency. An epic never appears in `needs`, never sequences members, and has no parent. Nesting is how a plan becomes a filing system.
+4. Never a dependency, and one optional parent. An epic never appears in `needs` and never sequences members. It may name the one initiative it serves — in its own document, nothing deeper ([initiatives.md](./initiatives.md)) — and the ladder stops there, because unbounded nesting is how a plan becomes a filing system.
 
 ## Completion is derived
 

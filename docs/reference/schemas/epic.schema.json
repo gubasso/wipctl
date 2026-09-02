@@ -36,8 +36,8 @@
   "$defs": {
     "id": {
       "type": "string",
-      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-[0-9a-f]{4}$",
-      "description": "The title's slug plus four lowercase hexadecimal characters, shared across stories and epics so one id names one thing."
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "The title's slug, shared across stories, epics, initiatives, and questions, so one id names one thing."
     },
     "entry": {
       "type": "object",
@@ -49,9 +49,9 @@
         "points": { "type": "integer", "minimum": 1, "maximum": 3 },
         "lane": { "enum": ["backlog", "todo", "doing", "review", "closed"] },
         "path": {
-          "description": "The story document, relative to the project root, so a consumer joins it to a root it already knows.",
+          "description": "The story document, as an absolute path, because the plan repository does not live under the working directory a consumer resolves from.",
           "type": "string",
-          "pattern": "^[^/].*\\.md$"
+          "pattern": "\\.md$"
         },
         "needs": {
           "description": "The ids this entry is still waiting on. Empty on every eligible entry, by construction.",

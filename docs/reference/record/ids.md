@@ -1,34 +1,64 @@
 # Ids
 
-One id names one thing — a story, an epic, or a question — across the whole record, for the whole life of the record.
+One id names one thing — a story, an epic, an initiative, or a question — across the whole record, for the whole life of the record.
 
 ## Grammar
 
+The id is the title's slug, and nothing else:
+
 ```text
-<slug>-<uid>
+[a-z0-9]+(-[a-z0-9]+)*
 ```
 
-- `slug` — the title in lowercase kebab: `[a-z0-9]+(-[a-z0-9]+)*`. Punctuation, capitals, and runs of spaces normalise away.
-- `uid` — exactly four lowercase hexadecimal characters: `[0-9a-f]{4}`.
+Examples: `rate-limit-the-search-endpoint`, `session-hardening`, `trustworthy-by-default`. Question ids carry the same grammar behind a fixed prefix: `Q-<slug>`, for example `Q-what-identifies-a-caller`.
 
-Examples: `rate-limit-the-search-endpoint-a7f3`, `session-hardening-c4d1`.
+## Slugification, stated once
 
-Question ids carry the same grammar behind a fixed prefix: `Q-<slug>-<uid>`, for example `Q-may-a-position-name-a-fragment-1d55`.
+One function turns a title into its id, specified here and used by the mint, by `rename`, and by the gate — three consumers computing the same string three ways is how an id and a title come to disagree in a system that claims they cannot:
+
+```text
+1. lowercase
+2. apostrophes are removed rather than hyphenated      don't -> dont
+3. every other run of characters outside a-z0-9 becomes a single hyphen
+4. leading and trailing hyphens are trimmed
+```
+
+## A title and its id always match
+
+An id is the slug of its title, always: `id == slugify(title)` for a story, an epic, an initiative, and a question. The two can never disagree, so changing a title changes the id, and that is a supported operation with its own verb ([../cli/verbs/rename.md](../cli/verbs/rename.md)), never a drift a reader has to tolerate. The document title line `# <id> — <short title>` is therefore an invariant the checker verifies, not a repetition (see [documents.md](./documents.md)).
 
 ## The id is the filename
 
-A story's document is `stories/<id>.md`; an epic's is `epics/<id>.md`; a journal is `journal/<id>.tsv`; a fragment is `pending/<id>.yml`. The filename stem and the id are one fact, checked against each other in both directions. A story or epic document's title line MUST repeat the id: `# <id> — <short title>` — the same pattern as `lane:` repeating the lane file's basename, so a document read in isolation still says what it is.
+A story's document is `stories/<id>.md`; an epic's is `epics/<id>.md`; an initiative's is `initiatives/<id>.md`; a journal is `journal/<id>.tsv`; a fragment is `pending/<id>.yml`. The filename stem and the id are one fact, checked against each other in both directions. Because the id is the slug, filenames are guessable: an agent that knows a title knows the path.
 
 ## Opacity
 
-A consumer MUST NOT parse an id into parts. The record library, the checker, the schemas, and shell completion all treat the id as one token. The id carries no order, no date, no rank, and no meaning in its interior; anything that wants the title reads the document. The one stated exemption is the drain's tie-break, which reads the trailing uid when two captures state the same instant ([../cli/verbs/land.md](../cli/verbs/land.md)).
+A consumer MUST NOT parse an id into parts. The record library, the checker, the schemas, and shell completion all treat the id as one token. The id carries no order, no date, no rank, and no meaning in its interior; anything that wants the title reads the document. There is no exemption: the drain's residual tie-break compares the full id lexically as one string ([../cli/verbs/land.md](../cli/verbs/land.md)).
 
-## Allocation is unobservable
+## The mint checks under the lock
 
-A mint reads nothing, locks nothing, and waits for nothing: it slugs the title and draws four hex characters from a source of randomness. Two sessions in two clones with no shared state cannot ask each other what the next id is, because nobody asks anything. A collision is surfaced, never prevented by the mint: claimants that coexist in one record are named by the id-uniqueness check, while two clones capturing one id collide on the same paths and surface as a version-control add/add conflict, resolved by keeping one capture's document and fragment together and re-minting the other whole (see [../../explanation/concurrent-capture.md](../../explanation/concurrent-capture.md)). On collision the uid MUST be re-minted, never incremented; an incremented uid is a counter.
+Allocation on a machine is observable: one live record sits behind one transaction lock, so a mint MUST read the record it is about to write into — the live entries and every tombstone — inside the lock, and MUST refuse a taken or burned id before the first byte, naming the holder and the resolution:
 
-A counter MUST NOT be used anywhere allocation is concurrent. The one excluded case is the decision record sequence (`ADR-NNNN`), which is allocated serially by one person merging one decision at a time.
+```text
+$ wipctl new story "Rate limit the search endpoint"
+wipctl: id rate-limit-the-search-endpoint is taken by an entry in todo
+wipctl: rephrase the title, or pass --id rate-limit-the-search-endpoint-v2
+```
+
+Rephrasing is the expected resolution: two titles that slug identically usually want different names anyway. A qualifying postfix — a number, `v2`, anything that distinguishes — is the fallback when the title is genuinely right as written, and it is passed, never guessed: the tool MUST NOT append a postfix on the operator's behalf, because a qualifying postfix is a naming judgment and no id is chosen by a machine (`new --id`, and `rename` with an explicit id, both mint through the same checks).
+
+A counter is still forbidden where allocation is concurrent (ADR-0026): within a machine the lock makes allocation serial, so a qualifying numeric postfix is legal there; between machines allocation is still concurrent, and two machines can mint the same slug. That collision is surfaced by reconciliation, never prevented — `sync` reports it naming both sides, and the recovery is to rephrase one title and re-capture it, keeping that capture's document and fragment together as a pair ([../cli/verbs/sync.md](../cli/verbs/sync.md)).
+
+The one excluded counter is the decision record sequence (`ADR-NNNN`), allocated serially by one person merging one decision at a time.
 
 ## Burned ids
 
-A deleted entry leaves a tombstone: a journal whose last event targets `deleted` (see [transition-journal.md](./transition-journal.md)). The id is burned — an entry, epic, or fragment claiming an id a tombstone holds is a validation failure naming both sides. Burning is what makes "one id names one thing" hold across the record's whole life rather than only its present.
+A deleted entry leaves a tombstone: a journal whose last event targets `deleted`; a renamed entry leaves one whose last event targets `renamed` (see [transition-journal.md](./transition-journal.md)). The id is burned for the life of the record — an entry, epic, initiative, or fragment claiming an id a tombstone holds is a failure naming both sides, and the mint refuses it at capture time in the same words as any other taken id:
+
+```text
+$ wipctl new story "Fix the parser"
+wipctl: id fix-the-parser is held by a tombstone: deleted 2026-08-30
+wipctl: that id is burned for the life of the record; rephrase the title
+```
+
+Burning is decided on a mechanical basis, not a philosophical one: a tombstone occupies the id-named path `journal/<id>.tsv`, so releasing the slug would mean deleting the tombstone — losing the fact that a deletion happened — or relocating tombstones out of the id-named path, a storage change made to buy back a title somebody can simply rephrase. Burning is what makes "one id names one thing" hold across the record's whole life rather than only its present.

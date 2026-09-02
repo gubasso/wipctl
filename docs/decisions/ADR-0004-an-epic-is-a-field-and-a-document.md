@@ -23,3 +23,5 @@ Chosen option: a field and a document — membership points one way and nothing 
 ## Status
 
 Accepted
+
+Amended by ADR-0054 — an epic may name one parent initiative; nesting stays bounded at three tiers.

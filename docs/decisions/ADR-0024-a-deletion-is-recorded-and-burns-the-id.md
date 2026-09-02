@@ -23,3 +23,5 @@ Chosen option: recorded deletion with a burned id — the record never loses the
 ## Status
 
 Accepted
+
+Amended by ADR-0052 — a rename burns the old id the same way a deletion does, through a tombstone whose final event destination is `renamed`.

@@ -10,8 +10,8 @@
     "properties": {
       "id": {
         "type": "string",
-        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-[0-9a-f]{4}$",
-        "description": "The title's slug plus four lowercase hexadecimal characters, shared across stories and epics so one id names one thing."
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+        "description": "The title's slug, shared across stories, epics, initiatives, and questions, so one id names one thing."
       }
     }
   }

@@ -5,7 +5,7 @@ The five lanes on one screen, derived on every run, never written anywhere.
 ## Usage
 
 ```text
-wipctl board [<plan-dir>]
+wipctl board
 ```
 
 ## Contract
@@ -22,6 +22,6 @@ wipctl board [<plan-dir>]
 ```text
 $ wipctl board
 todo (2)                              doing (1)
-  rate-limit-the-search-endpoint-a7f3   ▸ supervised-child-runtime-b47d
-  profile-composition-e01a ⛓
+  rate-limit-the-search-endpoint   ▸ supervised-child-runtime
+  profile-composition ⛓
 ```

@@ -46,8 +46,8 @@
   "$defs": {
     "id": {
       "type": "string",
-      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-[0-9a-f]{4}$",
-      "description": "The title's slug plus four lowercase hexadecimal characters. The id is the story document's filename stem. No consumer parses its interior."
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "The title's slug — id == slugify(title), always. The id is the story document's filename stem. No consumer parses its interior."
     },
     "slug": {
       "type": "string",
@@ -83,6 +83,10 @@
           "uniqueItems": true,
           "description": "Free board labels. Nothing gates on a tag."
         },
+        "branch": {
+          "type": "string",
+          "description": "The code branch carrying this entry's work — an explicit cross-reference, because plan and code no longer share commits. Opaque to every check beyond shape: the record cannot verify another repository."
+        },
         "outcome": {
           "enum": ["done", "cut", "reshaped"],
           "description": "Required in closed.yml and forbidden elsewhere."
@@ -91,6 +95,10 @@
           "type": "string",
           "format": "date",
           "description": "Required in closed.yml and forbidden elsewhere; used to derive velocity."
+        },
+        "delivered": {
+          "type": "string",
+          "description": "The commit that delivered the work, as its identifier in the host's version control. Meaningful in closed.yml only, like outcome and closed; the same standing as branch — stated, searchable, never verified."
         },
         "succeeded_by": {
           "$ref": "#/$defs/id",

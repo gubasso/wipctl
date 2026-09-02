@@ -22,4 +22,6 @@ Chosen option: an exclusive lock on the plan zone, writers only — the lost upd
 
 ## Status
 
-Accepted
+Superseded
+
+Superseded by ADR-0047 — the writer lock is per project per machine and protects a transaction.

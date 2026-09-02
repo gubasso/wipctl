@@ -5,7 +5,7 @@ Age, dwell, and rework per entry, folded from the transition journal — record 
 ## Usage
 
 ```text
-wipctl flow [--lane <lane>] [<plan-dir>]
+wipctl flow [--lane <lane>]
 ```
 
 ## Measures
@@ -29,9 +29,9 @@ wipctl flow [--lane <lane>] [<plan-dir>]
 
 ```text
 $ wipctl flow
-supervised-child-runtime-b47d        3d   1d   1
-secure-session-storage-9c2e          6d   2d   0
-proxy-guide-53c9                     unmeasured: no journal
+supervised-child-runtime        3d   1d   1
+secure-session-storage          6d   2d   0
+proxy-guide                     unmeasured: no journal
 ```
 
 ## Out of scope

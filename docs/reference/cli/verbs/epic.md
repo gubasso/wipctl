@@ -5,10 +5,10 @@ Resolves one epic into its execution plan: what serves it, what those entries wa
 ## Usage
 
 ```text
-wipctl epic [--json] [--write] [<epic-id>] [<plan-dir>]
+wipctl epic [--json] [--write] [<epic-id>]
 ```
 
-An argument matching the id grammar is the epic id; any other non-flag argument is the plan directory; a third positional is exit 2. `--help` prints usage on stdout, exit 0.
+At most one positional; a second is exit 2. `--help` prints usage on stdout, exit 0, and names the verb's two neighbours: `epics`, the rollup over every epic, and `initiative`, the tier above this one.
 
 ## With no id — the listing
 
@@ -16,7 +16,7 @@ Lists the epic ids, one `<id>` per line; with `--json`, an array conforming to `
 
 ## With an id — the resolution
 
-An unknown id is exit 2, naming the directory searched — a bad invocation, not a failed check.
+An unknown id is exit 2, naming the directory searched and the listing that shows what exists — a bad invocation, not a failed check.
 
 Resolution semantics, the load-bearing contract:
 
@@ -27,18 +27,18 @@ Resolution semantics, the load-bearing contract:
 - The resolution MUST be derived on every call and stored nowhere.
 
 ```text
-$ wipctl epic session-hardening-c4d1
-session-hardening-c4d1   6/13 pts   4 open
+$ wipctl epic session-hardening
+session-hardening   6/13 pts   4 open
 
 eligible now
-  rate-limit-the-search-endpoint-a7f3  story  2  todo  docs/plan/stories/rate-limit-the-search-endpoint-a7f3.md
-  harden-the-proxy-defaults-90ce       story  2  backlog  docs/plan/stories/harden-the-proxy-defaults-90ce.md  serves no epic
+  rate-limit-the-search-endpoint  story  2  todo  ~/.local/share/wipctl/projects/payments-acme/plan-repo/stories/rate-limit-the-search-endpoint.md
+  harden-the-proxy-defaults       story  2  backlog  ~/.local/share/wipctl/projects/payments-acme/plan-repo/stories/harden-the-proxy-defaults.md  serves no epic
 
 blocked
-  profile-composition-e01a  story  3  backlog  docs/plan/stories/profile-composition-e01a.md  needs rate-limit-the-search-endpoint-a7f3
+  profile-composition  story  3  backlog  ~/.local/share/wipctl/projects/payments-acme/plan-repo/stories/profile-composition.md  needs rate-limit-the-search-endpoint
 ```
 
-An empty group prints no heading. Header arithmetic: `done` delivers its own points; `cut` contributes nothing and stays in the total; a reopened member counts as open. A `reshaped` member delivers its own points exactly when its `succeeded_by` entry is closed `done` — one link is followed, never more, so a successor that is open, `cut`, reopened, or itself `reshaped` leaves the member undelivered. A successor that is itself a member counts separately as itself; the one-link rule is what keeps the two contributions distinct.
+An empty group prints no heading. Header arithmetic: `done` delivers its own points; `cut` contributes nothing and stays in the total; a reopened member counts as open. A `reshaped` member delivers its own points exactly when its `succeeded_by` entry is closed `done` — one link is followed, never more, so a successor that is open, `cut`, reopened, or itself `reshaped` leaves the member undelivered. A successor that is itself a member counts separately as itself; the one-link rule is what keeps the two contributions distinct. The same implementation computes `epics` and the initiative tier's numbers, so a number cannot appear twice with two values.
 
 ## `--json`
 
@@ -46,4 +46,4 @@ The resolution as an object conforming to `epic.schema.json`, on stdout.
 
 ## `--write`
 
-Writes the JSON payload (regardless of `--json`) to the user cache and prints only that path: `<user-cache>/wipctl/<project-basename>-<digest-of-root-path>/epic-<id>.json`. The digest keeps two same-named projects apart. The cache is not a store: rewritten every call, read back by no verb, required by no check, never committed; a missing, stale, or corrupt cache MUST change no answer and fail nothing.
+Writes the JSON payload (regardless of `--json`) to `$XDG_CACHE_HOME/wipctl/projects/<project_id>/epic-<id>.json` and prints only that path. The cache is not a store: rewritten every call, read back by no verb, required by no check, never committed; a missing, stale, or corrupt cache MUST change no answer and fail nothing.

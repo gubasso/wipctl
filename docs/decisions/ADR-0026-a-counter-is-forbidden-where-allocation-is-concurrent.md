@@ -25,3 +25,5 @@ Chosen option: no counter, unobservable allocation — identity needs no coordin
 Accepted
 
 Amended by ADR-0038 — the gate names claimants that coexist in one record; a same-path collision between clones surfaces as a version-control conflict, resolved by re-minting one capture whole.
+
+Amended by ADR-0051 — a qualifying postfix is legal where the lock makes allocation serial; between machines allocation stays concurrent and a collision is surfaced, never prevented.

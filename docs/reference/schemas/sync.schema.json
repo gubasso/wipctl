@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Sync report",
+  "description": "One replication round, as `wipctl sync --json` emits it: what was fetched, what reconciled, whether the trunk was pushed, and every conflict a person still has to decide. A conflict stops the push; the report names both sides so the decision can be made without re-deriving either.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fetched", "reconciled", "pushed", "conflicts"],
+  "properties": {
+    "fetched": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Commits fetched from the remote's plan trunk. Zero when the remote had not advanced."
+    },
+    "reconciled": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Disjoint changes combined semantically — captures, and transitions of different entries. Textual merging is never performed."
+    },
+    "pushed": {
+      "type": "boolean",
+      "description": "Whether the fast-forward push happened. False when a conflict stopped it, or when the push was rejected because another replica advanced meanwhile."
+    },
+    "conflicts": {
+      "type": "array",
+      "description": "The facts a machine cannot decide, one object each, empty when the round was clean.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "here", "remote"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "description": "The entry both sides speak about."
+          },
+          "kind": {
+            "enum": ["transition", "id"],
+            "description": "transition: the same entry transitioned on both sides, decided by `wipctl resolve`. id: two captures minted the same slug, recovered by rephrasing one title and re-capturing it."
+          },
+          "here": {
+            "$ref": "#/$defs/side",
+            "description": "This machine's side of the conflict."
+          },
+          "remote": {
+            "$ref": "#/$defs/side",
+            "description": "The remote's side of the conflict."
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "side": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fact"],
+      "properties": {
+        "fact": {
+          "type": "string",
+          "description": "One side of the disagreement, in the same words the terminal report prints — a transition with its instant and outcome, or the claimed path. Prose for a person; the kind field is what a consumer branches on."
+        }
+      }
+    }
+  }
+}

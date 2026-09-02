@@ -1,8 +1,8 @@
 # Adopting wipctl
 
-The sequence that puts a validated plan zone in your project. It assumes only what the method assumes: your project has a documentation directory.
+The sequence that gives your project a validated plan: one identity file in your repository, and a plan repository of its own on this machine. It assumes only what the method assumes: your project can carry one committed file at its root.
 
-## 1 — Install and choose the zone
+## 1 — Install and scaffold
 
 Inputs: none.
 
@@ -12,48 +12,58 @@ Inputs: none.
    $ wipctl version
    ```
 
-2. Decide where the zone lives. There is no default; `docs/plan` is only the most common answer. The zone can sit at any depth inside your documentation directory.
-
-Outputs of this phase:
-
-```text
-<PLAN_DIR> — the zone path, relative to the project root; recorded in .wipctl.toml by the scaffold
-```
-
-## 2 — Scaffold
-
-Inputs: `<PLAN_DIR>` (§1).
-
-1. Preview, then scaffold:
+2. Preview, then scaffold, at the project root:
 
    ```text
-   $ wipctl init --plan-dir <PLAN_DIR> --dry-run
-   $ wipctl init --plan-dir <PLAN_DIR>
+   $ wipctl init --dry-run
+   $ wipctl init
    ```
 
-   Without the flag and with a terminal, the verb prompts; without a terminal it refuses (exit 2). The scaffold is create-only — a second run writes nothing — and ends with a self-check of the zone it emitted.
+   The scaffold writes into two places: `.wipctl.toml` into your repository — the minted project id, and the only file your repository receives — and the plan repository into this machine's registry slot, with its zone, its config, its hook set, and its first commit. It is create-only — a second run writes nothing — and ends with a self-check of the zone it emitted.
 
-2. Note the shipped template location the scaffold prints; the first story starts from it.
+3. Commit `.wipctl.toml`, so every clone and worktree of your project resolves the same plan.
+4. Note the shipped template location the scaffold prints; the first story starts from it.
 
 Outputs of this phase:
 
 ```text
+<PROJECT_ID> — the minted identity; printed by init and recorded in .wipctl.toml
+<PLAN_REPO_PATH> — where the plan lives on this machine; printed by init
 <STORY_TEMPLATE_PATH> — where the shipped story template lives; printed by init
 ```
 
+## 2 — Host the plan, when you want it hosted
+
+Inputs: `<PLAN_REPO_PATH>` (§1).
+
+1. The plan works locally with no remote. When you want backup, replication, or a second machine, create an empty repository at any forge — private, public, your choice — and add it as the plan repository's remote.
+2. Push with the tool, not by hand:
+
+   ```text
+   $ wipctl sync
+   ```
+
+3. On any other machine, clone your project and attach its plan:
+
+   ```text
+   $ wipctl attach <plan-repo-url>
+   ```
+
+Outputs: none — every machine now resolves the same record through the same committed id.
+
 ## 3 — Fill the charter
 
-Inputs: none.
+Inputs: `<PLAN_REPO_PATH>` (§1).
 
-1. Open `charter.md` in the zone and replace every angle-bracketed placeholder: what your project is for, its pillars, its no-gos, and its cadence. The cadence also lives in `.wipctl.toml`, where the tool reads it.
+1. Open `charter.md` in the plan repository and replace every angle-bracketed placeholder: what your project is for, its pillars, its no-gos, and its cadence. The cadence also lives in the plan repository's `config.toml`, where the tool reads it.
 
 Outputs: none — the charter is read in review, not by a later phase.
 
 ## 4 — Write the first story
 
-Inputs: `<STORY_TEMPLATE_PATH>` (§2).
+Inputs: `<STORY_TEMPLATE_PATH>` (§1).
 
-1. Either capture it, complete the fragment, and land it:
+1. Capture it, complete the fragment, and land it:
 
    ```text
    $ wipctl new story "<title>" --lane todo
@@ -65,70 +75,45 @@ Inputs: `<STORY_TEMPLATE_PATH>` (§2).
    $ wipctl land
    ```
 
-   or copy the template to `stories/<slug>-<uid>.md`, mint the identity as the template shows, and add its lane entry to `todo.yml` by hand.
-
 2. Fill the document; [writing-a-story.md](./writing-a-story.md) is the sequence.
 
 Outputs of this phase:
 
 ```text
-<FIRST_STORY_ID> — the new entry's id; the filename stem of the story document
+<FIRST_STORY_ID> — the new entry's id: the title's slug, and the filename stem of the story document
 ```
 
 ## 5 — Gate the record
 
 Inputs: `<FIRST_STORY_ID>` (§4).
 
-1. Validate — it runs from anywhere inside the project, and the `schemas:` line names which halves ran:
+1. Validate — it runs from anywhere inside your project, and the `schemas:` line names which halves ran:
 
    ```text
    $ wipctl validate
    ```
 
-2. Confirm the record answers:
+2. The record's gates arrived with the plan repository: the scaffold installed its hook set — validation at commit and at push, the heading-shape checks, the single-branch and no-force guards. Confirm they are live:
 
    ```text
-   $ wipctl next
+   $ wipctl doctor
    ```
 
-   It prints `<FIRST_STORY_ID>`.
+3. Prove the gates by breaking something once — a hook that never selected a file is indistinguishable from a passing one. Revert, and the gates are trusted.
+4. Never wire the repair (`fix`) or the drain (`land`) into a hook; no hook invokes a writer.
 
 Outputs: none.
 
-## 6 — Wire the hooks
+## 6 — Start
 
-Inputs: `<PLAN_DIR>` (§1).
+Inputs: none.
 
-1. Emit the hook entries with your zone path substituted — the verb writes nothing:
-
-   ```text
-   $ wipctl init --print-hooks
-   ```
-
-2. Copy them into your hook runner's configuration. Pin the versions, point the schema entries at your installed copies, and register the record gates at both the commit and push stages.
-3. Never wire the repair (`fix`) or the drain (`land`) into a hook; no hook invokes a writer.
-4. Gate the heading shapes:
+1. Take the work atomically:
 
    ```text
-   $ wipctl init --headings-gate
+   $ wipctl start
    ```
 
-   It writes the two required-headings configurations — one per document shape — and prints their hook entries. Precondition: your general lint configuration must not set a required-headings rule at any value, or it would silently override the dedicated files — the verb refuses if it does. Add the epic-shape hook entry only once `epics/` has a file, if your hook runner errors on a pattern matching nothing.
-
-Outputs: none — the wired gates live in your hook runner's configuration.
-
-## 7 — Start, and prove the gates
-
-Inputs: `<FIRST_STORY_ID>` (§4).
-
-1. Start the work:
-
-   ```text
-   $ wipctl move <FIRST_STORY_ID> --to doing
-   ```
-
-   The report shows the per-file deltas, the journal event, and the ranking repair.
-
-2. Prove each gate is live by breaking something once — a hook that never selected a file is indistinguishable from a passing one. Revert, and you are done.
+   It prints `<FIRST_STORY_ID>` and moves it to `doing`, in one transaction. From here the loop is the method's: work it, move it to `review`, close it, and ask again.
 
 Outputs: none.

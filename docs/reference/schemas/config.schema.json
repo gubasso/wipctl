@@ -1,30 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Project config file",
-  "description": "Parameters the tool needs and cannot infer from the record: where the zone sits inside its project, and the window velocity is summed over. The file is .wipctl.toml at the project root, so the root is the directory holding it and nothing is derived. Charter prose states the same cadence for a reader; this file is what a tool reads. No key has a read-time default: a tool finding a required key absent fails its check rather than assuming a value, because a value guessed on a project's behalf is a value nobody wrote down.",
+  "title": "Plan repository config file",
+  "description": "The plan repository's own configuration: config.toml at the zone root. It restates the project's identity and carries every fact about the plan itself — the plan owns its own home, so its cadence and thresholds live with it, not with the host. The host repository's .wipctl.toml carries project_id alone and has no schema: one required key is below a schema's floor, and the cross-file checker owns its presence, grammar, and agreement with this file. No key has a read-time default: a tool finding a required key absent fails its check rather than assuming a value, because a value guessed on a project's behalf is a value nobody wrote down.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "plan_dir": {
-      "$ref": "#/$defs/relative_path",
-      "description": "Path from the project root to this plan zone, relative and without a trailing slash. A project must keep documents somewhere; what that directory is called, how it is organised, and how deep the zone sits inside it are the project's own affair. A common value is docs/plan."
-    },
-    "commit": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["type", "scope"],
-      "description": "Opt-in: present, `wipctl move` commits each transition it performs; absent, it writes the record and commits nothing. Both keys are required whenever the table exists and neither has a default, because a project's commit convention is the project's own.",
-      "properties": {
-        "type": {
-          "description": "The Conventional Commits type the generated message carries.",
-          "enum": ["feat", "fix", "docs", "style", "refactor", "perf", "test", "build", "ci", "chore", "revert"]
-        },
-        "scope": {
-          "type": "string",
-          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*(/[a-z0-9]+(-[a-z0-9]+)*)?$",
-          "description": "The scope the generated message carries. Lowercase kebab-case, at most two levels."
-        }
-      }
+    "project_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "The project this plan repository serves, in the slug grammar. Must equal the host repository's committed project_id; the two are checked against each other at every resolution, so an attach to the wrong repository surfaces as a disagreement between two committed facts."
     },
     "iteration": {
       "type": "object",
@@ -55,16 +39,6 @@
           "description": "The age in days past which an in-flight entry is marked."
         }
       }
-    }
-  },
-  "$defs": {
-    "relative_path": {
-      "type": "string",
-      "description": "One or more path segments joined by a single slash. Absolute paths are rejected because they resolve on one machine only; a trailing slash, an empty segment, and a . or .. segment are rejected because a path a tool joins to another must have exactly one spelling.",
-      "allOf": [
-        { "pattern": "^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*$" },
-        { "not": { "pattern": "(^|/)[.][.]?(/|$)" } }
-      ]
     }
   }
 }

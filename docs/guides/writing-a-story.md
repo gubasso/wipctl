@@ -8,7 +8,7 @@ One phase, from an itch to a gated entry. The heading contract the document must
    $ wipctl new story "<title>"
    ```
 
-   writes the document and its pending fragment, with the entry's `points` and `summary` left absent for you to fill — or copy the shipped template to `stories/<slug>-<uid>.md` with a hand-minted uid (four lowercase hex from any source of randomness; a collision is surfaced — the gate names claimants in one record, and parallel clones collide as a version-control conflict — and re-minted, never prevented).
+   writes the document and its pending fragment, with the entry's `points` and `summary` left absent for you to fill. The id is the title's slug, checked against the live record and every tombstone: a taken or burned id is refused on the spot, and the answer is to rephrase the title (or pass `--id` with a qualifying postfix when the title is right as written). Hand-minting without the tool is the same grammar without the guarantees: slugify the title, confirm nothing live or tombstoned holds the slug, copy the shipped template to `stories/<slug>.md`, and keep the filename and the title line in agreement.
 
 2. Name the outcome, not the mechanism. `Goal` says what becomes true, in the reader's terms.
 3. Show it from the reader's side. `Example` carries concrete values and real output in a fenced block — a description of a transcript is not a transcript.

@@ -22,4 +22,6 @@ Chosen option: generated and opt-in — the commit exists only where the config 
 
 ## Status
 
-Accepted
+Superseded
+
+Superseded by ADR-0057 — a plan mutation is always committed, in the plan trunk's grammar.

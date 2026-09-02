@@ -24,3 +24,5 @@ Chosen option: order by the stated instant — the only candidate that is a reco
 ## Status
 
 Accepted
+
+Amended by ADR-0051 — the residual tie-break reads the whole id, compared lexically; nothing parses an id into parts.

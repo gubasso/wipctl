@@ -14,7 +14,7 @@ One append-only stream per entry: `journal/<id>.tsv`. One event per line, exactl
 
 - Field 1 — the instant, RFC 3339 UTC with `Z`, second precision. One fixed textual form, so lexical order is chronological order and sorting needs no date parsing.
 - Field 2 — the lane left.
-- Field 3 — the lane entered, or the token `deleted`.
+- Field 3 — the lane entered, or a terminal token: `deleted` or `renamed`.
 
 The file is created on the entry's first transition. An entry that never moved has no journal file. Landing a fragment is a creation, not a transition: a landed entry's journal starts at its first move, not at its landing.
 
@@ -29,7 +29,7 @@ Lane files are authoritative for current state and are the reviewable diff. The 
 - A journal for an id in no lane is a failure — unless it is a tombstone.
 - Every line MUST have exactly three non-empty tab-separated fields.
 - Every instant MUST be valid RFC 3339 UTC with `Z` (real calendar date, hour 23 at most, minute 59 at most, second 60 at most for a leap second).
-- Both lane names on an event MUST be real lanes; the destination MAY also be `deleted`.
+- Both lane names on an event MUST be real lanes; the destination MAY also be `deleted` or `renamed`.
 - An event's source MUST NOT equal its destination, and MUST equal the destination of the event above it — a journal is one unbroken path; the first event's source is bound only to be a real lane.
 - An event dated after now is a failure. An event preceding the one above it is a warning.
 - The last event's lane MUST equal the entry's lane. For an entry in `closed`, the last event MUST enter `closed` and its day MUST equal the entry's `closed:` date.
@@ -41,7 +41,7 @@ Lane files are authoritative for current state and are the reviewable diff. The 
 
 ## Tombstones
 
-A deleted entry keeps nothing but its journal. The final event's destination is `deleted`; such a journal is a tombstone. A tombstone is exempt from the id-in-no-lane failure and from the lane-agreement invariant, and is held to every other journal rule. The id it holds is burned; see [ids.md](./ids.md).
+A journal whose final event's destination is `deleted` or `renamed` is a tombstone. A deleted entry keeps nothing but its tombstone. A renamed entry travels whole to its new id — document, journal, fragment, history — and leaves a fresh one-line tombstone at the old id, whose event's destination is `renamed` (see [../cli/verbs/rename.md](../cli/verbs/rename.md)). A tombstone is exempt from the id-in-no-lane failure and from the lane-agreement invariant, and is held to every other journal rule. In either case the id the tombstone holds is burned; see [ids.md](./ids.md).
 
 ## What the journal does not record
 

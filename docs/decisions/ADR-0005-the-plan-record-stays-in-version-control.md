@@ -21,4 +21,6 @@ Chosen option: plain files versioned with the project — a clone carries the wh
 
 ## Status
 
-Accepted
+Superseded
+
+Superseded by ADR-0045 — the plan record lives in its own per-project repository.

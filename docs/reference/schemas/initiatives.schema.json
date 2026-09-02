@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Initiative rollup",
+  "description": "Every initiative a record holds, with what it has delivered against what it promised, as `wipctl initiatives --json` emits it — the epics rollup one tier up. Derived on every call and stored nowhere. It names no members: the member epics are the decomposition's answer, described by initiative.schema.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["initiatives"],
+  "properties": {
+    "initiatives": {
+      "description": "One entry per document under initiatives/, in id order. An initiative no epic has joined appears at zero rather than being omitted.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "closed_points", "total_points", "open", "closed_out"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "description": "The title's slug, shared across stories, epics, initiatives, and questions, so one id names one thing."
+          },
+          "closed_points": {
+            "description": "Points delivered. The member epics' numbers summed; one implementation computes all three tiers, so a number cannot appear twice with two values.",
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_points": {
+            "description": "Points promised across every member epic, a cut member included.",
+            "type": "integer",
+            "minimum": 0
+          },
+          "open": {
+            "description": "Members not yet closed, across every member epic.",
+            "type": "integer",
+            "minimum": 0
+          },
+          "closed_out": {
+            "description": "True when nothing remains open in any member epic. Deliberately not a claim that the initiative is done: closed out is not done, which is why the document carries Done when. Nothing derives a retirement decision from it.",
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

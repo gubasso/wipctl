@@ -24,3 +24,5 @@ Chosen option: the conditional guarantee with re-mint recovery — the disjointn
 Accepted
 
 Amends ADR-0028 — the no-conflict merge consequence is conditional on no uid collision, with re-minting as the recovery.
+
+Amended by ADR-0051 — the collision case survives in a new shape: two machines minting one slug, surfaced at sync as a conflict naming both sides, recovered by rephrasing one title.

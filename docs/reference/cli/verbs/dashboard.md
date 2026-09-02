@@ -5,7 +5,7 @@ Four panels, one screen, each titled by the reader's question. Pure composition:
 ## Usage
 
 ```text
-wipctl dashboard [<plan-dir>]
+wipctl dashboard
 ```
 
 ## Contract
@@ -18,3 +18,4 @@ wipctl dashboard [<plan-dir>]
 - Two layouts, one breakpoint at 100 columns read from the terminal size; below it panels stack.
 - A panel whose owning verb reports unknown MUST render that reason in its place rather than being omitted — one degraded panel never degrades the other three.
 - The verb MUST NOT write to disk. Empty record: four panels at zero, exit 0.
+- The panel set is deliberately unchanged by the initiative tier: the scope panel stays the epic rollup, and no fifth panel exists. The dashboard is one screen whose value is that it fits, and a tier most projects will not use does not cost a panel in every project that does not (`initiatives` is the rollup for projects that do).

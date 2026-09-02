@@ -21,4 +21,6 @@ Chosen option: git and no other — one interface, invoked in exactly one opt-in
 
 ## Status
 
-Accepted
+Superseded
+
+Superseded by ADR-0048 — git is the plan repository's replication substrate.

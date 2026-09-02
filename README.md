@@ -1,8 +1,8 @@
 # wipctl
 
-wipctl is a planning method and the tooling that proves a project's plan record obeys it, shipped together and judged as one. The method plans with bounded stories, judgment-counting points, five lanes, and recorded transitions. The tooling is one command, `wipctl`, that scaffolds a plan zone, answers what to start next, validates the record, moves entries between lanes as recorded events, mints identities for concurrent capture, lands captured work, and renders the record as terminal views.
+wipctl is a planning method and the tooling that proves a project's plan record obeys it, shipped together and judged as one. The method plans with bounded stories, judgment-counting points, five lanes, and recorded transitions. The tooling is one command, `wipctl`, that scaffolds a project's plan, answers what to start next, takes work atomically, validates the record, moves entries between lanes as recorded events, captures and lands new work, replicates the plan between machines, and renders the record as terminal views.
 
-A project adopts wipctl by answering one question: where should the plan zone live. The zone is a directory of plain files inside the project's own documentation directory — five lane files, one document per story, one per epic, a charter, open questions, a transition journal, and an on-demand capture directory. The single assumption about the adopting project is that such a documentation directory exists; everything else belongs to the project.
+A project's plan lives in a plan repository of its own — a plain git repository holding five lane files, one document per story, epic, and initiative, a charter, open questions, a transition journal, and an on-demand capture directory — shared by every worktree and clone of the project on a machine, and hosted wherever its operator chooses. The project itself carries exactly one committed file, `.wipctl.toml`, naming its identity; that file is the entire footprint, and everything else belongs to the project.
 
 ## Install
 

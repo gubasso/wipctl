@@ -7,16 +7,16 @@
 One `##` section per question:
 
 ```markdown
-## Q-may-a-position-name-a-fragment-1d55 — May a fragment's position name another fragment?
+## Q-may-a-position-name-a-fragment — May a fragment's position name another fragment?
 
 Raised: 2026-08-14
 
-Blocks: land-the-capture-queue-9b21, drain-reports-drift-40ce — the drain's ordering rule depends on the answer.
+Blocks: land-the-capture-queue, drain-reports-drift — the drain's ordering rule depends on the answer.
 
 Exit: a decision record, measured against a worked two-session capture.
 ```
 
-- The heading carries the question id (`Q-<slug>-<uid>`, see [ids.md](./ids.md)) and the question.
+- The heading carries the question id (`Q-<slug>`, see [ids.md](./ids.md)) and the question.
 - `Raised:` — the date the question was opened.
 - `Blocks:` — REQUIRED on every section. Grammar: a comma-separated list of at least one existing entry id, then optionally an em dash and the reason: `Blocks: <id>[, <id>…] — <why>`.
 - `Exit:` — what closes the question: a recorded decision, a story revision, or a measurement. The form the host records it in is the host's choice.

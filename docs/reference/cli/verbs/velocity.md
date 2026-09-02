@@ -5,14 +5,14 @@ Points delivered per iteration window, from `closed.yml` and the configured cade
 ## Usage
 
 ```text
-wipctl velocity [<plan-dir>]
+wipctl velocity
 ```
 
 ## Contract
 
 - One row per iteration window from `iteration.start` to today: `YYYY-MM-DD..YYYY-MM-DD  <bar>  N pts`, the current window suffixed `(partial)`.
 - Arithmetic: only `outcome: done` counts — the closing entry's own points, in the window of its own `closed:` date. `cut` and `reshaped` contribute zero here: a reshaped entry's delivery is its successor's own close, counted once, as the successor's points in the successor's window, so no points are ever counted twice. A window with no closes MUST render at zero rather than being omitted.
-- The windows are anchored by `.wipctl.toml`; changing the anchor or the length restarts the series, and the verb MUST NOT stitch old windows onto new.
+- The windows are anchored by the plan repository's `config.toml`; changing the anchor or the length restarts the series, and the verb MUST NOT stitch old windows onto new.
 - The verb MUST read the record only — never repository history, never a remote.
 
 ## Example

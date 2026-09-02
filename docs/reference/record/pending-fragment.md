@@ -13,12 +13,12 @@ lane: backlog
 after: null
 captured: "2026-08-14T09:41:07Z"
 entry:
-  id: rate-limit-the-search-endpoint-a7f3
+  id: rate-limit-the-search-endpoint
   type: story
   points: 2
   summary: "Callers of the search endpoint are limited per token, and the limit is announced in the response headers rather than discovered by being cut off."
   needs: []
-  epic: session-hardening-c4d1
+  epic: session-hardening
 ```
 
 - `lane` — REQUIRED. MUST be `backlog` or `todo`. A fragment may claim a planning lane and nothing else: landing into a work lane would be a transition, and a transition owes a journal event.

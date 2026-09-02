@@ -21,4 +21,6 @@ Chosen option: upward discovery with a positional override — the common case c
 
 ## Status
 
-Accepted
+Superseded
+
+Superseded by ADR-0046 — a project is identified by a minted slug and resolved through an attachment registry.

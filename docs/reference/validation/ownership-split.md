@@ -4,13 +4,13 @@ Every check has exactly one owner. The split is architectural, not incidental: i
 
 ## The schema half
 
-A JSON Schema owns one file's shape: field names, types, enums, bounds, and single-file conditionals (the closed-lane requirement, the `reshaped`/`succeeded_by` pairing). Three instance schemas gate what a project writes — the lane files, the pending fragments, the config — and three output schemas gate what verbs emit. See [../schemas/README.md](../schemas/README.md).
+A JSON Schema owns one file's shape: field names, types, enums, bounds, and single-file conditionals (the closed-lane requirement, the `reshaped`/`succeeded_by` pairing). Three instance schemas gate what a project writes — the lane files, the pending fragments, the plan repository's config — and seven output schemas gate what verbs emit. See [../schemas/README.md](../schemas/README.md).
 
 The schema half runs through any draft 2020-12 instance checker, which is the product's one optional dependency: `validate` MUST name the half as run or skipped, every time, because a check that did not run reported as green is the one failure mode a gate must not have.
 
 ## The checker half
 
-The cross-file checker owns every fact spanning two files: id uniqueness across lanes and documents, entry-to-document agreement, dependency existence and acyclicity, lane-gate eligibility, journal agreement, pending claims, ranking. The full catalog is [checks.md](./checks.md). The checker is REQUIRED — its absence is a failure of `validate`, not a skip — and it is internal: it MUST be reached only through `validate`, `fix`, `move`'s preflight, `land`, `delete`, and `init`'s self-check, and MUST NOT be a separately supported command.
+The cross-file checker owns every fact spanning two files: id uniqueness across lanes and documents, entry-to-document agreement, dependency existence and acyclicity, lane-gate eligibility, journal agreement, pending claims, ranking. The full catalog is [checks.md](./checks.md). The checker is REQUIRED — its absence is a failure of `validate`, not a skip — and it is internal: it MUST be reached only through `validate`, the writers' preflights, `sync`'s reconciliation, and `init`'s self-check, and MUST NOT be a separately supported command.
 
 ## Three diagnostic classes
 

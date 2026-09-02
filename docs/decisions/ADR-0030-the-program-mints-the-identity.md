@@ -21,4 +21,6 @@ Chosen option: the program mints — an invariant spanning two files needs an ac
 
 ## Status
 
-Accepted
+Superseded
+
+Superseded by ADR-0051 — the slug is the id and the mint checks it under the lock; nothing random is drawn.
