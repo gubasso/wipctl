@@ -17,6 +17,10 @@ An epic is closed out when every entry carrying its id is in `closed.yml`. Close
 
 Open an epic when a split produced pieces whose shared end state is invisible from any one of them. Two stories rarely qualify. Anti-patterns: a renamed story with one member; a container opened before the split; an epic carrying acceptance criteria; an epic per release or per quarter.
 
+## Where the approach goes
+
+An epic states an end state, not a design. The approach that reaches it — the seams chosen, the reason for the order, the alternatives rejected — belongs in `Core` and `Example` when it is short, and in a host document the members name under `Reads` when it is long ([host-integration.md](./host-integration.md)). An epic has no section of its own for it, because a design an epic holds is a state nobody transfers forward when the strategy changes.
+
 ## Executing one
 
 `wipctl epic <id>` resolves the epic into eligible and blocked groups in graph order, outside prerequisites included and marked. The loop: take one entry from `eligible now`, work it, close it, ask again. Asking again is not optional — a close changes eligibility and may change the ranking. One entry serves one end state; a story that seems to serve two was split along the wrong seam.
