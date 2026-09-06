@@ -11,6 +11,12 @@
       url = "github:gubasso/release-kit/v0.2.19";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # `sdd`, the documentation gate, pinned at a release tag. `nix flake update
+    # spec-driven-docs` moves the lock; the tag in this URL is the version.
+    spec-driven-docs = {
+      url = "github:gubasso/spec-driven-docs/v0.4.13";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   # Two outputs. The development shell pins the toolchain every gate runs on;
@@ -22,6 +28,7 @@
       nixpkgs,
       rust-overlay,
       release-kit,
+      spec-driven-docs,
       ...
     }:
     let
@@ -102,6 +109,10 @@
             # `rk` from this flake, at the pinned tag. One provider: a host
             # install of release-kit beside this would serve a second version.
             release-kit.packages.${pkgs.stdenv.hostPlatform.system}.default
+
+            # `sdd` from the spec-driven-docs flake input, at the pinned tag.
+            # Same one-provider rule as `rk` above.
+            spec-driven-docs.packages.${pkgs.stdenv.hostPlatform.system}.default
 
             # The record is kept in git and the transition commit is specified
             # against it (ADR-0036); the journey test drives a real checkout.
