@@ -17,3 +17,34 @@ git_release_enable = false
 # external consumer holds an API for a bump to break. Set true in the same
 # change that adds a lib target other crates depend on.
 semver_check = false
+
+# The changelog is a generated artifact, and this repository's own prose gates
+# judge it like any other markdown: AGENTS.md bans bold and italics, and dprint
+# unwraps every soft-wrapped paragraph to one physical line. release-plz's
+# default template emits neither shape — it writes `*(scope)*` and
+# `[**breaking**]`, and wraps its header across two lines — so every generated
+# changelog would fail `lint` on the bot's own release request.
+#
+# The fix belongs here rather than in the gates: change the configuration and
+# regenerate, never edit the generated file, and never widen a gate to admit a
+# tool's default. The template below states the same facts without emphasis.
+# The scope is an identifier, so it takes inline code, which is what AGENTS.md
+# asks for; a breaking change says so in words.
+[changelog]
+header = """# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+"""
+body = """
+{% if version %}## [{{ version | trim_start_matches(pat="v") }}]{% if release_link %}({{ release_link }}){% endif %} - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}## [Unreleased]
+{% endif %}
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | upper_first }}
+
+{% for commit in commits %}- {% if commit.breaking %}breaking, {% endif %}{% if commit.scope %}`{{ commit.scope }}`: {% endif %}{{ commit.message | upper_first }}
+{% endfor %}
+{% endfor %}"""
+trim = true
