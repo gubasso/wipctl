@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.1.2](https://github.com/gubasso/wipctl/compare/v0.1.1...v0.1.2) - 2026-09-06
+
+### Fixed
+
+- `ci`: Gate the merge on every job, not one ([#3](https://github.com/gubasso/wipctl/pull/3))
+
 ## [0.1.1](https://github.com/gubasso/wipctl/compare/v0.1.0...v0.1.1) - 2026-09-06
 
 ### Fixed
