@@ -30,6 +30,12 @@ semver_check = false
 # tool's default. The template below states the same facts without emphasis.
 # The scope is an identifier, so it takes inline code, which is what AGENTS.md
 # asks for; a breaking change says so in words.
+#
+# The whitespace control is load-bearing. Tera emits a newline for the tag
+# line itself, so a plain `{% for %}` after the version heading writes a
+# second blank line, and dprint collapses it. `{%- for` trims that newline,
+# and the blank line after the group heading is written literally. Verified
+# by generating an entry and confirming dprint leaves it byte-identical.
 [changelog]
 header = """# Changelog
 
@@ -41,10 +47,9 @@ body = """
 {% if version %}## [{{ version | trim_start_matches(pat="v") }}]{% if release_link %}({{ release_link }}){% endif %} - {{ timestamp | date(format="%Y-%m-%d") }}
 {% else %}## [Unreleased]
 {% endif %}
-{% for group, commits in commits | group_by(attribute="group") %}
+{%- for group, commits in commits | group_by(attribute="group") %}
 ### {{ group | upper_first }}
 
 {% for commit in commits %}- {% if commit.breaking %}breaking, {% endif %}{% if commit.scope %}`{{ commit.scope }}`: {% endif %}{{ commit.message | upper_first }}
-{% endfor %}
-{% endfor %}"""
+{% endfor %}{% endfor %}"""
 trim = true

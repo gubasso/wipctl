@@ -147,3 +147,27 @@ jobs:
             experimental-features = nix-command flakes
       - name: Build the package
         run: nix build .#default --print-build-logs
+
+  # The one check the trunk's protection requires. `rk setup step protect-trunk`
+  # takes exactly one project check name beside `pr-title`, so a workflow with
+  # several jobs needs one job that stands for all of them. Without it only the
+  # named job blocks a merge, and an armed release request merges over a red
+  # sibling — which is how a release once shipped with `lint` failing.
+  #
+  # `always()` is what makes this a gate rather than a mirror: a needed job that
+  # fails or is cancelled skips a plain dependant, and a skipped required check
+  # never turns the merge button green, so the request hangs with nothing said.
+  # Running always and asserting each result reports a real failure instead.
+  gate:
+    if: always()
+    needs: [lint, lint-push, test, build, nix-build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: every job succeeded
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "job results: $RESULTS"
+          for r in $RESULTS; do
+            [ "$r" = success ] || { echo "a required job reported $r"; exit 1; }
+          done
