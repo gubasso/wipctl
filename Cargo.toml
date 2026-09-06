@@ -26,6 +26,7 @@ exclude = [
   "/justfile",
   "/flake.nix",
   "/flake.lock",
+  "/nix",
   "/.envrc",
   "/.pre-commit-config.yaml",
   "/.editorconfig",

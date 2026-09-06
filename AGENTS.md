@@ -36,10 +36,26 @@ Everything needed to understand, build, or gate this project lives in it. An out
 - No document narrates its own history: no `formerly`, no `used to`, no `this replaces`, no note explaining an absence. A decision record's context is the one home for it.
 - Let the filesystem own its state: a list, table, or tree stays only when its entries teach something beyond what is on disk.
 - Use no bold and no italics. Put identifiers, paths, flags, and statuses in inline code, and give every fenced block a language, `text` when none applies.
-- Binding requirements use uppercase RFC 8174 keywords, and only in `docs/reference/`; narrative zones stay lowercase.
+- Binding requirements use uppercase RFC 8174 keywords, and only in `docs/reference/`; narrative zones stay lowercase. A marked block that a tool splices in and verifies byte for byte is that tool's text and not this repository's prose, so this rule and the emphasis rule above do not reach inside one.
 - Preserve lowercase `<angle>` placeholders in project-agnostic material; upper-snake `<TOKENS>` are guide artifacts and never carry a real or realistic value.
 - Report documentation changes by ownership: which source of truth changed and which links were added.
 
 ## Gates
 
 What this repository owes its own toolchain — hooks, tests, pinned environment, dogfooding — is specified in `docs/reference/quality-gates.md`, and every shipped artifact carries those obligations in the same change that ships it.
+
+<!-- BEGIN release-kit -->
+
+## Releases
+
+- This repository runs the release-kit convention; `rk method invariants` states what must stay true.
+- An agent here guides and never drives: it reads this convention, tells the operator which step comes next, and takes no git or forge action — creating, switching or deleting a branch, creating or removing a worktree, committing, pushing, tagging, opening or updating or merging a pull request — unless the operator's request named that action. A request to change code authorizes the file changes alone.
+- Work reaches the trunk only through a squash-merged pull request from a short-lived branch — `<type>/<slug>` mirroring the squash title's type, or the forge-minted `<issue-id>-<slug>`. Nothing is committed on `master`.
+- This project works in worktrees: every code-changing branch lives in its linked worktree (`rk worktree add <branch>` creates or adopts it beside the checkout), the main checkout commits nothing, and `rk worktree prune` retires a merged worktree. One branch, one writer.
+- The request's title becomes the trunk's commit message, so it MUST be a scoped Conventional Commit; the body carries the context and lands with it: it names no internal planning artifact and carries no agent attribution — the landed rk-message hook, the forge's body check, and the observed body source hold it.
+- Every commit follows the same scoped convention; the landed commit-msg hook enforces it, and the scopes this project accepts are `cli,method,reference,explanation,explanation/epics,guides,decisions,glossary,docs,docs/agnosticism,nix,ci,hooks,deps,toolchain,repo`.
+- Never author a tag, and never hand-edit a generated artifact workflow.
+- Run `rk status` before changing anything under `.github/workflows/` or `.gitlab-ci.yml`, or any file `.release-kit/manifest.json` names.
+- The full method is `rk method --list`; the recovery paths are `rk method recovery`.
+
+<!-- END release-kit -->

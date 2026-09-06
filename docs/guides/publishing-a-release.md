@@ -1,17 +1,35 @@
 # Publishing a release
 
-How a version of `wipctl` reaches its package registry and its binary artifacts. The routine path is automated and the only human decision is merging a release pull request; the manual paths below exist for a first publish and for the days the automation is unavailable.
+How a version of `wipctl` reaches its package registry and its binary artifacts. The routine path is automated and needs no decision per release; the manual paths below exist for a first publish and for the days the automation is unavailable.
 
 The gates every release must already pass are [reference/quality-gates.md](../reference/quality-gates.md). This guide covers only the distribution step that follows them.
 
 ## The routine path
 
-1. Merge feature work into the default branch with commit subjects that follow Conventional Commits, since the version bump and the changelog are derived from them.
+This project releases from the trunk. The release decision was made once, when the workflow landed, and not once per release.
+
+1. Land work on the trunk through squash-merged pull requests. The request title is the trunk's commit subject and follows Conventional Commits, because the version bump and the changelog are derived from it.
 2. The release automation opens or refreshes a release pull request carrying the version bump, `CHANGELOG.md`, `Cargo.toml`, and `Cargo.lock`.
-3. Review that pull request and merge it.
+3. That request is armed the moment it opens: the forge merges it as soon as every required check passes. Nobody merges it by hand.
 4. Merging tags the release, publishes the crate, and builds the binary artifacts.
 
 The tag is never created by hand. Creating one manually desynchronizes the tag from the version the automation believes it published.
+
+## Holding a release
+
+An armed request has no review window, so a release is stopped by disarming it before its last check turns green.
+
+```bash
+gh pr view <RELEASE_PR> --repo gubasso/wipctl --json autoMergeRequest \
+  -q '.autoMergeRequest.enabledBy.login // "not armed"'
+gh pr merge <RELEASE_PR> --repo gubasso/wipctl --disable-auto
+```
+
+The first command prints the arming login, or `not armed`. The second disarms the request.
+
+Two things follow from a disarm. The next refresh from the bot can re-arm the request, so say somewhere the team reads it that the release is held. And a request that already merged is not held at all: it is withdrawn instead, which costs a yank and a fix forward.
+
+`rk guide release` prints the whole sequence with its checks.
 
 ## Registry authentication
 
@@ -47,6 +65,12 @@ Read that file list. The package should carry build inputs plus `README.md`, the
 ## Binary artifacts
 
 Prebuilt binaries and their installers are built by a separate, tag-triggered workflow configured in `dist-workspace.toml`. That workflow is generated, not written: regenerate it after editing the configuration rather than editing it directly. It publishes nothing to the registry, and it must never be the workflow registered as the trusted publisher.
+
+```bash
+dist generate
+```
+
+The `dist-generate-check` hook runs `dist generate --check` at the push stage and fails when the committed workflow does not match the configuration. `dist` comes from the devshell, and its version must equal the `cargo-dist-version` pin in `dist-workspace.toml`.
 
 Installing from a checkout instead is [the README's install section](../../README.md).
 

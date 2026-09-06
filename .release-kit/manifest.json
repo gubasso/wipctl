@@ -1,0 +1,92 @@
+{
+  "schema_version": 4,
+  "rk_version": "0.2.19",
+  "payload_sha256": "c415b49c0979c322c0ba7be359ef001712e6f5981e86a887e2f494334688ee02",
+  "origin": "adopt",
+  "tech": "rust",
+  "forge": "github",
+  "landed_at": "2026-09-06T02:40:51Z",
+  "parameters": {
+    "repo": "gubasso/wipctl",
+    "scopes": [
+      "cli",
+      "method",
+      "reference",
+      "explanation",
+      "explanation/epics",
+      "guides",
+      "decisions",
+      "glossary",
+      "docs",
+      "docs/agnosticism",
+      "nix",
+      "ci",
+      "hooks",
+      "deps",
+      "toolchain",
+      "repo"
+    ],
+    "workflow": "worktree",
+    "style": "trunk",
+    "nix": true
+  },
+  "files": [
+    {
+      "destination": ".github/workflows/pr-title.yml",
+      "kind": "rendered",
+      "sha256": "1b5e58faa3c33281465f9c4b0e492450f8ed0f386bf8f48d82398db634571ca6",
+      "baseline_sha256": "8fe464039815a02dba2a5feb9b5c10c3332729ef982ef209a4560b45aa5cb396"
+    },
+    {
+      "destination": ".github/workflows/release-plz.yml",
+      "kind": "rendered",
+      "sha256": "c6caff0323bb4489ea637178c99ac836c3c55c40ac4b4437e1345da12be272b7",
+      "baseline_sha256": "f67151adc5f1c8a215e2320edef81151435c71a837e175e7f4aeed5cf8d77ff1"
+    },
+    {
+      "destination": ".pre-commit-config.yaml",
+      "kind": "rendered",
+      "sha256": "1266ced0fb7304c7d8ae13499ef99ba60e5a9bc0eaaf1526ca649f63ded1deee",
+      "baseline_sha256": "c8a628ef3ed94761fee8c55e830714f8a0dc3dbc84c1699a1a97e1696652aa7a"
+    },
+    {
+      "destination": "AGENTS.md",
+      "kind": "rendered",
+      "sha256": "5f4a6b4266a4b9d9a5e6b829303bce5fbf4594600d2b269b654dcb6896470268",
+      "baseline_sha256": "590006b7fb873a8b5af79e89baea29276b02cc59bfea7fb2a680f6855b097317"
+    },
+    {
+      "destination": "dist-workspace.toml",
+      "kind": "seeded",
+      "sha256": "d51e679ff879c46e87d722fc3572a52a2e9e2ca85796c0635a580506622c47bb",
+      "baseline_sha256": "d51e679ff879c46e87d722fc3572a52a2e9e2ca85796c0635a580506622c47bb"
+    },
+    {
+      "destination": "nix/package.nix",
+      "kind": "seeded",
+      "sha256": "008f7d2400c5849db0c531eb4c5a7b5b8db59b2ae516da2c98b9f3260776a859",
+      "baseline_sha256": "bd1537cc2c4ef5e46c29d65a9149bdeaafbc448632f9fabd37aeff6deeb2a3eb"
+    },
+    {
+      "destination": "release-plz.toml",
+      "kind": "seeded",
+      "sha256": "9b4a5c5fd6630f835f820986930f081a6b6d0c8f7fb537f9473f80f8113138c0",
+      "baseline_sha256": "0983ed155c83959d08f4446b91fb9dfcfebc80284babe49969bed4eaa0e55f1d"
+    }
+  ],
+  "pins": {
+    "attest": "4",
+    "cargo-dist": "0.32.0",
+    "checkout": "4",
+    "conventional-pre-commit": "4.4.0",
+    "create-github-app-token": "3",
+    "dist-checkout": "6",
+    "dist-download-artifact": "8",
+    "dist-upload-artifact": "7",
+    "magic-nix-cache-action": "13",
+    "nix-installer-action": "19",
+    "pre-commit-hooks": "6.0.0",
+    "release-plz": "0.3.160",
+    "rust-toolchain": "stable"
+  }
+}

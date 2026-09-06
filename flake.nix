@@ -5,13 +5,25 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    # The project's own `rk`, pinned at a release tag. `rk devshell sync` moves
+    # the tag and the lock together, and `.envrc` runs it on directory entry.
+    release-kit = {
+      url = "github:gubasso/release-kit/v0.2.19";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  # This flake provides a development shell and nothing else: no packages, no
-  # apps, no checks. Every gate lives in `.pre-commit-config.yaml` and the
-  # `justfile`; the flake's only job is to pin the toolchain those gates run on.
+  # Two outputs. The development shell pins the toolchain every gate runs on;
+  # the gates themselves live in `.pre-commit-config.yaml` and the `justfile`.
+  # The package builds the crate from its committed lock, which is what
+  # `nix run github:gubasso/wipctl/vX.Y.Z` and the `nix-build` CI job resolve.
   outputs =
-    { nixpkgs, rust-overlay, ... }:
+    {
+      nixpkgs,
+      rust-overlay,
+      release-kit,
+      ...
+    }:
     let
       # Inlined instead of flake-utils.lib.eachDefaultSystem: one fewer input to
       # lock, and flake-utils has been unmaintained since 2024-11.
@@ -87,6 +99,9 @@
             # Release path to crates.io.
             pkgs.release-plz
             pkgs.cargo-dist # invoked as `dist`
+            # `rk` from this flake, at the pinned tag. One provider: a host
+            # install of release-kit beside this would serve a second version.
+            release-kit.packages.${pkgs.stdenv.hostPlatform.system}.default
 
             # The record is kept in git and the transition commit is specified
             # against it (ADR-0036); the journey test drives a real checkout.
@@ -97,6 +112,13 @@
           # nativeBuildInputs = [ pkgs.pkg-config ];
           shellHook = ''echo "wipctl dev shell ready (rust $(rustc --version | cut -d' ' -f2))"'';
         };
+      });
+
+      # `nix/package.nix` reads Cargo.toml and builds from the committed
+      # Cargo.lock; release-kit seeds it and reports drift, and this project
+      # owns it.
+      packages = forAllSystems (pkgs: {
+        default = pkgs.callPackage ./nix/package.nix { };
       });
     };
 }

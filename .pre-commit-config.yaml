@@ -13,6 +13,64 @@ default_install_hook_types: [pre-commit, commit-msg, pre-push]
 default_stages: [pre-commit, pre-push]
 
 repos:
+# BEGIN release-kit
+# The release convention's hooks. Install every stage they run at:
+# pre-commit install --hook-type pre-commit --hook-type commit-msg --hook-type pre-push
+# A CI sweep commits nothing, so a job running pre-commit against a trunk
+# checkout sets SKIP=no-commit-to-branch,rk-worktree-location in its environment.
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [--strict, --force-scope, --scopes, 'cli,method,reference,explanation,explanation/epics,guides,decisions,glossary,docs,docs/agnosticism,nix,ci,hooks,deps,toolchain,repo']
+  - repo: local
+    hooks:
+      - id: rk-message
+        name: rk message content
+        stages: [commit-msg]
+        language: system
+        entry: rk message --check
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: no-commit-to-branch
+        args: [--branch, master]
+  - repo: local
+    hooks:
+      - id: rk-branch-name
+        name: rk branch name
+        language: system
+        always_run: true
+        pass_filenames: false
+        entry: sh -c 'branch=$(git symbolic-ref --quiet --short HEAD) || exit 0; [ "$branch" = master ] && exit 0; printf %s "$branch" | grep -Eq "^((build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)/[A-Za-z0-9._/-]+|([0-9]+|[A-Z][A-Z0-9]+-[0-9]+)-[A-Za-z0-9._-]+|release[-/].+)$" && exit 0; echo "branch $branch is neither <type>/<slug> nor <issue-id>-<slug>; gh issue develop <issue> --checkout or its glab counterpart mints the linked form" >&2; exit 1'
+      - id: rk-worktree-location
+        name: rk worktree location
+        language: system
+        always_run: true
+        pass_filenames: false
+        entry: sh -c '[ "$(git rev-parse --git-dir)" = "$(git rev-parse --git-common-dir)" ] || exit 0; branch=$(git symbolic-ref --quiet --short HEAD) || { echo "this project works in worktrees — the main checkout takes no commit, detached included; rk worktree add <branch> seats work in its own worktree" >&2; exit 1; }; [ "$branch" = master ] && exit 0; echo "this project works in worktrees — the main checkout takes no branch commit, as the forge trunk takes no direct push; rk worktree add $branch gives this branch its own worktree" >&2; exit 1'
+      - id: rk-no-push-to-trunk
+        name: rk no push to trunk
+        stages: [pre-push]
+        language: system
+        always_run: true
+        pass_filenames: false
+        entry: sh -c '[ "$PRE_COMMIT_REMOTE_BRANCH" != refs/heads/master ] || { echo "the trunk takes no direct push; it is written through squash-merged pull requests alone" >&2; exit 1; }'
+      - id: rk-no-hand-authored-tag
+        name: rk no hand-authored tag
+        stages: [pre-push]
+        language: system
+        always_run: true
+        pass_filenames: false
+        entry: sh -c 'case "$PRE_COMMIT_REMOTE_BRANCH" in refs/tags/v*) echo "never author a tag; the release automation mints every v* tag" >&2; exit 1;; esac'
+      - id: rk-status-check
+        name: rk status check
+        language: system
+        pass_filenames: false
+        entry: rk status --check --target .
+        files: '^(\.github/workflows/|\.gitlab-ci\.yml$|\.gitlab/ci/|AGENTS\.md$|\.release-kit/|\.pre-commit-config\.yaml$|release-plz\.toml$|dist-workspace\.toml$|release-please-config\.json$|cliff\.toml$|\.release-please-manifest\.json$|VERSION$)'
+# END release-kit
   # --- Housekeeping (auto-fix where possible) ---
   #
   # Deliberately left as a pre-commit-managed python env, not converted to
@@ -276,7 +334,15 @@ repos:
         # filenames pre-commit passes explicitly.
         args: [--force-exclude]
         # upstream: https://github.com/crate-ci/typos (v1.49.0)
-  # --- Commit message linting (commit-msg stage) ---
+  # --- Commit message length and punctuation (commit-msg stage) ---
+  #
+  # Narrowed on purpose. The Conventional Commits shape — the type, the scope,
+  # and the scope vocabulary — belongs to `conventional-pre-commit` inside the
+  # release-kit block above, which reads the scope list recorded in
+  # `.release-kit/manifest.json`; the pull-request title check reads the same
+  # list. Two hooks must not judge one property, so ./committed.toml sets
+  # `style = "none"` and keeps only the 72-column caps and the trailing-period
+  # rule, which nothing in the block checks.
   #
   # Policy lives in ./committed.toml, which committed discovers at the repo
   # root, so this stanza only wires the stage and the message file. Local
@@ -375,6 +441,35 @@ repos:
         name: cargo deny
         entry: cargo deny check advisories bans sources
         language: system
+        pass_filenames: false
+        stages: [pre-push]
+
+  # --- Generated artifact workflow: drift gate (pre-push only) ---
+  #
+  # `.github/workflows/release.yml` is generated from `dist-workspace.toml` by
+  # `dist generate`, never written by hand, and it is the file GitHub actually
+  # executes at release time. Editing the configuration without regenerating
+  # leaves the executable workflow stale while every other gate stays green, so
+  # a setting like `github-attestations` or an action SHA pin silently does
+  # nothing until a release needs it. Nothing else here can see that: the
+  # release-kit block's `rk-status-check` judges the landing record, not
+  # cargo-dist's output.
+  #
+  # `language: system`, so `dist` comes from the flake devShell like every
+  # other tool hook. The devShell's `pkgs.cargo-dist` must stay equal to the
+  # `cargo-dist-version` pin in `dist-workspace.toml`; a different version
+  # generates a different workflow and this gate is what reports the mismatch.
+  #
+  # `--check` writes nothing and exits non-zero with the file it would change.
+  # pre-push only: regenerating is a deliberate act, and the repair is one
+  # `dist generate` away.
+  - repo: local
+    hooks:
+      - id: dist-generate-check
+        name: dist generate --check (the release workflow matches its config)
+        entry: dist generate --check
+        language: system
+        files: '^(dist-workspace\.toml|\.github/workflows/release\.yml)$'
         pass_filenames: false
         stages: [pre-push]
   # --- Nix: format (auto-fix) + lint (gate) ---

@@ -13,11 +13,15 @@
 # raise the bumps. Left on major tags because unattended SHA pins rot.
 name: ci
 
+# `release/**` is here for the day an older line is cut. A line's own CI must
+# run again on the line, because a cherry-pick is not the commit the trunk
+# tested, and the release request opened against the line requires the same
+# passing check the trunk's requires.
 on:
   push:
-    branches: [main, develop]
+    branches: [master, develop, 'release/**']
   pull_request:
-    branches: [main, develop]
+    branches: [master, develop, 'release/**']
 
 # Least privilege: read the code, nothing else.
 permissions:
@@ -54,6 +58,11 @@ jobs:
             target
           key: cargo-lint-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
       - name: Lint
+        # CI commits nothing and its checkout is detached on the main
+        # worktree, so the two commit-time guards in the release-kit block
+        # would refuse every trunk checkout they sweep.
+        env:
+          SKIP: no-commit-to-branch,rk-worktree-location
         run: nix develop --command just dev='' lint
 
   # Push-stage gate: dependency advisories and license policy
@@ -81,6 +90,8 @@ jobs:
             target
           key: cargo-lint-push-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
       - name: Push-stage gate
+        env:
+          SKIP: no-commit-to-branch,rk-worktree-location
         run: nix develop --command just dev='' lint-push
 
   test:
@@ -122,3 +133,17 @@ jobs:
           key: cargo-build-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
       - name: Build
         run: nix develop --command just dev='' build-release
+
+  # Proves the packaging capability `nix/package.nix` seeds. `nix flake check`
+  # builds only the `checks` output, so the package is built by name.
+  nix-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - name: Build the package
+        run: nix build .#default --print-build-logs
