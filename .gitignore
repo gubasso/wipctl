@@ -19,5 +19,8 @@ rustc-ice-*.txt
 
 # Nix devshell
 .direnv/
+# Per-checkout environment: the setup coordinates, and the switch that turns
+# the rk pin sync off on a runner. Never committed.
+/.envrc.local
 /result
 /result-*
