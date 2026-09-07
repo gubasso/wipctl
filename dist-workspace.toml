@@ -20,7 +20,7 @@ targets = [
   "x86_64-pc-windows-msvc",
 ]
 # Which actions to run on pull requests
-pr-run-mode = "plan"
+pr-run-mode = "skip"
 # Path that installers should place binaries in
 install-path = "CARGO_HOME"
 # Whether to install an updater program

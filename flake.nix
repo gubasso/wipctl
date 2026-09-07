@@ -8,7 +8,7 @@
     # The project's own `rk`, pinned at a release tag. `rk devshell sync` moves
     # the tag and the lock together, and `.envrc` runs it on directory entry.
     release-kit = {
-      url = "github:gubasso/release-kit/v0.2.21";
+      url = "github:gubasso/release-kit/v0.2.23";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # `sdd`, the documentation gate, pinned at a release tag. `nix flake update
@@ -81,7 +81,7 @@
             pkgs.shfmt # the same shell payload, formatting side
             pkgs.typos # spell check; the upstream hook ids do not run here
             pkgs.committed # commit-message shape, same reason
-            pkgs.gawk # scripts/check-emphasis, scripts/check-adr-length
+            pkgs.gawk # scripts/check-emphasis
             pkgs.ripsecrets # secret scan, pre-commit stage
             pkgs.gitleaks # secret scan, pre-push stage
             pkgs.editorconfig-checker # charset / EOL / trailing whitespace
