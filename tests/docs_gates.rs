@@ -1,9 +1,9 @@
-//! Cases for the two prose gates in `scripts/`.
+//! Cases for the prose gate in `scripts/`.
 //!
 //! Every shipped artifact owes a case in the test suite, and a gate owes more
 //! than that: it must be shown to fail on a deliberate defect, because a gate
-//! that never selected a file is indistinguishable from a passing one
-//! (`docs/reference/quality-gates.md`).
+//! that never selected a file is indistinguishable from a passing one.
+//! VERIFIES quality-gates:a-gate-fails-once-before-it-is-trusted
 //!
 //! The scripts are repository tooling and are excluded from the published
 //! package, so each case resolves them from the manifest directory and skips
@@ -78,34 +78,4 @@ fn emphasis_gate_ignores_code_and_honours_the_escape_hatch() {
     .expect("the gate should be runnable")
     .expect("the script was present a moment ago");
     assert!(escaped, "the escape hatch must exempt the following line");
-}
-
-#[test]
-fn adr_length_gate_rejects_an_overlong_body() {
-    let long = format!("# ADR-9999-x\n\n{}\n", "word ".repeat(400));
-    let over = accepts("check-adr-length", "long", &long).expect("the gate should be runnable");
-    let Some(over) = over else { return };
-    assert!(!over, "a body over 350 words must fail the gate");
-
-    let short = accepts("check-adr-length", "short", "# ADR-9998-y\n\nShort body.\n")
-        .expect("the gate should be runnable")
-        .expect("the script was present a moment ago");
-    assert!(short, "a body under the limit must pass");
-}
-
-#[test]
-fn adr_length_gate_does_not_count_fenced_blocks() {
-    // A record carrying a long example must not be pushed over the limit by
-    // content its author did not write as prose.
-    let fenced = format!(
-        "# ADR-9997-z\n\nShort prose.\n\n```text\n{}\n```\n",
-        "word ".repeat(400)
-    );
-    let passes =
-        accepts("check-adr-length", "fenced", &fenced).expect("the gate should be runnable");
-    let Some(passes) = passes else { return };
-    assert!(
-        passes,
-        "fenced content must not count toward the word limit"
-    );
 }

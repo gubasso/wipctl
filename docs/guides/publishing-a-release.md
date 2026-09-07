@@ -1,15 +1,15 @@
 # Publishing a release
 
-How a version of `wipctl` reaches its package registry and its binary artifacts. The routine path is automated and needs no decision per release; the manual paths below exist for a first publish and for the days the automation is unavailable.
+How a version of `wipctl` reaches its package registry and its binary artifacts. The routine path is automated and needs no decision per release. The manual paths below exist for a first publish, and for the days the automation is unavailable.
 
-The gates every release must already pass are [reference/quality-gates.md](../reference/quality-gates.md). This guide covers only the distribution step that follows them.
+The gates every release must already pass are [specs/SPEC-quality-gates.md](../specs/SPEC-quality-gates.md). This guide covers only the distribution step that follows them.
 
 ## The routine path
 
 This project releases from the trunk. The release decision was made once, when the workflow landed, and not once per release.
 
 1. Land work on the trunk through squash-merged pull requests. The request title is the trunk's commit subject and follows Conventional Commits, because the version bump and the changelog are derived from it.
-2. The release automation opens or refreshes a release pull request carrying the version bump, `CHANGELOG.md`, `Cargo.toml`, and `Cargo.lock`.
+2. The release automation opens or refreshes a release pull request. It carries the version bump and the four changed files.
 3. That request is armed the moment it opens: the forge merges it as soon as every required check passes. Nobody merges it by hand.
 4. Merging tags the release, publishes the crate, and builds the binary artifacts.
 
@@ -47,20 +47,20 @@ The auth check lives inside `scripts/publish` and nowhere else. It confirms that
 
 ## Readiness checks
 
-`./scripts/publish-dry` runs the registry dry run and prints the exact file list the package would ship. Neither needs authentication, so it is safe to run at any point.
+`./scripts/publish-dry` runs the registry dry run and prints the exact file list the package ships. Neither needs authentication, so it is safe to run at any point.
 
-Read that file list. The package should carry build inputs plus `README.md`, the license files, and the changelog — nothing else. The `exclude` denylist in `Cargo.toml` keeps documentation, CI, task running, and development tooling out of it; a denylist is used rather than an allowlist because an allowlist silently drops future source files, and because under an SPDX license expression the readme and license files are not included automatically. Re-read the file list whenever a new top-level artifact appears in the repository.
+Read that file list. The package carries build inputs, `README.md`, the license files, and the changelog, and nothing else. The `exclude` denylist in `Cargo.toml` keeps documentation, CI, task running, and development tooling out of it. A denylist is used rather than an allowlist for two reasons. An allowlist silently drops future source files. Under an SPDX license expression, the readme and license files are not included automatically. Re-read the file list whenever a new top-level artifact appears in the repository.
 
 ## Local release helpers
 
 `./scripts/release` drives a release by hand. None of its subcommands publish.
 
-- `release-plz-update` — apply the version bump and changelog locally.
-- `release-plz-pr` — open or refresh the release pull request.
-- `cargo-release-dry <level>` — dry-run a bump at the given level.
-- `semver-check` — check public API compatibility.
+- `release-plz-update`: apply the version bump and changelog locally.
+- `release-plz-pr`: open or refresh the release pull request.
+- `cargo-release-dry <level>`: dry-run a bump at the given level.
+- `semver-check`: check public API compatibility.
 
-`wipctl` ships a binary and exposes no library API, so the API compatibility check has nothing to inspect. The command surface is the compatibility surface instead, and [the reference zone](../README.md) is what defines it; a breaking change to a verb, a flag, or an exit code is a breaking release regardless of what the API check reports.
+`wipctl` ships a binary and exposes no library API, so the API compatibility check has nothing to inspect. The command surface is the compatibility surface instead, and [the spec zone](../README.md) defines it. A breaking change to a verb, a flag, or an exit code is a breaking release, whatever the API check reports.
 
 ## Binary artifacts
 

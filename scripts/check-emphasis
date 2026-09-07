@@ -35,6 +35,10 @@ for file in "$@"; do
         line = $0
 
         # Inline code spans are not prose. Strip them before matching.
+        # Double-backtick spans go first: a span exists in that form precisely
+        # to hold a backtick, so stripping single spans first would eat its
+        # delimiters and leave the content behind as prose.
+        gsub(/``.*``/, "", line)
         gsub(/`[^`]*`/, "", line)
         # Link and image targets can hold underscores and asterisks.
         gsub(/\]\([^)]*\)/, "]()", line)

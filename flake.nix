@@ -88,7 +88,8 @@
 
             # Nix quality tools for this flake itself — the repository owes its
             # own toolchain a gate for every artifact it ships, this one
-            # included (docs/reference/quality-gates.md).
+            # included.
+            # SATISFIES quality-gates:every-artifact-carries-a-toolchain-pin
             pkgs.nixfmt # RFC 166 formatter; nixfmt-rfc-style is a deprecated alias
             pkgs.statix
             pkgs.deadnix
@@ -115,7 +116,8 @@
             spec-driven-docs.packages.${pkgs.stdenv.hostPlatform.system}.default
 
             # The record is kept in git and the transition commit is specified
-            # against it (ADR-0036); the journey test drives a real checkout.
+            # against it; the journey test drives a real checkout.
+            # SATISFIES attachment:git-is-the-only-version-control
             pkgs.git
           ];
           # native deps for -sys crates, uncomment as needed:
