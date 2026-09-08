@@ -7,6 +7,7 @@
 - [Requirements](#requirements)
   - [`transitions:a-lane-change-is-the-verb` — A lane change is the verb and never an edit](#transitionsa-lane-change-is-the-verb--a-lane-change-is-the-verb-and-never-an-edit)
   - [`transitions:the-preflight-runs-entire-and-in-order` — The preflight runs entire and in order](#transitionsthe-preflight-runs-entire-and-in-order--the-preflight-runs-entire-and-in-order)
+  - [`transitions:a-refusal-names-the-plan-that-holds-it` — A refusal names the plan that holds it](#transitionsa-refusal-names-the-plan-that-holds-it--a-refusal-names-the-plan-that-holds-it)
   - [`transitions:a-lost-race-is-a-usage-error` — A lost race is a usage error](#transitionsa-lost-race-is-a-usage-error--a-lost-race-is-a-usage-error)
   - [`transitions:arrival-makes-no-rank-claim` — Arrival makes no rank claim](#transitionsarrival-makes-no-rank-claim--arrival-makes-no-rank-claim)
   - [`transitions:a-closing-flag-is-required-by-its-case` — A closing flag is required by its case](#transitionsa-closing-flag-is-required-by-its-case--a-closing-flag-is-required-by-its-case)
@@ -32,7 +33,7 @@ The lane change as a recorded event, and the verb that takes the next entry atom
 3. The id is in some lane.
 4. The entry is not already in the destination.
 5. The closing flags are consistent. An outcome is required by and only by a move to the closed lane. A successor is required by and only by a reshaped outcome.
-6. An entry entering a work lane has every dependency closed and no blocking question.
+6. An entry entering a work lane has every dependency closed and no blocking question. A dependency that names a peer is read in that peer's record, and step 6 needed no widening to reach it: a peer's entry is an entry and its lane is a lane.
 
 ## Requirements
 
@@ -57,6 +58,18 @@ The implementation MUST run the whole preflight in the stated order before the f
 - GIVEN an entry whose dependency is not closed
 - WHEN the move runs
 - THEN it fails naming the dependency and the act that unblocks it, and nothing is written
+
+Verify: `cargo nextest run --test verb_contracts`
+
+### `transitions:a-refusal-names-the-plan-that-holds-it` — A refusal names the plan that holds it
+
+Where the dependency blocking a transition sits in a peer, the refusal MUST name it in its prefixed form and MUST name who to ask.
+
+#### Scenario: An entry cannot start because another team has not finished
+
+- GIVEN a dependency still in that peer's scheduled lane
+- WHEN the transition is refused
+- THEN the message names the entry, its lane, and that plan's owners. The resolution is in another team's hands, and no edit here unblocks it
 
 Verify: `cargo nextest run --test verb_contracts`
 

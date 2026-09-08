@@ -15,9 +15,15 @@
 # is a failure rather than a silent pass, because an unchecked instance is
 # indistinguishable from a checked one in a green run.
 #
+# A third half checks the output samples. An instance schema governs a file a
+# project writes, and an output schema governs a shape a verb emits, so the
+# second kind needs a hand-written sample to be checked against anything at all.
+# A sample is named for the schema it belongs to, which is how it finds one.
+#
 # Usage:
 #   scripts/check-schemas                    the repository's own tree
 #   scripts/check-schemas --fixtures <dir>   a copy of the fixture
+#   scripts/check-schemas --outputs <dir>    a copy of the output samples
 #   scripts/check-schemas --schemas <dir>    a copy of the schema tree
 #
 # The gate runs from the repository root, so both overrides take an absolute
@@ -29,6 +35,7 @@ set -euo pipefail
 
 schema_root=docs/specs
 fixture_root=tests/fixtures/two-plans
+output_root=tests/fixtures/output
 
 absolute() {
   if [[ $2 != /* ]]; then
@@ -42,6 +49,11 @@ while (($# > 0)); do
     --fixtures)
       fixture_root=${2:?--fixtures needs a directory}
       absolute --fixtures "$fixture_root"
+      shift 2
+      ;;
+    --outputs)
+      output_root=${2:?--outputs needs a directory}
+      absolute --outputs "$output_root"
       shift 2
       ;;
     --schemas)
@@ -122,6 +134,35 @@ done < <(find "$fixture_root" -type f | sort)
 
 if ((instances == 0)); then
   printf 'check-schemas: the fixture at %s holds no governed instance\n' "$fixture_root" >&2
+  exit 1
+fi
+
+# --- Every output sample against the schema it is named for ---
+
+if [[ ! -d $output_root ]]; then
+  printf 'check-schemas: no output samples at %s; the output half selected nothing\n' "$output_root" >&2
+  exit 1
+fi
+
+samples=0
+while IFS= read -r file; do
+  stem=${file##*/}
+  stem=${stem%.json}
+  schema=$(find "$schema_root" -name "$stem.schema.json" | sort | head -1)
+
+  if [[ -z $schema ]]; then
+    printf 'check-schemas: %s is named for no schema under %s\n' "$file" "$schema_root" >&2
+    printf 'check-schemas: a sample is named <schema-stem>.json; rename it, or ship the schema it claims\n' >&2
+    status=1
+    continue
+  fi
+
+  samples=$((samples + 1))
+  check-jsonschema --schemafile "$schema" "$file" || status=1
+done < <(find "$output_root" -type f -name '*.json' | sort)
+
+if ((samples == 0)); then
+  printf 'check-schemas: the samples at %s hold no output shape\n' "$output_root" >&2
   exit 1
 fi
 

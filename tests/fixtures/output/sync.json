@@ -1,0 +1,13 @@
+{
+  "fetched": 2,
+  "reconciled": 1,
+  "pushed": false,
+  "conflicts": [
+    {
+      "id": "secure-session-storage",
+      "kind": "transition",
+      "here": { "fact": "moved to review at 2026-09-06T11:04:12Z" },
+      "remote": { "fact": "moved to closed, done, at 2026-09-06T10:58:41Z" }
+    }
+  ]
+}

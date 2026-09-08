@@ -165,6 +165,28 @@ fn accepts_fixture_with(case: &str, file: &str, from: &str, to: &str) -> io::Res
     accepts(&["--fixtures", &fixtures.to_string_lossy()])
 }
 
+/// Copy the output samples, replace `from` with `to` in one of them, and report
+/// whether the gate accepted the result.
+///
+/// An output schema governs a shape a verb emits rather than a file a project
+/// writes, so a hand-written sample is the only thing it can be checked
+/// against until the verb exists.
+fn accepts_output_with(case: &str, file: &str, from: &str, to: &str) -> io::Result<Option<bool>> {
+    let scratch = Scratch::new(case)?;
+    let outputs = scratch.path().join("output");
+    copy_tree(&repo().join("tests/fixtures/output"), &outputs)?;
+
+    let target = outputs.join(file);
+    let body = fs::read_to_string(&target)?;
+    assert!(
+        body.contains(from),
+        "the sample no longer holds {from:?}, so this case plants nothing"
+    );
+    fs::write(&target, body.replace(from, to))?;
+
+    accepts(&["--outputs", &outputs.to_string_lossy()])
+}
+
 #[test]
 fn the_gate_accepts_the_shipped_tree() {
     let ok = accepts(&[]).expect("the gate should be runnable");
@@ -311,6 +333,138 @@ fn a_peer_url_hiding_a_password_in_an_escape_fails() {
         !ok,
         "a url hiding a password in an escape must fail the gate"
     );
+}
+
+#[test]
+fn an_output_sample_missing_a_required_field_fails() {
+    // Every peer object states whether it is attached. Dropping that field is
+    // the defect an implementer produces by emitting the field only when true.
+    let ok = accepts_output_with(
+        "output-required",
+        "peer-list.json",
+        "\"attached\": true,\n",
+        "",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a sample missing a required field must fail the gate");
+}
+
+#[test]
+fn a_batch_outcome_without_its_diagnostic_fails() {
+    // A slot reported as failed or locked owes the reason. Absent it, a
+    // consumer reads an outcome it cannot act on, and the shape allowed it.
+    let ok = accepts_output_with(
+        "output-diagnostic",
+        "sync-all.json",
+        ",\n      \"diagnostic\": \"the writer lock for this plan was held past the bounded wait\"",
+        "",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a locked slot with no diagnostic must fail the gate");
+}
+
+#[test]
+fn an_attached_peer_reference_without_its_state_fails() {
+    // An attached peer answers what its target is. A reference that omits the
+    // answer states less than the shape promises, and a consumer reading it
+    // cannot tell a live target from a deleted one.
+    let ok = accepts_output_with(
+        "output-target-state",
+        "peer-list.json",
+        "\"lane\": \"todo\",\n        \"target_state\": \"live\"",
+        "\"lane\": \"todo\"",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(
+        !ok,
+        "an attached reference with no target state must fail the gate"
+    );
+}
+
+#[test]
+fn an_unattached_peer_reference_carrying_a_lane_fails() {
+    // An unattached peer answers nothing about its entries, so a lane on one of
+    // its references is a fact nothing produced. The row is marked unstale at
+    // the same time, so the lane is the only fault this case plants.
+    let ok = accepts_output_with(
+        "output-unattached-lane",
+        "peer-list.json",
+        "\"stale\": true,\n    \"references\": []",
+        "\"stale\": false,\n    \"references\": [{ \"entry\": \"a-b\", \"target\": \"c-d\", \"lane\": \"todo\" }]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(
+        !ok,
+        "an unattached reference carrying a lane must fail the gate"
+    );
+}
+
+#[test]
+fn a_stale_row_carrying_a_reference_fails() {
+    // Stale means no dependency uses the alias, and the reference list is
+    // those dependencies. A row claiming both states contradicts itself.
+    let ok = accepts_output_with(
+        "output-stale-referenced",
+        "peer-list.json",
+        "\"stale\": true,\n    \"references\": []",
+        "\"stale\": true,\n    \"references\": [{ \"entry\": \"a-b\", \"target\": \"c-d\" }]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a stale row carrying a reference must fail the gate");
+}
+
+#[test]
+fn an_unstale_row_with_no_references_fails() {
+    // The other direction of the same derived fact. A row nothing references
+    // is stale, and a report that says otherwise is one a reader acts on.
+    let ok = accepts_output_with(
+        "output-unstale-empty",
+        "peer-list.json",
+        "\"stale\": true,\n    \"references\": []",
+        "\"stale\": false,\n    \"references\": []",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(
+        !ok,
+        "a row that is not stale and references nothing must fail the gate"
+    );
+}
+
+#[test]
+fn a_batch_exit_code_that_contradicts_its_outcomes_fails() {
+    // The precedence is part of the shape. A run reporting success while one
+    // slot could not be entered is the report a consumer acts on wrongly.
+    let ok = accepts_output_with("output-exit", "sync-all.json", "\"exit\": 3", "\"exit\": 0")
+        .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(
+        !ok,
+        "an exit code contradicting the slot outcomes must fail the gate"
+    );
+}
+
+#[test]
+fn an_output_sample_named_for_no_schema_fails() {
+    // A sample finds its schema by name. One named for a schema that does not
+    // exist is a sample nothing checks, which is the silent pass this gate
+    // exists to refuse.
+    let scratch = Scratch::new("output-unnamed").expect("a scratch directory should be creatable");
+    let outputs = scratch.path().join("output");
+    copy_tree(&repo().join("tests/fixtures/output"), &outputs)
+        .expect("the samples should be copyable");
+
+    fs::write(outputs.join("board.json"), "{}\n").expect("the scratch sample should be writable");
+
+    let outputs = outputs.to_string_lossy().into_owned();
+    let ok = accepts(&["--outputs", &outputs]).expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a sample named for no schema must fail the gate");
 }
 
 #[test]

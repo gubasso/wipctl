@@ -14,6 +14,7 @@
   - [`cli-conventions:the-verb-list-is-derived` — The verb list is derived from the build](#cli-conventionsthe-verb-list-is-derived--the-verb-list-is-derived-from-the-build)
   - [`cli-conventions:global-flags-parse-before-the-verb` — Global flags parse before the verb](#cli-conventionsglobal-flags-parse-before-the-verb--global-flags-parse-before-the-verb)
   - [`cli-conventions:there-is-no-zone-argument` — There is no zone argument](#cli-conventionsthere-is-no-zone-argument--there-is-no-zone-argument)
+  - [`cli-conventions:a-verb-acts-on-one-plan` — A verb acts on one plan](#cli-conventionsa-verb-acts-on-one-plan--a-verb-acts-on-one-plan)
   - [`cli-conventions:a-machine-format-is-verb-local` — A machine format is verb-local and owes a schema](#cli-conventionsa-machine-format-is-verb-local--a-machine-format-is-verb-local-and-owes-a-schema)
   - [`cli-conventions:an-optional-dependency-never-gates-output` — An optional dependency never gates output](#cli-conventionsan-optional-dependency-never-gates-output--an-optional-dependency-never-gates-output)
   - [`cli-conventions:a-skipped-check-is-named` — A skipped check is named](#cli-conventionsa-skipped-check-is-named--a-skipped-check-is-named)
@@ -56,7 +57,7 @@ wipctl delete <id> [--dry-run]
 wipctl rename <id> "<new title>" [--id <new-id>]
 wipctl rename <id> --id <new-id>
 wipctl fix [--slots]
-wipctl sync [--json]
+wipctl sync [--all] [--json]
 wipctl resolve <id> --keep <here|remote>
 wipctl validate
 wipctl doctor
@@ -183,6 +184,18 @@ The implementation MUST NOT offer a positional zone argument or a project flag.
 - GIVEN a caller outside the project they mean
 - WHEN they want to act on it
 - THEN they change directory, because resolution answers from the working directory and a second answer contradicts it
+
+Verify: `cargo nextest run --test verb_contracts`
+
+### `cli-conventions:a-verb-acts-on-one-plan` — A verb acts on one plan
+
+A verb MUST act on the plan the working directory resolves to, and MUST reach more than one plan only under a batch flag.
+
+#### Scenario: A check reads two attached peers to answer about this plan
+
+- GIVEN a record whose dependencies reach two peers
+- WHEN validation runs
+- THEN it is still single-plan, because it answers about this plan, while fetching, reconciling, or pushing several is a batch and needs the flag
 
 Verify: `cargo nextest run --test verb_contracts`
 

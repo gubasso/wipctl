@@ -253,7 +253,7 @@ Verify: `cargo nextest run --test validation`
 | -------------------------------------- | ----------------------------------------------------------------- |
 | `validation:every-check-has-one-owner` | Whether a proposed rule spans two files is a reading of the rule. |
 
-Five instance schemas gate what a project writes, and eight output schemas gate what verbs emit. A verb relaying a record fact in its own voice carries the command prefix, which is the ordinary stream discipline.
+Five instance schemas gate what a project writes, and ten output schemas gate what verbs emit. A verb relaying a record fact in its own voice carries the command prefix, which is the ordinary stream discipline.
 
 ## Diagnostics
 

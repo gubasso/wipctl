@@ -4,6 +4,8 @@
 
 The environment report: what the build needs, what it can use, what will degrade, and whether this project's plan machinery is sound. The boundary runs at aggregation: this domain owns the report and the dependency manifest, while the command surface domain owns what an optional dependency owes at any other verb's entry.
 
+The report says whether each declared peer is attached and stops there. What this record needs from each one is the peer view's answer. A health report that repeats a view is a second copy of it.
+
 ## The dependency manifest
 
 The required set is git, plus the language runtime the implementation needs, or none. The baseline optional set holds one entry: a draft 2020-12 instance checker, probed by validation, presence-only, whose declared fallback is the named skip.
@@ -74,13 +76,13 @@ Verify: `cargo nextest run --test verb_contracts`
 
 ### `doctor:the-report-covers-the-plan-machinery` — The report covers the plan machinery
 
-Inside a project, the report MUST also cover the lock directory, the attachment and identity state, the hook installation, and every blocker.
+Inside a project, the report MUST cover the lock directory, the attachment and identity state, every declared peer's slot, the hook installation, and every blocker.
 
 #### Scenario: A clone has the record and no hooks
 
 - GIVEN a plan repository cloned onto a second machine
 - WHEN the report runs
-- THEN the missing hook installation is a miss and never a silent state, alongside the open questions and unclosed dependencies holding work
+- THEN the missing hook installation is a miss and never a silent state, alongside the open questions and unclosed dependencies holding work. Each declared peer is named as attached, with the revision read, or as missing, with the command that fills its slot
 
 Verify: `cargo nextest run --test verb_contracts`
 
