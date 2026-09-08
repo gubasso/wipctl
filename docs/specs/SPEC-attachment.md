@@ -4,8 +4,11 @@
 
 - [Purpose](#purpose)
 - [The postfix escalation](#the-postfix-escalation)
+- [Where each identity enters resolution](#where-each-identity-enters-resolution)
 - [Requirements](#requirements)
   - [`attachment:resolution-is-two-steps` — Resolution is two steps](#attachmentresolution-is-two-steps--resolution-is-two-steps)
+  - [`attachment:a-plan-uid-is-minted-only-at-creation` — A global identity is minted only at creation](#attachmenta-plan-uid-is-minted-only-at-creation--a-global-identity-is-minted-only-at-creation)
+  - [`attachment:one-plan-occupies-one-slot` — One plan occupies one slot](#attachmentone-plan-occupies-one-slot--one-plan-occupies-one-slot)
   - [`attachment:git-is-the-only-version-control` — Git is the only version control](#attachmentgit-is-the-only-version-control--git-is-the-only-version-control)
   - [`attachment:the-registry-is-the-filesystem` — The registry is the filesystem](#attachmentthe-registry-is-the-filesystem--the-registry-is-the-filesystem)
   - [`attachment:the-scaffold-does-not-walk-upward` — The scaffold does not walk upward](#attachmentthe-scaffold-does-not-walk-upward--the-scaffold-does-not-walk-upward)
@@ -51,6 +54,18 @@ scope != username (acme/payments)      scope == username (gbasso/wipctl)
 5. payments-acme-gbasso-github-01      5. wipctl-gbasso-github-01
 ```
 
+## Where each identity enters resolution
+
+```text
+the ordinary path   walk upward to .wipctl.toml for project_id, then find
+                    that slug in the attachment registry
+
+where a uid is      resolve as above, then read plan_uid from config.toml
+needed              inside each slot and pick the slot that matches
+```
+
+`project_id` resolves and `plan_uid` travels. The uid is looked up inside a slot and never names one. There is no tree keyed by it, so a reader never goes looking for one. The configuration domain owns what each value is. This domain owns where each one enters an invocation.
+
 ## Requirements
 
 ### `attachment:resolution-is-two-steps` — Resolution is two steps
@@ -62,6 +77,30 @@ When a verb touches a record, the verb MUST resolve the project id by an upward 
 - GIVEN a working directory with no identity file at or above it
 - WHEN the verb resolves
 - THEN it is a usage error, because the invocation named no project. An unattached id is a failed check instead, naming the attachment that fixes it
+
+Verify: `cargo nextest run --test attachment`
+
+### `attachment:a-plan-uid-is-minted-only-at-creation` — A global identity is minted only at creation
+
+When a verb creates a plan, it MUST mint a fresh `plan_uid`, and a verb that adopts one MUST read the uid it carries.
+
+#### Scenario: A record that predates the key is upgraded
+
+- GIVEN a plan repository whose configuration carries no `plan_uid`
+- WHEN the operator runs the one explicit upgrade form
+- THEN a uid is minted once, committed to the plan trunk, and reported. A second run is refused, because a value other plans can carry is never replaced by a verb
+
+Verify: `cargo nextest run --test attachment`
+
+### `attachment:one-plan-occupies-one-slot` — One plan occupies one slot
+
+When a plan repository is offered whose uid already sits in a slot, the implementation MUST refuse and MUST name both sides.
+
+#### Scenario: A copy is attached beside the plan it was copied from
+
+- GIVEN a copy of a plan repository, carrying its origin's uid
+- WHEN it is attached on the machine that already holds the origin
+- THEN the refusal names the slot and the location offered, and every slot is left as it was. A copy carries the identity it was copied from, and no verb mints a new one
 
 Verify: `cargo nextest run --test attachment`
 
@@ -187,13 +226,13 @@ Verify: `cargo nextest run --test scaffold`
 
 ### `attachment:attach-takes-exactly-one-form` — Attach takes exactly one form
 
-The attach verb MUST accept either a plan repository location or the create form, and MUST reject both together and neither as a usage error.
+The attach verb MUST accept exactly one of a plan location, the create form, or the upgrade form, and MUST reject any other count.
 
-#### Scenario: Both forms are given
+#### Scenario: Two forms are given
 
 - GIVEN a location and the create flag in one invocation
 - WHEN the verb parses them
-- THEN it is a usage error, because the two forms answer opposite questions
+- THEN it is a usage error, because each form answers a different question: adopt a plan that exists, create one that does not, or give an identity to a record that predates the key
 
 Verify: `cargo nextest run --test verb_contracts`
 
@@ -243,3 +282,5 @@ Each resolution failure names its own resolution.
 - The identity files disagree. Exit 1, naming the host value, the plan value, and the choice between re-attaching and correcting whichever file is wrong.
 - The scaffold finds an existing identity. Exit 1, reporting the id it found and naming attach for a machine that lacks the plan.
 - A clone that is not a plan repository. Exit 1, naming the create form as the way to start one.
+- A clone carrying no `plan_uid`. Exit 1, naming the upgrade form that gives a record which predates the key an identity of its own.
+- A clone whose uid is already in a slot. Exit 1, naming the slot that holds the plan and the location offered. The message says that one plan gets one slot. A copy meant to be a plan of its own needs an identity of its own, which no verb mints yet.

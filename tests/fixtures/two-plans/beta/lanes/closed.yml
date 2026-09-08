@@ -1,0 +1,8 @@
+lane: closed
+stories:
+  - id: token-rotation
+    type: story
+    points: 2
+    outcome: done
+    closed: "2026-07-08"
+    summary: "Replace a session token on every sign-in, so that a token read from an old log grants nothing to the reader who finds it."

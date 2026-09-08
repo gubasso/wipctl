@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+# Validate every shipped schema, and every fixture file the schemas govern
+# (quality-gates:every-schema-validates-against-the-metaschema).
+#
+# Two jobs, because a schema can fail in two independent ways. A schema that is
+# not itself valid against the draft gates nothing, and a schema that is valid
+# but says the wrong thing gates the wrong record. The first job catches the
+# first fault, and the second catches the second by running every schema
+# against a record the project keeps as a fixture.
+#
+# The instance half selects its schema from the file's own name and position,
+# never from a list in this script. A later change that adds a governed file to
+# the fixture is picked up without editing the gate, which is the same rule the
+# scaffold follows for its payload. A fixture file the map does not recognise
+# is a failure rather than a silent pass, because an unchecked instance is
+# indistinguishable from a checked one in a green run.
+#
+# Usage:
+#   scripts/check-schemas                    the repository's own tree
+#   scripts/check-schemas --fixtures <dir>   a copy of the fixture
+#   scripts/check-schemas --schemas <dir>    a copy of the schema tree
+#
+# The gate runs from the repository root, so both overrides take an absolute
+# path. A relative one would resolve against a directory the caller did not
+# choose. Each override exists so that the case suite can plant a deliberate
+# defect and watch this gate fail on it, which is the only way to tell a gate
+# that passed from a gate that selected nothing.
+set -euo pipefail
+
+schema_root=docs/specs
+fixture_root=tests/fixtures/two-plans
+
+absolute() {
+  if [[ $2 != /* ]]; then
+    printf 'check-schemas: %s takes an absolute path, and %s is relative\n' "$1" "$2" >&2
+    exit 2
+  fi
+}
+
+while (($# > 0)); do
+  case $1 in
+    --fixtures)
+      fixture_root=${2:?--fixtures needs a directory}
+      absolute --fixtures "$fixture_root"
+      shift 2
+      ;;
+    --schemas)
+      schema_root=${2:?--schemas needs a directory}
+      absolute --schemas "$schema_root"
+      shift 2
+      ;;
+    *)
+      printf 'check-schemas: unknown argument %s\n' "$1" >&2
+      exit 2
+      ;;
+  esac
+done
+
+root=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+cd "$root"
+
+# Exit 3 says the validator is absent, and it is a distinct code on purpose. A
+# missing tool makes every check below fail, which reads exactly like a record
+# that was checked and rejected. The case suite reads this code as a skip, so a
+# build without the tool reports nothing rather than reporting a pass it did
+# not earn.
+if ! command -v check-jsonschema >/dev/null 2>&1; then
+  printf 'check-schemas: check-jsonschema is not on PATH\n' >&2
+  printf 'check-schemas: it is pinned in the development environment; a build that\n' >&2
+  printf 'check-schemas: does not provide it skips this gate rather than passing it\n' >&2
+  exit 3
+fi
+
+status=0
+
+# --- Every shipped schema against the draft 2020-12 metaschema ---
+
+mapfile -t schemas < <(find "$schema_root" -name '*.schema.json' | sort)
+
+if ((${#schemas[@]} == 0)); then
+  printf 'check-schemas: no schema under %s; the gate selected nothing\n' "$schema_root" >&2
+  exit 1
+fi
+
+check-jsonschema --check-metaschema "${schemas[@]}" || status=1
+
+# --- Every fixture instance against the schema its name selects ---
+
+# Report the schema that governs a fixture file, or nothing when the file is
+# prose. A story document is narrative and owes no schema.
+schema_for() {
+  local path=$1
+  case $path in
+    */lanes/*.yml) printf '%s/SPEC-lane-file/lane.schema.json\n' "$schema_root" ;;
+    */pending/*.yml) printf '%s/SPEC-pending-fragment/pending.schema.json\n' "$schema_root" ;;
+    */config.toml) printf '%s/SPEC-configuration/config.schema.json\n' "$schema_root" ;;
+    */peers.toml) printf '%s/SPEC-peers/peers.schema.json\n' "$schema_root" ;;
+    *.md) ;;
+    *) return 1 ;;
+  esac
+}
+
+if [[ ! -d $fixture_root ]]; then
+  printf 'check-schemas: no fixture at %s; the instance half selected nothing\n' "$fixture_root" >&2
+  exit 1
+fi
+
+instances=0
+while IFS= read -r file; do
+  if ! schema=$(schema_for "$file"); then
+    printf 'check-schemas: %s is governed by no schema this gate knows\n' "$file" >&2
+    printf 'check-schemas: add it to schema_for in scripts/check-schemas, or move it out of the fixture\n' >&2
+    status=1
+    continue
+  fi
+
+  [[ -n $schema ]] || continue
+
+  instances=$((instances + 1))
+  check-jsonschema --schemafile "$schema" "$file" || status=1
+done < <(find "$fixture_root" -type f | sort)
+
+if ((instances == 0)); then
+  printf 'check-schemas: the fixture at %s holds no governed instance\n' "$fixture_root" >&2
+  exit 1
+fi
+
+exit "$status"

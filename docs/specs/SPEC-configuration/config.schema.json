@@ -10,6 +10,11 @@
       "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
       "description": "The project this plan repository serves, in the slug grammar. Must equal the host repository's committed project_id; the two are checked against each other at every resolution, so an attach to the wrong repository surfaces as a disagreement between two committed facts."
     },
+    "plan_uid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$",
+      "description": "This plan's global identity: 128 bits of randomness, minted once when the plan is created, written as 32 lowercase hexadecimal characters. It answers which plan anywhere, while project_id answers which plan on this machine. Another plan repository writes this value down in its own peer table, so it is never renamed, never derived from anything, and never parsed: it carries no time, no machine, and no order."
+    },
     "iteration": {
       "type": "object",
       "additionalProperties": false,
