@@ -15,6 +15,7 @@
   - [`repair:a-multi-item-operation-is-all-or-nothing` — A multi-item operation is all or nothing](#repaira-multi-item-operation-is-all-or-nothing--a-multi-item-operation-is-all-or-nothing)
   - [`repair:only-the-repair-reorders` — Only the repair reorders](#repaironly-the-repair-reorders--only-the-repair-reorders)
   - [`repair:the-repair-never-changes-a-lane` — The repair never changes a lane](#repairthe-repair-never-changes-a-lane--the-repair-never-changes-a-lane)
+  - [`repair:the-repair-never-names-a-plan-or-a-dependency` — The repair never names a plan or a dependency](#repairthe-repair-never-names-a-plan-or-a-dependency--the-repair-never-names-a-plan-or-a-dependency)
   - [`repair:the-slot-report-writes-nothing` — The slot report writes nothing](#repairthe-slot-report-writes-nothing--the-slot-report-writes-nothing)
 - [Unenforced rules](#unenforced-rules)
 
@@ -155,6 +156,18 @@ The repair MUST NOT move an entry to another lane, and a removal MUST NOT reorde
 - GIVEN an entry the repair ranks below the eligible ones
 - WHEN the repair runs
 - THEN it stays in its lane, because moving an entry is a transition and a transition owes a journal event
+
+Verify: `cargo nextest run --test writer_guarantees`
+
+### `repair:the-repair-never-names-a-plan-or-a-dependency` — The repair never names a plan or a dependency
+
+The repair MUST NOT write the peer table and MUST NOT edit a dependency list, bare or prefixed.
+
+#### Scenario: A dependency names an alias the table no longer has
+
+- GIVEN a record whose dependency points at a peer nothing declares
+- WHEN the repair runs
+- THEN it changes neither file. Choosing a peer is a naming judgment, and a dependency is a claim about the work that no tool can re-derive
 
 Verify: `cargo nextest run --test writer_guarantees`
 

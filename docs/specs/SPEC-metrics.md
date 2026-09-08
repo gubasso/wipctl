@@ -6,6 +6,7 @@
 - [The three flow measures](#the-three-flow-measures)
 - [Requirements](#requirements)
   - [`metrics:a-measure-is-folded-from-the-journal` — A measure is folded from the journal](#metricsa-measure-is-folded-from-the-journal--a-measure-is-folded-from-the-journal)
+  - [`metrics:an-entry-outside-this-record-is-never-a-quantity` — An entry outside this record is never a quantity](#metricsan-entry-outside-this-record-is-never-a-quantity--an-entry-outside-this-record-is-never-a-quantity)
   - [`metrics:the-clock-is-read-once` — The clock is read once](#metricsthe-clock-is-read-once--the-clock-is-read-once)
   - [`metrics:an-unmeasurable-entry-is-reported-unmeasured` — An unmeasurable entry is reported unmeasured](#metricsan-unmeasurable-entry-is-reported-unmeasured--an-unmeasurable-entry-is-reported-unmeasured)
   - [`metrics:an-out-of-order-journal-is-not-folded` — An out-of-order journal is not folded](#metricsan-out-of-order-journal-is-not-folded--an-out-of-order-journal-is-not-folded)
@@ -45,6 +46,18 @@ Every flow measure MUST be folded from the transition journal, and MUST NOT be r
 - GIVEN a checkout with truncated history
 - WHEN the measures run
 - THEN they match the full clone's numbers, because the journal is the source and history only witnesses it
+
+Verify: `cargo nextest run --test metrics`
+
+### `metrics:an-entry-outside-this-record-is-never-a-quantity` — An entry outside this record is never a quantity
+
+Every derived number MUST be computed from this record's own entries alone: velocity, epic and initiative arithmetic, flow, aging, and every board count.
+
+#### Scenario: A peer's entry closes
+
+- GIVEN an entry in an attached peer, closed inside this window
+- WHEN velocity is computed
+- THEN it counts nothing, because a prefixed dependency is an edge and an ordering fact, and never a quantity this record delivered
 
 Verify: `cargo nextest run --test metrics`
 
