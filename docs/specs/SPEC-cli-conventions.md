@@ -27,7 +27,7 @@
 
 ## Purpose
 
-One command with capabilities as verbs, and the rules that bind every one of them. The boundary runs at the surface: this domain covers exit codes, streams, dispatch, machine formats, and the two verbs that resolve nothing. What a message must say belongs to the messages domain, and what a writing verb must hold belongs to the transactions domain.
+One command with capabilities as verbs, and the rules that bind every one of them. The boundary runs at the surface: this domain covers exit codes, streams, dispatch, machine formats, and the three verbs that resolve nothing. What a message must say belongs to the messages domain, and what a writing verb must hold belongs to the transactions domain. What the manual holds and where it comes from belong to `SPEC-manual.md`.
 
 ## Exit codes
 
@@ -70,6 +70,7 @@ wipctl epic [--json] [--write] [<epic-id>]
 wipctl epics [--json]
 wipctl initiative [--json] [<initiative-id>]
 wipctl initiatives [--json]
+wipctl man [<verb>]
 wipctl help
 wipctl version
 ```
