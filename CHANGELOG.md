@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - `cli`: Report the peers and sync the closure on request ([#25](https://github.com/gubasso/wipctl/pull/25))
 
+### Correction
+
+This entry was generated before [#27](https://github.com/gubasso/wipctl/pull/27) landed, and the tag sits on a commit that contains it. So 0.1.10 also carries a breaking change to the command surface: the rule forbidding a project flag is replaced, and a caller who wants another plan names it with `--plan <alias>` instead of changing directory. Under 0.y the minor position is the breaking one, so that change owed a minor bump and shipped as a patch. A published entry is never rewritten, so the correction is recorded here and the version line moves at the next release.
+
 ## [0.1.9](https://github.com/gubasso/wipctl/compare/v0.1.8...v0.1.9) - 2026-09-08
 
 ### Added
