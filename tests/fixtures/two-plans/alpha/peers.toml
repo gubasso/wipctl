@@ -1,3 +1,9 @@
 [peers.beta]
 uid = "4c81d0e7f39a4b25861d7c04e9a2f358"
 urls = ["https://git.example.org/acme/beta-plan.git"]
+
+# Declared and referenced by nothing: the instance of the stale rule. It is
+# legal while unattached, because a check demands only what it reads.
+[peers.platform]
+uid = "b7d0e94a15c8f0236a41e78c3d5b0f62"
+urls = ["https://git.example.org/acme/platform-plan.git"]

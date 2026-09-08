@@ -3,4 +3,5 @@ stories:
   - id: secure-session-storage
     type: story
     points: 3
+    needs: ["alpha#profile-composition"]
     summary: "Hold a session identity in a store that survives a restart, so that a reader stays signed in and no identity is readable by another process."
