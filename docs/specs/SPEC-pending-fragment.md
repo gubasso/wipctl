@@ -21,7 +21,7 @@
 
 ## Purpose
 
-One file per captured entry, written by capture and consumed by the drain. A fragment states a delta, meaning where a new entry wants to land, and never a copy of anything a lane file holds. The boundary runs at landing. This domain owns the fragment and what the drain refuses. The lane file domain owns the entry once it lands.
+One file per captured entry, written by capture and consumed by the drain. A fragment states a delta, meaning where a new entry wants to land, and never a copy of anything a lane file holds. The boundary runs at landing. This domain owns the fragment and what the drain refuses. The lane file domain owns the entry once it lands, and it owns the two forms a dependency takes.
 
 ## File shape
 
@@ -34,9 +34,11 @@ entry:
   type: story
   points: 2
   summary: "Callers of the search endpoint are limited per token, and the limit is announced in the response headers rather than discovered by being cut off."
-  needs: []
+  needs: ["payments#secure-session-storage"]
   epic: session-hardening
 ```
+
+A fragment's `needs` accepts the same two forms a lane entry's does, and the double-quoting rule applies here too.
 
 ## Requirements
 
@@ -138,13 +140,13 @@ Verify: `cargo nextest run --test validation`
 
 ### `pending-fragment:a-fragment-id-is-not-a-duplicate` — A fragment id is not a duplicate
 
-A fragment's id MUST NOT appear in a lane file, and its entry, epic, and dependencies MUST each resolve in the record.
+A fragment's id MUST NOT appear in a lane file, and its entry, epic, and dependencies MUST each resolve in the record each one names.
 
 #### Scenario: A capture is drained twice
 
 - GIVEN an id present in both a fragment and a lane
 - WHEN validation runs
-- THEN it fails as a duplicate, because two records of one entry disagree on the first edit
+- THEN it fails as a duplicate, because two records of one entry disagree on the first edit. A prefixed dependency resolves in the peer its alias names, under the same rule
 
 Verify: `cargo nextest run --test validation`
 

@@ -205,6 +205,36 @@ fn a_lane_entry_outside_the_schema_fails() {
 }
 
 #[test]
+fn a_dependency_outside_both_grammars_fails() {
+    // A dependency is a bare id or one alias, one separator, and one id. Two
+    // separators is the value a hand edit produces when a reader assumes the
+    // prefix nests, which is the assumption the one-hop rule refuses.
+    let ok = accepts_fixture_with(
+        "needs-grammar",
+        "alpha/lanes/todo.yml",
+        "\"beta#secure-session-storage\"",
+        "\"beta#gamma#secure-session-storage\"",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a dependency outside both grammars must fail the gate");
+}
+
+#[test]
+fn a_repeated_dependency_fails() {
+    // One list, one mention. A repeat states nothing the first mention did not.
+    let ok = accepts_fixture_with(
+        "needs-repeat",
+        "alpha/lanes/todo.yml",
+        "[session-token-parsing, \"beta#secure-session-storage\"]",
+        "[session-token-parsing, session-token-parsing]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a repeated dependency must fail the gate");
+}
+
+#[test]
 fn a_peer_row_without_a_uid_fails() {
     // A peer is identified by the uid its own plan declares. A row naming only
     // a location names a place, not a plan.

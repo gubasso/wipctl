@@ -1,0 +1,9 @@
+lane: backlog
+after: null
+captured: "2026-07-11T09:41:07Z"
+entry:
+  id: profile-export
+  type: story
+  points: 2
+  summary: "Export a reader's profile as one file they can download, so that leaving the service does not mean leaving the data behind."
+  needs: ["beta#token-rotation"]

@@ -36,7 +36,7 @@
         },
         "needs": {
           "type": "array",
-          "items": { "$ref": "#/$defs/id" },
+          "items": { "$ref": "#/$defs/needs_id" },
           "uniqueItems": true
         },
         "epic": { "$ref": "#/$defs/id" },
@@ -59,6 +59,11 @@
     "slug": {
       "type": "string",
       "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "needs_id": {
+      "type": "string",
+      "pattern": "^([a-z0-9]+(-[a-z0-9]+)*#)?[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "A dependency target, restated from the lane entry: a bare id naming an entry in this record, or <alias>#<id> naming an entry in an attached peer. Keeping this mirror in agreement with the lane schema is the same review responsibility the entry object already carries."
     }
   }
 }
