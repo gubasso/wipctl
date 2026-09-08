@@ -37,6 +37,14 @@ desktop   ... abc1234 ── def5678 ── 77ff88e   move audit-headers to revi
 
 The third case is rare and the first is overwhelmingly common. That is why capture writes a disjoint fragment instead of editing a shared ranked lane file. One case is new under the slug-only grammar. Two machines can mint the same slug, and that too surfaces at replication as a conflict naming both sides. The recovery is to rephrase one title, which a person usually wants to do anyway.
 
+## A peer at two revisions
+
+A peer is one more plan repository, so the divergence above applies to it. Two machines can hold one peer at two revisions until that peer's own sync runs. Each machine then answers correctly about the state it holds, and the two answers differ.
+
+That is diagnosable rather than mysterious, because the check's census names the revision it read each peer at. One line tells a reader which machine is behind.
+
+`wipctl sync --all` is the verb that closes the gap. It walks the declared set, reconciles every slot before it verifies any, and holds one writer lock at a time. Reconciling plan by plan judges the first plan against peers the same run has not fetched yet. Peer graphs have cycles, so no ordering of slots avoids that. [../specs/SPEC-sync.md](../specs/SPEC-sync.md) holds the four passes.
+
 ## The two layers, side by side
 
 ```text

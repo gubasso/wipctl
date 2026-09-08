@@ -16,6 +16,8 @@
   - [`review:a-reshaped-successor-serves-its-epic` — A reshaped successor serves its epic](#reviewa-reshaped-successor-serves-its-epic--a-reshaped-successor-serves-its-epic)
   - [`review:a-drift-report-is-read-and-acted-on` — A drift report is read and acted on](#reviewa-drift-report-is-read-and-acted-on--a-drift-report-is-read-and-acted-on)
   - [`review:a-moved-host-document-carries-its-references` — A moved host document carries its references](#reviewa-moved-host-document-carries-its-references--a-moved-host-document-carries-its-references)
+  - [`review:a-peer-row-is-read-from-the-plan-it-names` — A peer row is read from the plan it names](#reviewa-peer-row-is-read-from-the-plan-it-names--a-peer-row-is-read-from-the-plan-it-names)
+  - [`review:the-other-team-learns-they-are-depended-on` — The other team learns they are depended on](#reviewthe-other-team-learns-they-are-depended-on--the-other-team-learns-they-are-depended-on)
   - [`review:a-declared-delta-matches-the-diff` — A declared delta matches the diff](#reviewa-declared-delta-matches-the-diff--a-declared-delta-matches-the-diff)
 - [Unenforced rules](#unenforced-rules)
 
@@ -170,6 +172,30 @@ When a host document moves, the author MUST update every inbound and outbound re
 - THEN each reference names the document that now carries the claim, because a reference that governs nothing is worse than none
 
 Verify: reviewer confirms every reference to a moved document names its new home
+
+### `review:a-peer-row-is-read-from-the-plan-it-names` — A peer row is read from the plan it names
+
+When a change adds a peer row, the reviewer MUST confirm that its uid came from that plan's own configuration.
+
+#### Scenario: A uid is typed from memory
+
+- GIVEN a row whose uid is one character off
+- WHEN the walk runs on a machine that already holds that plan
+- THEN it clones and refuses, and no earlier check tells a wrong uid from a plan nobody has yet. The reviewer also confirms that the alias reads for this project, and that one location is reachable by the people who run the walk
+
+Verify: reviewer confirms the uid came from the peer's configuration and the alias reads for this project
+
+### `review:the-other-team-learns-they-are-depended-on` — The other team learns they are depended on
+
+When a change makes an entry depend on a peer's entry, the author MUST tell that plan's owners.
+
+#### Scenario: An entry here waits on work nobody there scheduled
+
+- GIVEN a new prefixed dependency
+- WHEN nobody tells the other team
+- THEN this board is gated by work that plan has not agreed to. No record stores who depends on whom, so no check finds it
+
+Verify: reviewer confirms the owners of each newly depended-on plan were told
 
 ### `review:a-declared-delta-matches-the-diff` — A declared delta matches the diff
 
