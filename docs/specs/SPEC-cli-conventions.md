@@ -44,6 +44,8 @@ One command with capabilities as verbs, and the rules that bind every one of the
 The command is `wipctl`. These are its verbs and their usage. A verb's own domain states what it does. This table states what it is called and what it accepts.
 
 ```text
+wipctl [--plan <alias>] <verb> [...]
+
 wipctl init [--root DIR] [--iteration-start YYYY-MM-DD] [--print-hooks] [--dry-run]
 wipctl attach <plan-repo-url>
 wipctl attach --create
@@ -171,31 +173,31 @@ The implementation MUST answer `-h` and `--help` with help, `-V` and `--version`
 - WHEN it runs
 - THEN help prints and the run succeeds
 
-The implementation parses these tokens only before the verb. An unknown leading option and an unknown verb are both usage errors, and each names the usage command.
+The implementation parses these tokens only before the verb. An unknown leading option and an unknown verb are both usage errors, and each names the usage command. `--plan` sits in the same group, and the plan targeting domain owns what it selects and which verbs refuse it.
 
 Verify: `cargo nextest run --test verb_contracts`
 
 ### `cli-conventions:there-is-no-zone-argument` — There is no zone argument
 
-The implementation MUST NOT offer a positional zone argument or a project flag.
+The implementation MUST NOT offer a positional zone argument, and a caller who wants another plan MUST name it with the plan flag.
 
-#### Scenario: A caller wants another project
+#### Scenario: A caller wants a plan this one does not declare
 
-- GIVEN a caller outside the project they mean
-- WHEN they want to act on it
-- THEN they change directory, because resolution answers from the working directory and a second answer contradicts it
+- GIVEN an alias no row of this plan's peer table holds
+- WHEN the flag names it
+- THEN it is a usage error, because the flag selects from the closure this record already committed to and is not a path
 
 Verify: `cargo nextest run --test verb_contracts`
 
 ### `cli-conventions:a-verb-acts-on-one-plan` — A verb acts on one plan
 
-A verb MUST act on the plan the working directory resolves to, and MUST reach more than one plan only under a batch flag.
+A verb MUST act on exactly one plan, and MUST reach more than one only under a batch flag.
 
 #### Scenario: A check reads two attached peers to answer about this plan
 
 - GIVEN a record whose dependencies reach two peers
 - WHEN validation runs
-- THEN it is still single-plan, because it answers about this plan, while fetching, reconciling, or pushing several is a batch and needs the flag
+- THEN it is still single-plan, because it answers about this plan. That one plan is the one the working directory resolves to, unless the invocation names another through the plan targeting domain's flag
 
 Verify: `cargo nextest run --test verb_contracts`
 

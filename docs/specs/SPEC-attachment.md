@@ -66,7 +66,7 @@ needed              inside each slot and pick the slot that matches
 
 `project_id` resolves and `plan_uid` travels. The uid is looked up inside a slot and never names one. There is no tree keyed by it, so a reader never goes looking for one. The configuration domain owns what each value is. This domain owns where each one enters an invocation.
 
-A slot holds one plan, whether it arrived as this machine's own project or as a peer another plan named. Once filled, nothing distinguishes the two. The peer attachment domain owns the walk that fills a peer's slot.
+A slot holds one plan, whether it arrived as this machine's own project or as a peer another plan named. Once filled, nothing distinguishes the two. The peer attachment domain owns the walk that fills a peer's slot. The plan targeting domain owns the third resolution path, where an invocation names one of this plan's peers.
 
 ## Requirements
 
