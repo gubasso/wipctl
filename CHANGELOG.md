@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.1.7](https://github.com/gubasso/wipctl/compare/v0.1.6...v0.1.7) - 2026-09-08
+
+### Added
+
+- `record`: Let a plan name its peers, write them, and attach them ([#19](https://github.com/gubasso/wipctl/pull/19))
+
 ## [0.1.6](https://github.com/gubasso/wipctl/compare/v0.1.5...v0.1.6) - 2026-09-08
 
 ### Added
