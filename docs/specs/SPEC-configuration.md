@@ -4,10 +4,12 @@
 
 - [Purpose](#purpose)
 - [The two files](#the-two-files)
+- [The two identities](#the-two-identities)
 - [Requirements](#requirements)
   - [`configuration:no-key-has-a-read-time-default` — No key has a read-time default](#configurationno-key-has-a-read-time-default--no-key-has-a-read-time-default)
   - [`configuration:the-identity-file-carries-one-key` — The identity file carries one key](#configurationthe-identity-file-carries-one-key--the-identity-file-carries-one-key)
   - [`configuration:the-identity-file-marks-the-root` — The identity file marks the project root](#configurationthe-identity-file-marks-the-root--the-identity-file-marks-the-project-root)
+  - [`configuration:the-plan-declares-a-global-identity` — The plan declares a global identity](#configurationthe-plan-declares-a-global-identity--the-plan-declares-a-global-identity)
   - [`configuration:the-two-identities-agree` — The two identities agree](#configurationthe-two-identities-agree--the-two-identities-agree)
   - [`configuration:an-unknown-key-is-rejected` — An unknown key is rejected](#configurationan-unknown-key-is-rejected--an-unknown-key-is-rejected)
   - [`configuration:the-iteration-window-is-required` — The iteration window is required](#configurationthe-iteration-window-is-required--the-iteration-window-is-required)
@@ -31,10 +33,11 @@ The two configuration files and what each one owns. The host file identifies, an
 project_id = "payments-acme"
 ```
 
-`config.toml` lives at the zone root, inside the plan repository. It restates the identity and carries every fact about the plan itself, because the plan owns its own home.
+`config.toml` lives at the zone root, inside the plan repository. It restates the identity, declares the plan's own global identity, and carries every fact about the plan itself, because the plan owns its own home.
 
 ```toml
 project_id = "payments-acme"
+plan_uid = "9f2c41a08b7d4e63a15c8f02d7e4b619"
 
 [iteration]
 start = 2026-07-06
@@ -43,6 +46,34 @@ length_days = 14
 [aging]
 threshold_days = 21
 ```
+
+## The two identities
+
+A plan carries two names, and they answer two questions.
+
+```text
+project_id    slug         resolution key and human name; unique on THIS
+                           machine; renaming it is an explicit operation
+plan_uid      32 hex       global identity; written down by other plans;
+                           never renamed, never derived, never parsed
+```
+
+`project_id` answers which plan on this machine. `plan_uid` answers which plan anywhere. The first is a path segment under the data directory. The second is a value another repository commits. A machine-local slug cannot be the second one. Two operators mint the same slug without ever meeting, because uniqueness is decided against this machine's registry and not globally.
+
+`plan_uid` has four properties and no more:
+
+```text
+grammar      exactly 32 lowercase hexadecimal characters
+mint         128 bits from the machine's random source, at creation, once
+immutable    no verb changes it, and there is no rename operation for it
+opaque       nothing parses it; it carries no time, no machine, no order
+```
+
+Thirty-two hexadecimal characters sit inside the slug grammar as one segment, so no other grammar widens to hold the value. The mint size is stated as a fact. 128 bits of randomness makes a collision between two independently minted plans a risk no operator thinks about. No coordination between machines buys anything more.
+
+Immutability binds verbs. Two replicas that each minted a uid before either replicated are a disagreement in one committed file. An operator settles it by editing that file and committing. There is no verb for it, and the reason is the same one that makes the value useful. Other plans write it down, and a verb that rewrites it rewrites one they already hold.
+
+The uid never names a slot. A verb resolves a plan by the two steps the attachment domain states, then reads `plan_uid` inside the slot it reached. There is no tree keyed by the uid.
 
 ## Requirements
 
@@ -81,6 +112,18 @@ The directory holding the host identity file MUST be the project root, and nothi
 - THEN the upward walk stops at the identity file, because a second root marker lets two directories both claim the root
 
 Verify: `cargo nextest run --test attachment`
+
+### `configuration:the-plan-declares-a-global-identity` — The plan declares a global identity
+
+The plan configuration MUST carry `plan_uid` as exactly 32 lowercase hexadecimal characters, minted once when the plan is created.
+
+#### Scenario: A plan another plan named moves to a new forge
+
+- GIVEN a peer table in another plan repository holding this plan's uid
+- WHEN this plan is renamed, rehosted, or moved between forges
+- THEN the reference still resolves, because the identity is the value that repository committed and the location is a hint beside it
+
+Verify: `cargo nextest run --test schemas`
 
 ### `configuration:the-two-identities-agree` — The two identities agree
 
@@ -172,4 +215,5 @@ Verify: `cargo nextest run --test validation`
 - `project_id` absent or outside the slug grammar, in either file. A failed check naming the file and the field.
 - The two `project_id` values disagree. A failed check naming both files, both values, and the choice between re-attaching and correcting whichever file is wrong.
 - A required key absent from the plan configuration. A failed check naming the field.
+- `plan_uid` absent or outside its grammar. A failed check naming the file and the key. The message names the one verb form that gives an identity to a record that predates the key.
 - A malformed value. The schema half of validation reports it.

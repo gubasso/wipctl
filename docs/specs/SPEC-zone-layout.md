@@ -58,7 +58,7 @@ XDG_CACHE_HOME   $HOME/.cache
 
 ```text
 plan-repo/
-  config.toml                   identity and configuration
+  config.toml                   both identities and the configuration
   sources.toml                  declared external sources; earned, not scaffolded
   README.md                     orientation for a reader arriving at the zone
   AGENTS.md                     the method, self-sufficient, written by the scaffold

@@ -46,6 +46,7 @@ The command is `wipctl`. These are its verbs and their usage. A verb's own domai
 wipctl init [--root DIR] [--iteration-start YYYY-MM-DD] [--print-hooks] [--dry-run]
 wipctl attach <plan-repo-url>
 wipctl attach --create
+wipctl attach --mint-uid
 wipctl new <type> "<title>" [--id <id>] [--epic <id>] [--points <n>] [--lane <backlog|todo>]
 wipctl land [--report]
 wipctl move <id> --to <lane> [--outcome <o>] [--succeeded-by <id>] [--closed <date>] [--dry-run]

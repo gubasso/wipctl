@@ -82,6 +82,11 @@
             pkgs.typos # spell check; the upstream hook ids do not run here
             pkgs.committed # commit-message shape, same reason
             pkgs.gawk # scripts/check-emphasis
+            # scripts/check-schemas: the draft 2020-12 metaschema check and the
+            # instance check over the two-plan fixture. It reads TOML, YAML,
+            # and JSON instances, which is what the record is written in.
+            # SATISFIES quality-gates:every-schema-validates-against-the-metaschema
+            pkgs.check-jsonschema
             pkgs.ripsecrets # secret scan, pre-commit stage
             pkgs.gitleaks # secret scan, pre-push stage
             pkgs.editorconfig-checker # charset / EOL / trailing whitespace

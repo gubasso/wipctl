@@ -516,6 +516,38 @@ repos:
         files: '\.nix$'
         pass_filenames: false
         stages: [pre-push]
+
+  # --- Schemas: the draft, and the record they govern (local) ---
+  #
+  # docs/specs/SPEC-quality-gates.md requires that every shipped schema
+  # validate against the draft 2020-12 metaschema, and that a machine format be
+  # validated against its schema with real content. Neither claim can be made
+  # in prose: a schema that is not itself valid gates nothing, and a valid
+  # schema that says the wrong thing gates the wrong record.
+  #
+  # `pass_filenames: false` with a `files` selector: the script walks the
+  # schema tree and the fixture itself and pairs each instance with the schema
+  # its name and position select, so a later change that adds a governed file
+  # is picked up without editing this hook. `files` decides when the gate runs;
+  # the script decides what it reads.
+  #
+  # Both stages, per quality-gates:the-record-gates-run-at-both-stages: a
+  # commit made with the commit hooks skipped still meets the gate before
+  # anything is published.
+  #
+  # `language: system`; check-jsonschema comes from the devShell, which is the
+  # single provider.
+  # SATISFIES quality-gates:every-schema-validates-against-the-metaschema
+  - repo: local
+    hooks:
+      - id: check-schemas
+        name: schemas match the draft, and the fixture matches the schemas
+        entry: scripts/check-schemas
+        language: system
+        files: '^(docs/specs/SPEC-[^/]+/.*\.schema\.json|tests/fixtures/two-plans/.*|scripts/check-schemas)$'
+        pass_filenames: false
+        stages: [pre-commit, pre-push]
+
   # --- Prose rules no linter can express (local; before the formatter) ---
   #
   # AGENTS.md bans inline bold and italics, and caps an ADR body at 350 words.

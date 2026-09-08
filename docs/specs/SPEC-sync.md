@@ -6,6 +6,7 @@
 - [The four reconciliation cases](#the-four-reconciliation-cases)
 - [Requirements](#requirements)
   - [`sync:reconciliation-is-semantic-never-textual` — Reconciliation is semantic, never textual](#syncreconciliation-is-semantic-never-textual--reconciliation-is-semantic-never-textual)
+  - [`sync:two-minted-identities-are-reported` — Two minted identities are reported, never merged](#synctwo-minted-identities-are-reported--two-minted-identities-are-reported-never-merged)
   - [`sync:the-reconciliation-runs-under-the-lock` — The reconciliation runs under the lock](#syncthe-reconciliation-runs-under-the-lock--the-reconciliation-runs-under-the-lock)
   - [`sync:a-conflict-stops-the-push` — A conflict stops the push](#synca-conflict-stops-the-push--a-conflict-stops-the-push)
   - [`sync:a-conflict-names-both-sides` — A conflict names both sides](#synca-conflict-names-both-sides--a-conflict-names-both-sides)
@@ -31,6 +32,7 @@ Replication between machines, and the decision a person makes when two machines 
 | different entries transitioned on each side | combined; different entry blocks and different journal files                 |
 | the same entry transitioned on both sides   | a semantic conflict, decided by a person                                     |
 | one slug minted on both sides               | an id collision, recovered by renaming the losing capture                    |
+| one plan, two minted global identities      | a semantic conflict, decided by a person, because no fact orders the mints   |
 
 ## Requirements
 
@@ -43,6 +45,22 @@ The implementation MUST reconcile the local and remote histories semantically, a
 - GIVEN two disjoint sets of changes
 - WHEN reconciliation runs
 - THEN both are combined, because the record's shape says they cannot conflict and a line-based merge cannot see that
+
+Verify: `cargo nextest run --test sync`
+
+### `sync:two-minted-identities-are-reported` — Two minted identities are reported, never merged
+
+Where two replicas of one plan each minted a `plan_uid`, replication MUST report both values and MUST name the edit that resolves it.
+
+#### Scenario: Two machines upgrade one record before either replicates
+
+- GIVEN two replicas that each ran the upgrade form
+- WHEN the next replication reads both
+- THEN both values are named and neither is chosen. A uid carries no time and no order, and history is not a store this method reads, so nothing on disk orders the two mints
+
+The resolution is an operator's edit of `config.toml` on the losing side, committed by hand. No verb performs it, because no verb changes a uid.
+
+That settles the two replicas and nothing beyond them. A uid another plan already wrote into its own peer table stays written there, and no verb changes a row's uid. So this is cheap while the plan is young and expensive once other plans name it. The message says which case the operator is in.
 
 Verify: `cargo nextest run --test sync`
 

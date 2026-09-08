@@ -1,0 +1,8 @@
+lane: closed
+stories:
+  - id: session-token-parsing
+    type: story
+    points: 1
+    outcome: done
+    closed: "2026-07-10"
+    summary: "Read the session token from the request and turn it into an identity value the rest of the request handling can use."

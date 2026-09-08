@@ -1,0 +1,7 @@
+lane: todo
+stories:
+  - id: profile-composition
+    type: story
+    points: 2
+    needs: [session-token-parsing]
+    summary: "Compose a reader's profile page from the session identity, so that a signed-in reader sees their own name and settings."

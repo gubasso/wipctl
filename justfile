@@ -17,6 +17,11 @@ lint:
 lint-push:
 	{{dev}} pre-commit run --hook-stage pre-push --all-files --show-diff-on-failure
 
+# Run the schema gate: every shipped schema against the draft, and the fixture
+# against the schemas that govern it.
+schemas:
+	{{dev}} ./scripts/check-schemas
+
 # Run the test suite.
 test:
 	{{dev}} cargo nextest run --all-features
