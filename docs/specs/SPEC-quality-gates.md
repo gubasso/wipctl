@@ -16,6 +16,7 @@
   - [`quality-gates:the-journey-runs-against-an-installation` — The journey runs against an installation](#quality-gatesthe-journey-runs-against-an-installation--the-journey-runs-against-an-installation)
   - [`quality-gates:a-rendering-verb-is-gated-on-pipe-safety` — A rendering verb is gated on pipe safety](#quality-gatesa-rendering-verb-is-gated-on-pipe-safety--a-rendering-verb-is-gated-on-pipe-safety)
   - [`quality-gates:the-record-gates-run-at-both-stages` — The record gates run at both stages](#quality-gatesthe-record-gates-run-at-both-stages--the-record-gates-run-at-both-stages)
+  - [`quality-gates:the-published-artifact-carries-its-licence` — The published artifact carries its licence](#quality-gatesthe-published-artifact-carries-its-licence--the-published-artifact-carries-its-licence)
   - [`quality-gates:the-repository-is-self-contained` — The repository is self-contained](#quality-gatesthe-repository-is-self-contained--the-repository-is-self-contained)
   - [`quality-gates:an-implementation-conforms-by-every-gate` — An implementation conforms by every gate](#quality-gatesan-implementation-conforms-by-every-gate--an-implementation-conforms-by-every-gate)
 - [Unenforced rules](#unenforced-rules)
@@ -171,6 +172,20 @@ The record gates MUST run at both the commit stage and the push stage of the pla
 - THEN the push stage still meets the gate before anything is published
 
 Verify: `cargo nextest run --test scaffold`
+
+### `quality-gates:the-published-artifact-carries-its-licence` — The published artifact carries its licence
+
+When an implementation publishes an artifact, it MUST carry every licence text its expression names, and MUST NOT carry a development-only directory.
+
+#### Scenario: A governance directory reaches the published artifact
+
+- GIVEN a repository whose documentation tooling vendors a third party under its own terms
+- WHEN the artifact is published with that directory in it
+- THEN a consumer receives terms the artifact's own expression does not name, and the case rejects the file set
+
+A development-only directory is one no consumer of the artifact reads. The governance instance and the release convention of this repository are two.
+
+Verify: `cargo nextest run --test packaging`
 
 ### `quality-gates:the-repository-is-self-contained` — The repository is self-contained
 
