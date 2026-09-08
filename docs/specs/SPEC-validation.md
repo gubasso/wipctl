@@ -213,13 +213,13 @@ Verify: `cargo nextest run --test validation`
 
 ### `validation:the-verb-takes-no-argument` — The validation verb takes no argument
 
-The validation verb MUST take no argument and no flag, and MUST treat any as a usage error.
+The validation verb MUST take no argument and no verb-local flag, and MUST treat any as a usage error.
 
 #### Scenario: A caller passes a path
 
 - GIVEN an invocation naming a lane file
 - WHEN it parses
-- THEN it is a usage error, because every rule is cross-file and a partial run answers a different question
+- THEN it is a usage error, because every rule is cross-file and a partial run answers a different question. A global flag parsed before the verb is not a verb-local flag, so naming a plan to run against is not one either
 
 Verify: `cargo nextest run --test verb_contracts`
 
