@@ -1,8 +1,10 @@
 # wipctl
 
-wipctl is a planning method and the tooling that proves a project's plan record obeys it, shipped together and judged as one. The method plans with bounded stories, judgment-counting points, five lanes, and recorded transitions. The tooling is one command, `wipctl`, that scaffolds a project's plan, answers what to start next, takes work atomically, validates the record, moves entries between lanes as recorded events, captures and lands new work, replicates the plan between machines, and renders the record as terminal views.
+wipctl is a planning method and the tooling that proves a project's plan record obeys it. The two ship together and are judged as one. The method plans with bounded stories, judgment-counting points, five lanes, and recorded transitions. The tooling is one command. It scaffolds a project's plan, answers what to start next, and takes work atomically. It validates the record and moves entries between lanes as recorded events. It captures and lands new work, replicates the plan between machines, and renders the record as terminal views.
 
-A project's plan lives in a plan repository of its own — a plain git repository holding five lane files, one document per story, epic, and initiative, a charter, open questions, a transition journal, and an on-demand capture directory — shared by every worktree and clone of the project on a machine, and hosted wherever its operator chooses. The project itself carries exactly one committed file, `.wipctl.toml`, naming its identity; that file is the entire footprint, and everything else belongs to the project.
+A project's plan lives in a plan repository of its own. That is a plain git repository. It holds five lane files, one document per story, epic, and initiative, a charter, open questions, a transition journal, and an on-demand capture directory. Every worktree and clone of the project on a machine shares it, and its operator chooses where it is hosted.
+
+The project itself carries exactly one committed file, `.wipctl.toml`, naming its identity. That file is the entire footprint. Everything else belongs to the project.
 
 ## Install
 
@@ -14,7 +16,7 @@ cd wipctl
 cargo install --path .
 ```
 
-The command surface the binary implements is specified in [docs/reference/](./docs/reference/), which is where to look for the exact verbs, arguments, and exit codes rather than inferring them from the build.
+[docs/specs/](./docs/README.md) specifies the command surface the binary implements. Read it for the exact verbs, arguments, and exit codes, rather than inferring them from the build.
 
 ## Development
 
@@ -25,7 +27,7 @@ direnv allow   # loads the devShell on entering the directory
 nix develop    # or enter it ad hoc
 ```
 
-Checks live in the pre-commit hooks and the `justfile`, and nowhere else — CI runs those same entry points:
+Checks live in the pre-commit hooks and the `justfile`, and nowhere else. CI runs those same entry points:
 
 ```bash
 just check   # the full gate set
@@ -33,13 +35,13 @@ just test    # the test suite
 just lint    # formatting and lints
 ```
 
-Install the hooks once with `pre-commit install` inside the devShell; they run at commit and push. What this repository owes every artifact it ships is stated in [docs/reference/quality-gates.md](./docs/reference/quality-gates.md), which is binding on any change that adds one.
+Install the hooks once with `pre-commit install` inside the devShell. They run at commit and at push. [docs/specs/SPEC-quality-gates.md](./docs/specs/SPEC-quality-gates.md) states what this repository owes every artifact it ships, and it binds any change that adds one.
 
 ## Documentation
 
-Everything about the product lives under [docs/](./docs/README.md), organised by reader need: guides for task sequences, reference for exact contracts and formats, explanation for the method and the design, decisions for why. The reference zone is the normative specification this build conforms to; `AGENTS.md` states how the two relate while the build is under way.
+Everything about the product lives under [docs/](./docs/README.md), organised by reader need. There are guides for task sequences, specs for binding rules, explanation for the method and the design, and decisions for why. The spec zone is the normative specification this build conforms to. `AGENTS.md` states how the two relate while the build is under way.
 
-Start at [docs/explanation/overview.md](./docs/explanation/overview.md) to learn the method, or at [docs/reference/record/zone-layout.md](./docs/reference/record/zone-layout.md) to build against the specification.
+Start at [docs/explanation/overview.md](./docs/explanation/overview.md) to learn the method, or at [docs/specs/SPEC-zone-layout.md](./docs/specs/SPEC-zone-layout.md) to build against the specification.
 
 ## License
 

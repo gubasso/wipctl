@@ -6,7 +6,7 @@ How many agents share one plan without waiting on each other and without losing 
 
 A lock protects a transaction, never a session.
 
-An agent that is implementing a story is not editing the plan. It touched the plan for a few milliseconds when it took the work, and it will touch the plan again for a few milliseconds when it hands the work to review. In between, the plan is free.
+An agent that is implementing a story is not editing the plan. It touched the plan for a few milliseconds when it took the work. It will touch the plan again for a few milliseconds when it hands the work to review. In between, the plan is free.
 
 ```text
 the picture that needs a queue          the picture that does not
@@ -46,7 +46,7 @@ The critical section is exactly four steps:
    $XDG_RUNTIME_DIR/wipctl/payments-acme.lock                  the one writer lock
 ```
 
-One project, one plan, one lock, regardless of how many checkouts exist. The lock lives outside the record, so it is never committed, never cloned, and answers no question about the plan. Readers never take it — `next`, `board`, `epic`, `validate` read the committed state and are never blocked.
+One project, one plan, one lock, regardless of how many checkouts exist. The lock lives outside the record, so it is never committed, never cloned, and answers no question about the plan. Readers never take it. The preview, the board, the epic resolution, and validation all read the committed state and are never blocked.
 
 ## Simulation 1 — two agents, different entries
 
@@ -79,7 +79,7 @@ time   agent A (pid 41291)                    agent B (pid 41337)
 
 Agent B waited 19 milliseconds and got a different entry. Two facts carry the whole design:
 
-- Line 0.024. B reads inside the lock. Whatever B may have read a minute ago is advisory; the state B checks against is the state B writes into.
+- Line 0.024. B reads inside the lock. Whatever B read a minute ago is advisory. The state B checks against is the state B writes into.
 - Line 0.025. Because A already removed `rate-limit-search` from `todo`, the head B sees is the next one. The agents fan out without negotiating.
 
 ## Simulation 2 — two agents, the same entry
@@ -112,9 +112,9 @@ An agent that takes an entry by id can still lose a race. It loses safely.
                                                         next startable entry
 ```
 
-No corruption, no lost update, no double claim. The `move` is the claim; there is no separate claim record to keep in agreement with the lanes.
+No corruption, no lost update, no double claim. The move is the claim. There is no separate claim record to keep in agreement with the lanes.
 
-The exit code is deliberate. `2` means the invocation was wrong, so a caller retrying the identical command would be retrying a mistake — the correct response is to ask again what to start and take a different entry. That is what `start` does in one step.
+The exit code is deliberate. A usage error means the invocation was wrong, so a caller that retries the identical command retries a mistake. The correct response is to ask again what to start and take a different entry. The take verb does that in one step.
 
 ```text
 without start (read, then race)          with start (read and take, atomically)
@@ -147,13 +147,15 @@ The case the whole design is shaped around.
                 └ UNLOCK                                        held 18ms
 ```
 
-Two lock holdings totalling 39 milliseconds across 34 minutes of work. The second holding reads a record that changed a great deal while the agent was busy, and preflights against that record rather than against the one it remembers.
+Two lock holdings totalling 39 milliseconds across 34 minutes of work. The second holding reads a record that changed a great deal while the agent was busy. It preflights against that record rather than against the one it remembers.
 
 ## Capture, and why it is a fragment
 
-`wipctl new` writes a story document and a pending fragment, and touches no lane file. The fragment states where the entry wants to land — a lane, a position — and nothing the lane files already hold; two rules bound it: a fragment claims a planning lane only, and its position names a landed entry only ([../reference/record/pending-fragment.md](../reference/record/pending-fragment.md)). The drain, `wipctl land`, later reconciles every fragment into the ranked record in a derived order every machine agrees on, reporting every drift — a need that closed, a position target that moved — instead of repairing any, because rank is a claim and only a person makes one.
+`wipctl new` writes a story document and a pending fragment, and touches no lane file. The fragment states a lane and a position, and nothing the lane files already hold. Two rules bound it: a fragment claims a planning lane only, and its position names a landed entry only. [../specs/SPEC-pending-fragment.md](../specs/SPEC-pending-fragment.md) holds both.
 
-On one machine the lock already serialises captures, so the fragment is not needed for safety there. It is needed for the next section: a capture is a disjoint delta — one new file, named by an id nobody else was minting — and disjoint deltas are what make reconciliation between machines cheap. That choice was made so captures combine rather than conflict, and it pays exactly where no lock can reach.
+The drain later reconciles every fragment into the ranked record, in a derived order every machine agrees on. It reports every drift and repairs none. A drift is a need that closed, or a position target that moved. Rank is a claim, and only a person makes one.
+
+On one machine the lock already serialises captures, so the fragment is not needed for safety there. It is needed for the next section. A capture is a disjoint delta: one new file, named by an id nobody else was minting. Disjoint deltas are what make reconciliation between machines cheap. That choice was made so captures combine rather than conflict, and it pays exactly where no lock can reach.
 
 ## Simulation 4 — two machines
 
@@ -180,7 +182,7 @@ desktop   ... abc1234 ── def5678 ── 77ff88e   move audit-headers to revi
        through resolve. Never by whichever line won a textual merge.
 ```
 
-The third case is rare and the first is overwhelmingly common, which is why capture writes a disjoint fragment instead of editing a shared ranked lane file. One case is new under the slug-only grammar: two machines can mint the same slug, and that too surfaces at sync as a conflict naming both sides — the recovery is to rephrase one title, which a person would usually want to do anyway.
+The third case is rare and the first is overwhelmingly common. That is why capture writes a disjoint fragment instead of editing a shared ranked lane file. One case is new under the slug-only grammar. Two machines can mint the same slug, and that too surfaces at replication as a conflict naming both sides. The recovery is to rephrase one title, which a person usually wants to do anyway.
 
 ## The two layers, side by side
 
@@ -197,7 +199,7 @@ frequency      milliseconds of contention       whenever two machines worked
 
 ## Why there is no queue
 
-A queue answers a question this design does not have: how to fairly schedule a scarce resource. At twenty milliseconds the resource is not scarce. And a queue that was correct would have to answer all of this:
+A queue answers a question this design does not have: how to fairly schedule a scarce resource. At twenty milliseconds the resource is not scarce. And a queue that is correct must answer all of this:
 
 ```text
    an agent enters the queue and its process is killed
@@ -218,7 +220,7 @@ A queue answers a question this design does not have: how to fairly schedule a s
        problem the queue was supposed to solve
 ```
 
-What is promised instead: a waiting writer says who holds the lock, the wait is bounded, expiry is exit 3 naming the holder rather than an unbounded block, and a dead holder's lock is released rather than inherited.
+What is promised instead is four things. A waiting writer says who holds the lock. The wait is bounded. Expiry names the holder rather than blocking without end. A dead holder's lock is released rather than inherited.
 
 ## What this asks of an agent
 
@@ -233,8 +235,8 @@ sync when leaving a machine fetch, reconcile, push; never force
 
 ## A note on ids
 
-Every id on this page is a title's slug — `rate-limit-search`, never a random suffix. That is a consequence of everything above: a random suffix is what a mint draws when it cannot see the record it is writing into, which was true when every clone held its own copy. With one live record behind one lock, the mint reads before it writes, so a taken id is refused at capture time and the answer is to rephrase the title, or to keep it and choose a qualifying postfix. The grammar and the checks are in [../reference/record/ids.md](../reference/record/ids.md).
+Every id on this page is a title's slug, such as `rate-limit-search`, and never a random suffix. That is a consequence of everything above. A random suffix is what a mint draws when it cannot see the record it is writing into. That was true when every clone held its own copy. With one live record behind one lock, the mint reads before it writes. A taken id is therefore refused at capture time. The answer is to rephrase the title, or to keep it and choose a qualifying postfix. The grammar and the checks are in [../specs/SPEC-ids.md](../specs/SPEC-ids.md).
 
 ## A note on messages
 
-Every message on this page names its resolution, and that is a rule rather than a courtesy ([../reference/cli/conventions.md](../reference/cli/conventions.md)). A reader who is told only what failed has to guess the next step, and a coding agent guessing is a wrong action rather than a question. So a refusal names the verb or the edit that unblocks it, a wait names who is holding and whether they are alive, and a conflict names both sides and the choice between them.
+Every message on this page names its resolution, and that is a rule rather than a courtesy ([../specs/SPEC-cli-conventions.md](../specs/SPEC-cli-conventions.md)). A reader who is told only what failed has to guess the next step. A coding agent that guesses takes a wrong action rather than asking a question. So a refusal names the verb or the edit that unblocks it. A wait names who is holding and whether they are alive. A conflict names both sides and the choice between them.
