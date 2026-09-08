@@ -53,6 +53,8 @@ Two schemes are accepted for a peer url, `https` and `ssh`, and each MUST be wri
 
 A peer has three names, and they are three separate facts. The alias is chosen here. The uid is declared by the peer, and it never changes. The url is a locator that changes when the plan moves host, and changing it changes nothing else.
 
+This table is the only place an alias resolves. A dependency written as `<alias>#<id>` reads the alias here, in the record the dependency was written in, and never in any other plan's table.
+
 ## Two sets, named once
 
 ```text

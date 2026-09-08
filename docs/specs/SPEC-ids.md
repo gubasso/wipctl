@@ -4,12 +4,14 @@
 
 - [Purpose](#purpose)
 - [Grammar and slugification](#grammar-and-slugification)
+- [An id and a prefixed id](#an-id-and-a-prefixed-id)
 - [Requirements](#requirements)
   - [`ids:one-id-names-one-thing` — One id names one thing](#idsone-id-names-one-thing--one-id-names-one-thing)
   - [`ids:a-title-and-its-id-always-match` — A title and its id always match](#idsa-title-and-its-id-always-match--a-title-and-its-id-always-match)
   - [`ids:slugification-is-stated-once` — Slugification is stated once](#idsslugification-is-stated-once--slugification-is-stated-once)
   - [`ids:the-id-is-the-filename` — The id is the filename](#idsthe-id-is-the-filename--the-id-is-the-filename)
   - [`ids:an-id-is-opaque-to-every-consumer` — An id is opaque to every consumer](#idsan-id-is-opaque-to-every-consumer--an-id-is-opaque-to-every-consumer)
+  - [`ids:a-prefixed-id-is-split-once` — A prefixed id is split once](#idsa-prefixed-id-is-split-once--a-prefixed-id-is-split-once)
   - [`ids:the-mint-checks-under-the-lock` — The mint checks under the lock](#idsthe-mint-checks-under-the-lock--the-mint-checks-under-the-lock)
   - [`ids:a-postfix-is-passed-never-guessed` — A postfix is passed, never guessed](#idsa-postfix-is-passed-never-guessed--a-postfix-is-passed-never-guessed)
   - [`ids:a-postfix-qualifies-a-held-base` — A postfix qualifies a held base](#idsa-postfix-qualifies-a-held-base--a-postfix-qualifies-a-held-base)
@@ -43,6 +45,22 @@ A question id carries the same grammar behind the fixed prefix `Q-`.
 id  ==  slugify(title)                     the ordinary case
 id  ==  slugify(title) + "-" + <postfix>   where the slug alone was taken
 ```
+
+## An id and a prefixed id
+
+A dependency can name an entry in another plan, so two shapes appear where one used to.
+
+```text
+an id             one token; never parsed; names one thing in one record
+
+a prefixed id     an alias, a separator, and an id; split exactly once on
+                  the first separator; the alias half goes to the peer
+                  table and the id half is carried whole
+```
+
+Exactly one function in an implementation performs that split. Nothing else in the code splits a dependency value. A second splitter is how the two halves come to disagree.
+
+After the split, the id half is an ordinary id under the ordinary rule. So the opacity rule below survives the addition: it is the id that is never parsed, and a prefixed id is a pair that was never one id.
 
 ## Requirements
 
@@ -105,6 +123,18 @@ A consumer MUST treat an id as one token and MUST NOT parse it into parts.
 - THEN it compares the full id lexically as one string, because the id carries no order, date, rank, or interior meaning
 
 Verify: `cargo nextest run --test ids`
+
+### `ids:a-prefixed-id-is-split-once` — A prefixed id is split once
+
+A prefixed dependency MUST be split once, on the first separator, by one function of the implementation.
+
+#### Scenario: A view wants the alias for a heading
+
+- GIVEN a report grouping dependencies by the plan they name
+- WHEN it splits the value itself
+- THEN two splitters disagree on the first edge case, so the report asks the one function instead
+
+Verify: reviewer confirms one function splits a prefixed dependency
 
 ### `ids:the-mint-checks-under-the-lock` — The mint checks under the lock
 
@@ -183,5 +213,6 @@ Verify: `cargo nextest run --test ids`
 | Rule                                    | Why no command decides it                                                          |
 | --------------------------------------- | ---------------------------------------------------------------------------------- |
 | `ids:a-postfix-is-passed-never-guessed` | Whether a passed postfix distinguishes anything for a reader is a naming judgment. |
+| `ids:a-prefixed-id-is-split-once`       | No command tells one splitter from two that happen to agree today.                 |
 
 Rephrasing is the expected resolution for a collision: two titles that slug identically usually want different names anyway. A postfix answers a collision inside one record, and a rephrase answers one between two.
