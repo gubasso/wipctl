@@ -10,6 +10,8 @@ The lane entry carries what a scanner needs: type, points, summary, dependencies
 
 An entry is eligible when every id in its `needs` is closed and no open question blocks it. Blocked is always derived from those two edge kinds, never a lane and never a field. As a result, a view and a gate can never disagree about it.
 
+An id that carries an alias prefix is read in the peer that alias names. It gates this entry exactly as a local id does. [plans-and-peers.md](./plans-and-peers.md) says why the two forms are one edge.
+
 ## The two ranking rules
 
 - R1. In `todo.yml`, no ineligible entry sits above an eligible one. Whenever the lane holds a startable entry, the head is one, so the preview verb is a head read and not a search.

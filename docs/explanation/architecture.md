@@ -16,9 +16,11 @@ One executable entry point resolves the invocation: global flags, verb selection
 
 One implementation of the two-step resolution, used by every verb that touches a record. It covers the upward walk to the identity file and the attachment registry lookup. It also covers the identity agreement and the split between a usage error and a failed check. The scaffold bypasses it by design.
 
+It owns the third path too. Where an invocation names a peer, the component resolves this plan first and reads its peer table. It then finds the slot whose configuration declares the uid that alias binds. A slot holds one plan, whether it arrived as this machine's project or as a peer, so nothing downstream distinguishes the two.
+
 ## The record library
 
-The single reader of the record. It scans the configuration, the five lanes, the presence of the story, epic, and initiative documents, the open questions, the fragments, and the journals. It answers the derived questions every consumer shares: eligibility, the blocking edges of both kinds, story paths, positions, topological order, the startable set, pending claims, and membership at both tiers.
+The single reader of the record. It scans the configuration, the five lanes, the presence of the story, epic, and initiative documents, the open questions, the fragments, and the journals. It scans the peer table too. It reads an attached peer through itself, at the tree of that peer's current commit. A peer is a plan, and there is no second reader for one. It answers the derived questions every consumer shares: eligibility, the blocking edges of both kinds, story paths, positions, topological order, the startable set, pending claims, and membership at both tiers.
 
 Two properties are load-bearing:
 
@@ -33,7 +35,7 @@ The cross-file rule catalog, implemented against the record library, emitting lo
 
 ## The writers and the transaction layer
 
-The nine writing verbs share one write-discipline layer. That layer holds the transaction lock, the preflight before the first byte, and block relocation without re-serialisation. It also holds temporary-file-and-rename placement, the four guarantees, and the closing plan trunk commit in the fixed grammar. The rank repair is one implementation, called by the repair verb and by the transition verbs.
+The ten writing verbs share one write-discipline layer. That layer holds the transaction lock, the preflight before the first byte, and block relocation without re-serialisation. It also holds temporary-file-and-rename placement, the four guarantees, and the closing plan trunk commit in the fixed grammar. The rank repair is one implementation, called by the repair verb and by the transition verbs.
 
 ## The plan repository manager
 

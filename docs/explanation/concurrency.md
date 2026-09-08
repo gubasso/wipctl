@@ -48,6 +48,8 @@ The critical section is exactly four steps:
 
 One project, one plan, one lock, regardless of how many checkouts exist. The lock lives outside the record, so it is never committed, never cloned, and answers no question about the plan. Readers never take it. The preview, the board, the epic resolution, and validation all read the committed state and are never blocked.
 
+A peer is read the same way, at the tree of its current commit. So this plan's reader never blocks that peer's own writer, and never sees a half-written transaction. That is one lock per plan, and this chapter covers one of them. What crosses machines lives in [replication.md](./replication.md), which now covers the peer case too.
+
 ## Simulation 1 — two agents, different entries
 
 The ordinary case. Agent A starts one story while agent B starts another.

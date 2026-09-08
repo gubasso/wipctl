@@ -51,7 +51,27 @@ Inputs: `<PLAN_REPO_PATH>` (§1).
 
 Outputs: none. Every machine now resolves the same record through the same committed id.
 
-## 3 — Fill the charter
+## 3 — Name the plans this one depends on
+
+Inputs: none. Skip this phase when no entry here will depend on another project's plan.
+
+1. Add one row per plan you will depend on. The verb clones the plan, reads its identity, and writes the row, so you never type a uid:
+
+   ```text
+   $ wipctl peer add <plan-repo-url>
+   ```
+
+2. Fill every slot the closure needs, on this machine:
+
+   ```text
+   $ wipctl attach --peers
+   ```
+
+3. Run the attach again whenever the table gains a row, on every machine that checks this record. A peer a dependency reaches must be attached before the checker answers.
+
+Outputs: none. An entry can now depend on a peer's entry by writing `"<alias>#<id>"` in its `needs` list.
+
+## 4 — Fill the charter
 
 Inputs: `<PLAN_REPO_PATH>` (§1).
 
@@ -59,7 +79,7 @@ Inputs: `<PLAN_REPO_PATH>` (§1).
 
 Outputs: none. The charter is read in review, not by a later phase.
 
-## 4 — Write the first story
+## 5 — Write the first story
 
 Inputs: `<STORY_TEMPLATE_PATH>` (§1).
 
@@ -83,9 +103,9 @@ Outputs of this phase:
 <FIRST_STORY_ID> — the new entry's id, which is the title's slug and the story document's filename stem
 ```
 
-## 5 — Gate the record
+## 6 — Gate the record
 
-Inputs: `<FIRST_STORY_ID>` (§4).
+Inputs: `<FIRST_STORY_ID>` (§5).
 
 1. Validate. It runs from anywhere inside your project, and the `schemas:` line names which halves ran:
 
@@ -104,7 +124,7 @@ Inputs: `<FIRST_STORY_ID>` (§4).
 
 Outputs: none.
 
-## 6 — Start
+## 7 — Start
 
 Inputs: none.
 
