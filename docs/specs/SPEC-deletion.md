@@ -4,17 +4,19 @@
 
 Removal of an entry that never belonged in the record, leaving nothing but its journal. Deletion is not a cut. A cut entry was decided against. It stays in the closed lane, with its points in the epic denominator. A deleted entry keeps no lane presence at all. The boundary runs at the tombstone. This domain owns the removal, and the ids domain owns what the burned name means afterwards.
 
+The refusal covers this record. A plan that needs this id through a prefixed dependency is not consulted, because no record stores who depends on it. Deleting an entry another plan names is legal here and fails there, at that plan's next validation, in a message naming this plan. Where the id is one another team relies on, tell them. That is a review responsibility, and the review spec carries it.
+
 ## Requirements
 
 ### `deletion:a-referenced-id-is-not-deleted` — A referenced id is not deleted
 
-The implementation MUST refuse a deletion while anything still names the id, and MUST name the referrer and the edit or verb that clears it.
+The implementation MUST refuse a deletion while anything in this record still names the id, and MUST name the referrer and the resolution.
 
-#### Scenario: Another entry depends on the target
+#### Scenario: A peer depends on the target
 
-- GIVEN an entry whose dependency list names the target
+- GIVEN an entry another plan reaches through a prefixed dependency
 - WHEN the deletion runs
-- THEN it refuses naming that entry, because removing the target leaves a dependency that resolves to nothing
+- THEN it succeeds, because no record stores who depends on it and the refusal can only see this one. That plan learns at its next validation, in a message naming this plan, so the operator tells its owners
 
 Verify: `cargo nextest run --test verb_contracts`
 

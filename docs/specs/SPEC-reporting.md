@@ -9,6 +9,7 @@
   - [`reporting:the-board-reads-the-lane-entry` — The board reads the lane entry](#reportingthe-board-reads-the-lane-entry--the-board-reads-the-lane-entry)
   - [`reporting:the-current-story-is-marked` — The current story is marked](#reportingthe-current-story-is-marked--the-current-story-is-marked)
   - [`reporting:a-blocked-entry-is-shown-never-hidden` — A blocked entry is shown, never hidden](#reportinga-blocked-entry-is-shown-never-hidden--a-blocked-entry-is-shown-never-hidden)
+  - [`reporting:a-dependency-across-plans-is-visible` — A dependency across plans is visible](#reportinga-dependency-across-plans-is-visible--a-dependency-across-plans-is-visible)
   - [`reporting:the-board-offers-no-interaction` — The board offers no interaction](#reportingthe-board-offers-no-interaction--the-board-offers-no-interaction)
   - [`reporting:the-preview-is-a-head-read` — The preview is a head read](#reportingthe-preview-is-a-head-read--the-preview-is-a-head-read)
   - [`reporting:a-defect-warns-and-the-line-prints` — A defect warns and the line prints](#reportinga-defect-warns-and-the-line-prints--a-defect-warns-and-the-line-prints)
@@ -88,6 +89,18 @@ The board MUST show blocked entries with distinct badges for a dependency block 
 - THEN the glyphs still tell them apart, because the distinction is carried by the glyph and not by colour
 
 Verify: `cargo nextest run --test reporting`
+
+### `reporting:a-dependency-across-plans-is-visible` — A dependency across plans is visible
+
+The board MUST mark a row whose dependency reaches a peer, and the dependency drawing MUST name a peer's entry by its prefixed form.
+
+#### Scenario: A reader scans a board holding both kinds of dependency
+
+- GIVEN entries blocked inside this record and entries blocked by a peer
+- WHEN the board draws
+- THEN one glyph tells them apart, because a board is a scan and a scan needs a mark rather than a list. The blocked reason and the drawing name the peer's entry, which is the reader's cue that it lives elsewhere
+
+Verify: `cargo nextest run --test rendering`
 
 ### `reporting:the-board-offers-no-interaction` — The board offers no interaction
 

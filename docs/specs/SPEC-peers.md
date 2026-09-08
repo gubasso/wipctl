@@ -6,7 +6,9 @@
 - [The file](#the-file)
 - [Two sets, named once](#two-sets-named-once)
 - [What the table is not](#what-the-table-is-not)
+- [The view](#the-view)
 - [Requirements](#requirements)
+  - [`peers:the-view-answers-from-the-table-and-the-slots` — The view answers from the table and the slots](#peersthe-view-answers-from-the-table-and-the-slots--the-view-answers-from-the-table-and-the-slots)
   - [`peers:a-row-carries-a-uid-and-a-location` — A row carries a uid and a location](#peersa-row-carries-a-uid-and-a-location--a-row-carries-a-uid-and-a-location)
   - [`peers:an-alias-is-local-and-unique` — An alias is local and unique](#peersan-alias-is-local-and-unique--an-alias-is-local-and-unique)
   - [`peers:one-row-names-one-other-plan` — One row names one other plan](#peersone-row-names-one-other-plan--one-row-names-one-other-plan)
@@ -77,7 +79,48 @@ The split follows the two jobs. Attaching is an operator saying which plans they
 - The table is not authoritative about the peer. The peer's own `config.toml` is, and the walk refuses a clone that disagrees with the row.
 - The table is not a cache. Reading a peer is a read of that peer's slot, and no peer state is stored here.
 
+## The view
+
+```text
+wipctl peers [--json]
+```
+
+The view reads the table, this record's five lane files, and the slot of each attached peer.
+
+```text
+$ wipctl peers
+payments   9f2c41a08b7d4e63a15c8f02d7e4b619   attached  91a47c0d
+           https://git.example.org/acme/payments-plan.git
+           2 entries need it
+             profile-composition   needs secure-session-storage   todo
+             profile-export        needs token-rotation           closed
+
+platform   4c81d0e7f39a4b25861d7c04e9a2f358   not attached
+           https://git.example.net/mirrors/platform-plan.git
+           run 'wipctl attach --peers'
+```
+
+The contract states five things. The view lists every declared peer. It names whether each is attached and at which revision. It groups this record's prefixed dependencies under the peer they name, with the lane each target sits in. It marks a row no dependency uses as stale. It never fetches, which the page says out loud, because a reader who sees a location expects a network call.
+
+`peers` is a reader in the family of `epics` and `initiatives`, and a view belongs beside the views. The health report names whether each declared peer is attached and stops there. A report that repeats a view is a second copy of it.
+
+The machine format is `peer-list.schema.json`, in the companion directory of this spec. A field is absent rather than null where the state does not have it, which is the rule an entry's optional fields already follow. Stale is derived from the reference list rather than stated beside it, so the schema holds the two in agreement.
+
+A prefixed dependency that resolves to no entry has no message on this page. The validation domain owns that condition and answers it three ways from the peer's own tombstones. A fourth, vaguer message here gives one condition two answers, and the vaguer one is the one a reader meets first.
+
 ## Requirements
+
+### `peers:the-view-answers-from-the-table-and-the-slots` — The view answers from the table and the slots
+
+The peer view MUST list every declared row, name whether each is attached and at which revision, and mark an unused row stale.
+
+#### Scenario: The plan names no peers
+
+- GIVEN a record with no table
+- WHEN the view runs
+- THEN it succeeds and says so. Naming no peers is the ordinary case, and a verb that fails on the ordinary case teaches the wrong thing
+
+Verify: `cargo nextest run --test verb_contracts`
 
 ### `peers:a-row-carries-a-uid-and-a-location` — A row carries a uid and a location
 
@@ -189,4 +232,9 @@ two rows claiming one uid                                                 exit 1
   wipctl: peers 'payments' and 'billing' name one plan
   wipctl:   uid 9f2c41a08b7d4e63a15c8f02d7e4b619
   wipctl: one plan gets one alias; drop the row you do not use
+
+the view runs against a plan with no table                                exit 0
+  wipctl: this plan names no peers
+  wipctl: a peer is declared in peers.toml at the plan zone root; see
+          'wipctl help peers'
 ```

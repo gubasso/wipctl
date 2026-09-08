@@ -33,6 +33,8 @@ The constraints every view verb obeys. Terminal text is the only rendering targe
 | Box Drawing      | junctions for the ladder graph, from the four direction bits                                                   |
 | Braille patterns | a density tier, weakest in font coverage, announced as braille by screen readers; no baseline view requires it |
 
+A cross-plan marker is drawn from the default tier, and its plain-flag form comes from the ASCII tier, like every other badge. It carries one fact, which is that a dependency of this row reaches another plan, so one width-1 glyph is the whole of it.
+
 ## Requirements
 
 ### `rendering:the-terminal-is-the-only-target` — The terminal is the only target

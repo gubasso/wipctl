@@ -544,7 +544,7 @@ repos:
         name: schemas match the draft, and the fixture matches the schemas
         entry: scripts/check-schemas
         language: system
-        files: '^(docs/specs/SPEC-[^/]+/.*\.schema\.json|tests/fixtures/two-plans/.*|scripts/check-schemas)$'
+        files: '^(docs/specs/SPEC-[^/]+/.*\.schema\.json|tests/fixtures/.*|scripts/check-schemas)$'
         pass_filenames: false
         stages: [pre-commit, pre-push]
 

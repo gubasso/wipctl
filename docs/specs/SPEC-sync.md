@@ -4,7 +4,13 @@
 
 - [Purpose](#purpose)
 - [The four reconciliation cases](#the-four-reconciliation-cases)
+- [The batch run](#the-batch-run)
+- [When the transport cannot finish](#when-the-transport-cannot-finish)
 - [Requirements](#requirements)
+  - [`sync:the-batch-runs-in-four-passes` — The batch runs in four passes](#syncthe-batch-runs-in-four-passes--the-batch-runs-in-four-passes)
+  - [`sync:the-batch-publishes-only-what-it-verified` — The batch publishes only what it verified](#syncthe-batch-publishes-only-what-it-verified--the-batch-publishes-only-what-it-verified)
+  - [`sync:the-batch-holds-one-lock-at-a-time` — The batch holds one lock at a time](#syncthe-batch-holds-one-lock-at-a-time--the-batch-holds-one-lock-at-a-time)
+  - [`sync:the-aggregate-exit-code-has-a-precedence` — The aggregate exit code has a precedence](#syncthe-aggregate-exit-code-has-a-precedence--the-aggregate-exit-code-has-a-precedence)
   - [`sync:reconciliation-is-semantic-never-textual` — Reconciliation is semantic, never textual](#syncreconciliation-is-semantic-never-textual--reconciliation-is-semantic-never-textual)
   - [`sync:two-minted-identities-are-reported` — Two minted identities are reported, never merged](#synctwo-minted-identities-are-reported--two-minted-identities-are-reported-never-merged)
   - [`sync:the-reconciliation-runs-under-the-lock` — The reconciliation runs under the lock](#syncthe-reconciliation-runs-under-the-lock--the-reconciliation-runs-under-the-lock)
@@ -34,7 +40,112 @@ Replication between machines, and the decision a person makes when two machines 
 | one slug minted on both sides               | an id collision, recovered by renaming the losing capture                    |
 | one plan, two minted global identities      | a semantic conflict, decided by a person, because no fact orders the mints   |
 
+## The batch run
+
+```text
+wipctl sync [--all] [--json]
+```
+
+Without `--all` the verb is unchanged: this plan's trunk, fetched, reconciled, validated, pushed fast-forward. `sync.schema.json` is unchanged with it.
+
+With `--all` the run is not that contract repeated, and the reason comes before the passes. The single-plan contract validates before it pushes. Running it plan by plan validates the first plan against peers this same run has not fetched yet. That plan then fails against state the run is about to replace, and nothing revisits it. Peer graphs have cycles, so no ordering of slots fixes that. The batch is four named passes instead.
+
+```text
+discover    resolve this plan, walk the declared set, and deduplicate by
+            plan_uid, so a plan two rows reach is visited once. The
+            output of this pass is the visit list, in a stated order:
+            this plan first, then each plan in the order it was first
+            declared.
+
+reconcile   for each slot in turn: take that slot's writer lock, fetch,
+            fast-forward or reconcile, commit, release. No validation
+            here, and no push. One lock at a time. Then re-run discover
+            and repeat, until the visit list stops growing.
+
+verify      with every slot reconciled and no lock held, validate the
+            closure once, recording the revision each slot was read at.
+            This is the answer the run reports, and it is an answer
+            about the state on disk after the reconcile pass.
+
+publish     for each slot that gained a commit, in turn: take that
+            slot's lock, confirm the trunk still stands at the recorded
+            revision, push fast-forward, release. A slot that failed
+            verification is not pushed, and the summary says so.
+```
+
+The reconcile pass loops because reconciling a peer can bring in a row this run never saw. That plan joins the declared set. Without the loop, a plan already in a slot is verified at a revision the run never fetched. The loop ends because the closure is finite and the visit list only grows.
+
+Publishing checks the recorded revision because verification releases every lock before it runs. A local writer can commit into a slot in that window. A slot whose trunk moved is reported and not pushed, so the run publishes no commit that verification never read.
+
+Each slot is independent in the reconcile and publish passes. A failure in one slot stops that slot and nothing else, and the run continues so the summary names every slot's outcome. A slot whose lock is still held when the bounded wait expires is reported as locked.
+
+A slot's outcome is one of five: up to date, advanced, reconciled, failed, or locked. The single-plan contract holds one lock from the fetch to the push, and the batch cannot, because its verify pass reads every slot at once. So the batch states what replaces that hold: one lock at a time, and a push only of the revision verification read.
+
+The verb writes into a peer's slot only what replication writes into any slot: a fetch, a fast-forward, a reconciliation commit when both sides moved, and a push. It never edits a peer's record and never settles a peer's semantic conflict, which stays with that plan's owners and their own resolution verb.
+
+```text
+$ wipctl sync --all
+payments-acme      remote advanced; fetched 2 commits; nothing to push
+platform-acme      up to date
+profile-acme       reconciled 1 disjoint capture; pushed the plan trunk
+verified the closure: 63 entries, 3 plans, ok
+```
+
+`--json` under `--all` conforms to `sync-all.schema.json` and not to `sync.schema.json`. One is an object about one plan and the other is a run over many. One schema for both makes every field of the smaller one optional.
+
+## When the transport cannot finish
+
+Reconciliation here is semantic, and its conflicts have their own diagnostics below. The other class is the transport itself. It cannot complete a fetch, a fast-forward, or a push, or the slot is not as the tool left it. The messages domain owns that class, because relaying another tool's output is a rule about what a message says and not about replication.
+
 ## Requirements
+
+### `sync:the-batch-runs-in-four-passes` — The batch runs in four passes
+
+Under the batch flag, replication MUST reconcile until the declared set stops growing, and MUST verify the closure once after that.
+
+#### Scenario: Reconciling one peer brings in a plan the run never visited
+
+- GIVEN a peer whose table gains a row for a plan already in a slot
+- WHEN the reconcile pass ends
+- THEN discovery runs again and that slot is reconciled too. A plan verified at a revision the run never fetched is the failure these passes exist to prevent
+
+Verify: `cargo nextest run --test sync`
+
+### `sync:the-batch-publishes-only-what-it-verified` — The batch publishes only what it verified
+
+Under the batch flag, replication MUST record the revision it verified each slot at, and MUST NOT push a slot that moved since.
+
+#### Scenario: A local writer commits between verification and publication
+
+- GIVEN a slot that gained a commit after the verify pass released its lock
+- WHEN its publish turn arrives
+- THEN it is reported and not pushed. Verification runs with no lock held, and that window otherwise allows a push of work nothing verified
+
+Verify: `cargo nextest run --test sync`
+
+### `sync:the-batch-holds-one-lock-at-a-time` — The batch holds one lock at a time
+
+The batch MUST hold one writer lock at a time, and MUST report a slot whose bounded wait expires as locked while the run continues.
+
+#### Scenario: Another agent is writing one plan of the closure
+
+- GIVEN a slot whose lock is held throughout the run
+- WHEN the reconcile pass reaches it
+- THEN that slot alone is reported and the rest of the run proceeds, and no ordering of slots can deadlock against that agent
+
+Verify: `cargo nextest run --test writer_guarantees`
+
+### `sync:the-aggregate-exit-code-has-a-precedence` — The aggregate exit code has a precedence
+
+The batch MUST exit 1 where any slot failed, 3 where a lock timeout was the only fault, and 0 where every slot succeeded.
+
+#### Scenario: One slot fails a check and another times out
+
+- GIVEN a run with both outcomes
+- WHEN it ends
+- THEN it exits 1, because a lock timeout is a retry and a failed check is a decision
+
+Verify: `cargo nextest run --test sync`
 
 ### `sync:reconciliation-is-semantic-never-textual` — Reconciliation is semantic, never textual
 
@@ -66,13 +177,13 @@ Verify: `cargo nextest run --test sync`
 
 ### `sync:the-reconciliation-runs-under-the-lock` — The reconciliation runs under the lock
 
-Replication MUST fetch, reconcile, validate, commit, and push, with the reconciliation inside one lock holding.
+Without the batch flag, replication MUST fetch, reconcile, validate, commit, and push, with the reconciliation inside one lock holding.
 
 #### Scenario: A local capture runs during a sync
 
 - GIVEN a concurrent local mutation
 - WHEN reconciliation holds the lock
-- THEN the two cannot interleave, because a reconciliation reading a record another writer is changing reconciles a state that never existed
+- THEN the two cannot interleave, because a reconciliation reading a record another writer is changing reconciles a state that never existed. The batch cannot hold one lock across its passes, so it names its own guarantees instead: one lock at a time, and a push only of what verification read
 
 Verify: `cargo nextest run --test sync`
 
