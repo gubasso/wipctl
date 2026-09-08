@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.1.3](https://github.com/gubasso/wipctl/compare/v0.1.2...v0.1.3) - 2026-09-08
+
+### Other
+
+- `docs`: Adopt the spec-driven-docs convention ([#7](https://github.com/gubasso/wipctl/pull/7))
+
 ## [0.1.2](https://github.com/gubasso/wipctl/compare/v0.1.1...v0.1.2) - 2026-09-06
 
 ### Fixed
