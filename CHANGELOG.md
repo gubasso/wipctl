@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.1.4](https://github.com/gubasso/wipctl/compare/v0.1.3...v0.1.4) - 2026-09-08
+
+### Other
+
+- `repo`: State the contribution grant and correct the published file set
+
 ## [0.1.3](https://github.com/gubasso/wipctl/compare/v0.1.2...v0.1.3) - 2026-09-08
 
 ### Other
