@@ -17,6 +17,7 @@
   - [`documents:the-initiative-section-carries-one-token` — The initiative section carries one token](#documentsthe-initiative-section-carries-one-token--the-initiative-section-carries-one-token)
   - [`documents:an-initiative-has-no-parent-section` — An initiative has no parent section](#documentsan-initiative-has-no-parent-section--an-initiative-has-no-parent-section)
   - [`documents:a-reference-opens-with-its-path` — A reference opens with its path](#documentsa-reference-opens-with-its-path--a-reference-opens-with-its-path)
+  - [`documents:a-source-item-opens-with-its-reference` — A source item opens with its reference](#documentsa-source-item-opens-with-its-reference--a-source-item-opens-with-its-reference)
   - [`documents:a-promised-path-is-exempt-and-never-stubbed` — A promised path is exempt and never stubbed](#documentsa-promised-path-is-exempt-and-never-stubbed--a-promised-path-is-exempt-and-never-stubbed)
   - [`documents:a-rule-delta-is-typed-and-single` — A rule delta is typed and single](#documentsa-rule-delta-is-typed-and-single--a-rule-delta-is-typed-and-single)
   - [`documents:an-artifact-lives-beside-the-document` — An artifact lives beside the document](#documentsan-artifact-lives-beside-the-document--an-artifact-lives-beside-the-document)
@@ -40,6 +41,7 @@ One document per story, epic, and initiative, and the shape each one carries. Th
 | `Out of scope` | `Out of scope` | `Out of scope` |
 | `Reads`        | `Reads`        | `Reads`        |
 | `Amends`       | `Amends`       | `Amends`       |
+| `Sources`      | `Sources`      | `Sources`      |
 | `Acceptance`   | —              | —              |
 | —              | `Done when`    | `Done when`    |
 | `Tasks`        | —              | —              |
@@ -191,6 +193,18 @@ Each reference item MUST open with its path as an inline-code token, and an outb
 - GIVEN an item whose sentence names another file
 - WHEN the references are read
 - THEN only the leading token is a path, because everything after it is prose, and inbound paths are deliberately unchecked as a review responsibility
+
+Verify: `cargo nextest run --test documents`
+
+### `documents:a-source-item-opens-with-its-reference` — A source item opens with its reference
+
+Each source item MUST open with one source reference as an inline-code token, in the alias-and-key shape the external sources domain states.
+
+#### Scenario: A source item names the outside item and explains it
+
+- GIVEN an item whose sentence quotes the outside item's own title
+- WHEN the sources section is read
+- THEN only the leading token is a reference, because everything after it is prose the record never parses
 
 Verify: `cargo nextest run --test documents`
 

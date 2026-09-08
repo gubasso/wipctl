@@ -136,7 +136,7 @@ The case the whole design is shaped around.
                 ┌ LOCK   read, preflight, todo -> doing, commit
                 └ UNLOCK                                        held 21ms
 
-  09:00:00.021  ── agent reads the story, reads its Reads sources,
+  09:00:00.021  ── agent reads the story, reads its Reads documents,
                    writes code, runs tests, rewrites, runs tests ──
                    the plan is completely free this whole time
                    other agents take work, close work, capture work

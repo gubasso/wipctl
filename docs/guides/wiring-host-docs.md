@@ -34,6 +34,7 @@ These are review-only responsibilities, named because no gate holds them:
 - the named document is the right one
 - the transfer happened
 - a promise marked `new:` was kept
-- `Reads` names the sources a session genuinely needs
+- `Reads` names the documents a session genuinely needs
+- `Sources` names the outside items the work genuinely answers
 - a reference is genuinely load-bearing, or genuinely changed
 - a story that changed a rule declared its typed delta, and the type matches the diff

@@ -20,6 +20,7 @@ One spec per domain, each requirement carrying a rule id, an example scenario, a
 - The verbs: [SPEC-capture.md](./specs/SPEC-capture.md), [SPEC-transitions.md](./specs/SPEC-transitions.md), [SPEC-drain.md](./specs/SPEC-drain.md), [SPEC-deletion.md](./specs/SPEC-deletion.md), [SPEC-rename.md](./specs/SPEC-rename.md), [SPEC-attachment.md](./specs/SPEC-attachment.md), [SPEC-sync.md](./specs/SPEC-sync.md).
 - The views: [SPEC-reporting.md](./specs/SPEC-reporting.md), [SPEC-metrics.md](./specs/SPEC-metrics.md), [SPEC-epics.md](./specs/SPEC-epics.md), [SPEC-initiatives.md](./specs/SPEC-initiatives.md), [SPEC-rendering.md](./specs/SPEC-rendering.md).
 - What is checked and by which half: [SPEC-validation.md](./specs/SPEC-validation.md), [SPEC-ranking.md](./specs/SPEC-ranking.md), [SPEC-repair.md](./specs/SPEC-repair.md), [SPEC-doctor.md](./specs/SPEC-doctor.md).
+- [SPEC-external-sources.md](./specs/SPEC-external-sources.md): naming an item in a system outside the plan repository.
 - [SPEC-scaffold.md](./specs/SPEC-scaffold.md): what the scaffold lands, and the contract each landed file carries.
 - [SPEC-quality-gates.md](./specs/SPEC-quality-gates.md): what any implementation gates, and what it means to conform.
 - [SPEC-review.md](./specs/SPEC-review.md): the human review gate, holding every rule no command can decide.

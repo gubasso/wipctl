@@ -6,17 +6,25 @@ wipctl asks the host project to carry one committed file: `.wipctl.toml` at its 
 
 The scaffold writes exactly that one file into the host. It owns the plan repository it creates, including the method document that travels with it. Host-owned files are read at most. Content intended for them is printed for a person to place.
 
-## Two directions of reference
+## Two directions into the host
 
 Stories reference the host's documents across the two repositories. The paths resolve against the host's project root, which is the directory holding the identity file.
 
-`Reads` is the inbound direction. It names the individual sources a work session must load before starting. The gate does not check it, because the right sources are a judgment about the host's documents. That makes it entirely a review responsibility.
+`Reads` is the inbound direction. It names the individual documents a work session must load before starting. The gate does not check it, because the right documents are a judgment about the host's own tree. That makes it entirely a review responsibility.
 
 A host whose documentation method excludes a class of document from that load set excludes it here too. Several methods exclude decision records, so a session reads the rule that binds rather than the argument that shaped it. This method adds no constraint of its own and lifts none.
 
 `Amends` is the outbound direction. It names the documents the work must leave changed, and it is gated. Each path is relative, carries no dot segment, and resolves against the project root. An assertion opening with `new:` is the exception. It promises a document the work will create, and it exempts existence for the life of the entry. Both directions point anywhere in the project, not only at its documentation.
 
 A host that keeps requirement-level specifications identifies each rule by an id of the shape `<domain>:<rule-slug>`. An `Amends` assertion can then carry a typed delta: `ADDED`, `MODIFIED`, or `REMOVED`, plus the rule id in inline code. Rule-to-story traceability is then one fixed-string search over the plan zone. The gate checks a declared clause's shape and never its presence, for the same reason the inbound direction is unchecked. Which host documents keep rule ids is a fact about the host.
+
+## A reference out of the project
+
+A project rarely plans in one list. Forge issues, ticket-system items, and bug reports name pending work at the same time. The record needs a way to say which of them a piece of work answers. `Sources` is that way, and it runs in a third direction. It points out to a system neither repository can see.
+
+The shape holds the same doctrine as the branch and the commit. The record stores the item's key and nothing else. The remote system stays the source of truth, so nothing here goes stale behind it. A reference is `<alias>#<key>`, and the alias is declared once in `sources.toml` at the plan zone root, per [../specs/SPEC-external-sources.md](../specs/SPEC-external-sources.md). The host's footprint does not grow: the declaration lives with the plan, and the host still carries one file.
+
+Two rules keep the tier ladder intact. A reference never sequences and never counts, so `needs` stays the one sequencing fact. A reference also carries no hierarchy, so a story's reference is never checked against its epic's. Membership runs one way through the local ladder, and a remote tree read as membership becomes a second store of it. The cost is stated rather than hidden. Nothing tells a reader that a story and its epic point at unrelated outside trees, and that stays a review question.
 
 ## A story is a diff, a durable document is a state
 
@@ -28,7 +36,7 @@ The transfer's same-change guarantee becomes a same-unit-of-review obligation. N
 
 ## What the gate checks here, and what it does not
 
-The gate checks the outbound direction's shape and resolution, including the shape of a declared rule-delta clause. It checks the identity file's presence, its grammar, and its agreement with the plan repository.
+The gate checks the outbound direction's shape and resolution, including the shape of a declared rule-delta clause. It checks the identity file's presence, its grammar, and its agreement with the plan repository. It checks a source reference's shape and its alias against the declaration file, and stops there.
 
 These are review responsibilities instead, and are stated as such:
 
@@ -37,4 +45,5 @@ These are review responsibilities instead, and are stated as such:
 - whether a promised document was created
 - whether a story that changed a rule declared its delta clause, and whether the declared type matches the diff
 - whether the code references are honest
+- whether a source reference names work the artifact delivers
 - every inbound path
