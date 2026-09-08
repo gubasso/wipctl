@@ -1,31 +1,13 @@
 {
-  "schema_version": 4,
-  "rk_version": "0.2.23",
-  "payload_sha256": "d91eba8f7d2ef5be2397bba5773fea92f50801da75494adf361dfb3c65990b63",
+  "schema_version": 5,
+  "rk_version": "0.3.0",
+  "payload_sha256": "9f84d604207ffc6895899a1ebe170d41b566f8a9f8c02dc98a86efc69cdd38bc",
   "origin": "adopt",
   "tech": "rust",
   "forge": "github",
   "landed_at": "2026-09-06T02:40:51Z",
   "parameters": {
     "repo": "gubasso/wipctl",
-    "scopes": [
-      "cli",
-      "method",
-      "reference",
-      "explanation",
-      "explanation/epics",
-      "guides",
-      "decisions",
-      "glossary",
-      "docs",
-      "docs/agnosticism",
-      "nix",
-      "ci",
-      "hooks",
-      "deps",
-      "toolchain",
-      "repo"
-    ],
     "workflow": "worktree",
     "style": "trunk",
     "nix": true
@@ -34,8 +16,8 @@
     {
       "destination": ".github/workflows/pr-title.yml",
       "kind": "rendered",
-      "sha256": "1b5e58faa3c33281465f9c4b0e492450f8ed0f386bf8f48d82398db634571ca6",
-      "baseline_sha256": "8fe464039815a02dba2a5feb9b5c10c3332729ef982ef209a4560b45aa5cb396"
+      "sha256": "9a10a4d7f9ada97c0e7b871a9d7c351574ff3cb13081504cd7f453cf7a012ee4",
+      "baseline_sha256": "95565551a263edecb52c98cf91f40e0f6c9412560243481f816ba525049854c1"
     },
     {
       "destination": ".github/workflows/release-plz.yml",
@@ -46,19 +28,19 @@
     {
       "destination": ".pre-commit-config.yaml",
       "kind": "rendered",
-      "sha256": "1266ced0fb7304c7d8ae13499ef99ba60e5a9bc0eaaf1526ca649f63ded1deee",
-      "baseline_sha256": "c8a628ef3ed94761fee8c55e830714f8a0dc3dbc84c1699a1a97e1696652aa7a"
+      "sha256": "78149baea10341037a25dd728b31ae014c9d391a1c75375076d494663783e6f1",
+      "baseline_sha256": "78149baea10341037a25dd728b31ae014c9d391a1c75375076d494663783e6f1"
     },
     {
       "destination": "AGENTS.md",
       "kind": "rendered",
-      "sha256": "8cc44c7860467746715b459134d6c41abc0f798eb5b4ed06c1d16be96c43320e",
-      "baseline_sha256": "1b9661acaf7a79fbc2b62b6292d5d2d5f1b22f86c4270254102080c6fd599fe6"
+      "sha256": "06981a4a2f55f76f32dfb6d59e2643ed65bb01df173452ef8c00d4f0811ce91c",
+      "baseline_sha256": "06981a4a2f55f76f32dfb6d59e2643ed65bb01df173452ef8c00d4f0811ce91c"
     },
     {
       "destination": "dist-workspace.toml",
       "kind": "seeded",
-      "sha256": "3fe25f97cd30c288aff3a93b7aeda1f07cb4d12134da2406d037d11c4f019566",
+      "sha256": "11af5303127617e3f326f4987b77b934be3a0801a395e5b2e8a10cf30207c3e1",
       "baseline_sha256": "d51e679ff879c46e87d722fc3572a52a2e9e2ca85796c0635a580506622c47bb"
     },
     {

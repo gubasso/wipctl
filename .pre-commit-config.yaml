@@ -29,7 +29,7 @@ repos:
     hooks:
       - id: conventional-pre-commit
         stages: [commit-msg]
-        args: [--strict, --force-scope, --scopes, 'cli,method,reference,explanation,explanation/epics,guides,decisions,glossary,docs,docs/agnosticism,nix,ci,hooks,deps,toolchain,repo']
+        args: [--strict, --force-scope]
   - repo: local
     hooks:
       - id: rk-message
@@ -342,13 +342,14 @@ repos:
         # upstream: https://github.com/crate-ci/typos (v1.49.0)
   # --- Commit message length and punctuation (commit-msg stage) ---
   #
-  # Narrowed on purpose. The Conventional Commits shape — the type, the scope,
-  # and the scope vocabulary — belongs to `conventional-pre-commit` inside the
-  # release-kit block above, which reads the scope list recorded in
-  # `.release-kit/manifest.json`; the pull-request title check reads the same
-  # list. Two hooks must not judge one property, so ./committed.toml sets
-  # `style = "none"` and keeps only the 72-column caps and the trailing-period
-  # rule, which nothing in the block checks.
+  # Narrowed on purpose. The Conventional Commits shape — the type and the
+  # required scope — belongs to `conventional-pre-commit` inside the
+  # release-kit block above, and the pull-request title check holds the same
+  # shape. Neither one holds the scope to a fixed vocabulary: the scope is free
+  # text, and AGENTS.md carries the guidance for choosing one. Two hooks must
+  # not judge one property, so ./committed.toml sets `style = "none"` and keeps
+  # only the 72-column caps and the trailing-period rule, which nothing in the
+  # block checks.
   #
   # Policy lives in ./committed.toml, which committed discovers at the repo
   # root, so this stanza only wires the stage and the message file. Local
