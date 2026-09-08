@@ -1,12 +1,12 @@
 # Commit-message length and punctuation (crate-ci/committed).
 #
-# The Conventional Commits shape — the type, the scope, and the scope
-# vocabulary — is owned by the `conventional-pre-commit` hook inside the
-# release-kit block of `.pre-commit-config.yaml`, which reads the scope list
-# recorded in `.release-kit/manifest.json`. That list and the pull-request
-# title check are rendered from one source, so the local hook and the forge
-# gate can never disagree. `style = "none"` here is what keeps a second
-# authority off that job.
+# The Conventional Commits shape — the type and the required scope — is owned
+# by the `conventional-pre-commit` hook inside the release-kit block of
+# `.pre-commit-config.yaml`. The scope is free text held to a shape, not a
+# fixed vocabulary, and AGENTS.md carries the guidance for choosing one. The
+# hook and the pull-request title check are rendered from one source, so the
+# local gate and the forge gate can never disagree. `style = "none"` here is
+# what keeps a second authority off that job.
 #
 # What is left is what no other hook checks: the line width and the trailing
 # period.
