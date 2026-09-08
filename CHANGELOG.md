@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.1.8](https://github.com/gubasso/wipctl/compare/v0.1.7...v0.1.8) - 2026-09-08
+
+### Added
+
+- `record`: Let a needs id name an entry in an attached peer ([#21](https://github.com/gubasso/wipctl/pull/21))
+
 ## [0.1.7](https://github.com/gubasso/wipctl/compare/v0.1.6...v0.1.7) - 2026-09-08
 
 ### Added
