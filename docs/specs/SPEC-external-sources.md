@@ -14,13 +14,17 @@
   - [`external-sources:a-declared-source-carries-a-template-and-a-command` — A declared source carries a template and a command](#external-sourcesa-declared-source-carries-a-template-and-a-command--a-declared-source-carries-a-template-and-a-command)
   - [`external-sources:an-alias-is-unique-and-slugged` — An alias is unique and slugged](#external-sourcesan-alias-is-unique-and-slugged--an-alias-is-unique-and-slugged)
   - [`external-sources:the-declaration-file-is-earned` — The declaration file is earned](#external-sourcesthe-declaration-file-is-earned--the-declaration-file-is-earned)
+  - [`external-sources:the-view-runs-each-declared-command` — The view runs each declared command](#external-sourcesthe-view-runs-each-declared-command--the-view-runs-each-declared-command)
+  - [`external-sources:the-view-marks-an-unreferenced-item` — The view marks an unreferenced item](#external-sourcesthe-view-marks-an-unreferenced-item--the-view-marks-an-unreferenced-item)
+  - [`external-sources:a-missing-source-command-degrades-loudly` — A missing source command degrades loudly](#external-sourcesa-missing-source-command-degrades-loudly--a-missing-source-command-degrades-loudly)
+  - [`external-sources:the-view-cache-is-authoritative-for-nothing` — The view cache is authoritative for nothing](#external-sourcesthe-view-cache-is-authoritative-for-nothing--the-view-cache-is-authoritative-for-nothing)
 - [Diagnostics](#diagnostics)
 
 <!--TOC-->
 
 ## Purpose
 
-A project plans in one record and often carries pending work in other systems at the same time. This domain lets a story, an epic, or an initiative name the outside items it answers. It also lets the plan repository declare where those items live. The boundary runs at the reference. This domain owns the declaration file, the reference grammar, and the checks over both. The documents domain owns the heading sequence that carries the reference. The zone layout domain owns where the declaration file sits and where a derived view is cached.
+A project plans in one record and often carries pending work in other systems at the same time. This domain lets a story, an epic, or an initiative name the outside items it answers. It also lets the plan repository declare where those items live. The boundary runs at the reference. This domain owns the declaration file, the reference grammar, the checks over both, and the view that reports a declared source's open items. The documents domain owns the heading sequence that carries the reference. The zone layout domain owns where the declaration file sits and where a derived view is cached. The rendering domain owns the table, and the messages domain owns the wording of a diagnostic.
 
 The declaration file is stated by a person, never derived from anything, so the rule against storing derived state in the zone is satisfied. The remote system keeps its own items, and this record keeps a key.
 
@@ -153,6 +157,54 @@ Where the project declares no source, `sources.toml` MUST be absent, and its abs
 
 Verify: `cargo nextest run --test validation`
 
+### `external-sources:the-view-runs-each-declared-command` — The view runs each declared command
+
+The view MUST run the list command each declared alias carries, and MUST leave the plan zone untouched.
+
+#### Scenario: A reader asks what is open across every system
+
+- GIVEN two declared sources
+- WHEN the view runs
+- THEN both commands run and the record gains nothing, because a view is derived on every run and writes no state anybody later reads
+
+Verify: `cargo nextest run --test verb_contracts`
+
+### `external-sources:the-view-marks-an-unreferenced-item` — The view marks an unreferenced item
+
+The view MUST mark each listed item as referenced by an artifact of this record or as referenced by none.
+
+#### Scenario: A forge issue nobody planned
+
+- GIVEN an open item no document references
+- WHEN the view runs
+- THEN it is marked unreferenced, because the reason to read several lists at once is to see what fell between them
+
+Verify: `cargo nextest run --test verb_contracts`
+
+### `external-sources:a-missing-source-command-degrades-loudly` — A missing source command degrades loudly
+
+Where a declared command does not answer, the view MUST name the degradation on the error stream and MUST report every source that did.
+
+#### Scenario: One of two source commands is not installed
+
+- GIVEN a machine carrying one of the two declared commands
+- WHEN the view runs
+- THEN the installed source reports and the absent one is named, because an optional dependency improves output and never gates it
+
+Verify: `cargo nextest run --test verb_contracts`
+
+### `external-sources:the-view-cache-is-authoritative-for-nothing` — The view cache is authoritative for nothing
+
+Where the report is written to the cache, it MUST be rewritten on every call, read back by no verb, and required by no check.
+
+#### Scenario: The cached report is deleted mid-session
+
+- GIVEN a session holding the path the view printed
+- WHEN the file is removed
+- THEN every answer is unchanged and nothing fails, because a file nothing believes cannot become a second store
+
+Verify: `cargo nextest run --test verb_contracts`
+
 ## Diagnostics
 
 Each fault names its own resolution.
@@ -160,3 +212,5 @@ Each fault names its own resolution.
 - A source reference naming an undeclared alias. This is a failure, exit 1. The message names the alias, the document, and `sources.toml`, and offers the two resolutions: declare the alias, or correct the reference.
 - A malformed reference token. This is a failure, exit 1. The message shows the token and the `<alias>#<key>` shape it must carry.
 - A declaration file that no reference reaches. This is a warning. It reaches the reader and never the exit code, because a source declared before its first reference is a legal first draft.
+- A list command that is absent, exits non-zero, or emits unreadable output. This is a degradation, not a failure. One line on the error stream names the alias, the command, and the reader's next step. The view still exits on what the other sources answered.
+- A view run where the declaration file is absent. This is a usage error, exit 2. The message names the file and says that the project declares no source yet.
