@@ -103,7 +103,7 @@ A reshaped member MUST deliver its points exactly when its successor closed as d
 
 - GIVEN a chain of two reshaped members
 - WHEN the arithmetic runs
-- THEN the first stays undelivered, and a successor that is itself a member counts separately as itself
+- THEN the first stays undelivered, and a successor that is itself a member counts separately as itself. `review:a-reshaped-successor-serves-its-epic` guards the membership this credits
 
 Verify: `cargo nextest run --test epics`
 

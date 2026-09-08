@@ -7,6 +7,7 @@
   - [`reporting:a-view-is-derived-and-never-written` — A view is derived and never written](#reportinga-view-is-derived-and-never-written--a-view-is-derived-and-never-written)
   - [`reporting:a-view-never-gates` — A view never gates](#reportinga-view-never-gates--a-view-never-gates)
   - [`reporting:the-board-reads-the-lane-entry` — The board reads the lane entry](#reportingthe-board-reads-the-lane-entry--the-board-reads-the-lane-entry)
+  - [`reporting:the-current-story-is-marked` — The current story is marked](#reportingthe-current-story-is-marked--the-current-story-is-marked)
   - [`reporting:a-blocked-entry-is-shown-never-hidden` — A blocked entry is shown, never hidden](#reportinga-blocked-entry-is-shown-never-hidden--a-blocked-entry-is-shown-never-hidden)
   - [`reporting:the-board-offers-no-interaction` — The board offers no interaction](#reportingthe-board-offers-no-interaction--the-board-offers-no-interaction)
   - [`reporting:the-preview-is-a-head-read` — The preview is a head read](#reportingthe-preview-is-a-head-read--the-preview-is-a-head-read)
@@ -52,13 +53,27 @@ Verify: `cargo nextest run --test reporting`
 
 ### `reporting:the-board-reads-the-lane-entry` — The board reads the lane entry
 
-The board MUST read each row's summary from the lane entry alone.
+The board MUST render the five lanes in workflow order with their entry counts, and every row MUST show the entry's id and summary.
 
 #### Scenario: A record holds many stories
 
 - GIVEN a board over forty entries
 - WHEN it renders
 - THEN no document is opened, because the summary exists so a reader scanning the lane needs nothing else
+
+The summary is read from the lane entry and never by opening a story document.
+
+Verify: `cargo nextest run --test reporting`
+
+### `reporting:the-current-story-is-marked` — The current story is marked
+
+The board MUST mark the current story with the glyph `▸`, taking it from the same head the preview verb reads.
+
+#### Scenario: Work is in flight and more is scheduled
+
+- GIVEN entries in both lanes
+- WHEN the board renders
+- THEN the in-flight head carries the marker, because the current story is what a reader came to find
 
 Verify: `cargo nextest run --test reporting`
 

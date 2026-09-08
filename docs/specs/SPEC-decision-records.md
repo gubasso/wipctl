@@ -40,7 +40,7 @@ The author MUST NOT edit a decision record to describe a later design.
 - WHEN a later change narrows that rule
 - THEN the spec carries the narrowed rule and the record keeps its original wording
 
-Verify: `git log --format=%H -- '*/decisions/ADR-*' | head -50 | xargs -I{} git show --stat {}`
+Verify: reviewer confirms no edit to an accepted record makes it describe a later design
 
 ### `decision-records:merged-record-is-permanent` — A merged decision record is permanent
 
@@ -52,7 +52,7 @@ The author MUST NOT delete or rename a merged decision record.
 - WHEN the successor is written
 - THEN the original keeps its filename, gains a status, and links its successor
 
-Verify: `git log --diff-filter=DR --name-only --format= -- '*/decisions/ADR-*' | grep . && exit 1 || exit 0`
+Verify: `git log --diff-filter=DR --name-only --format= origin/master..HEAD -- '*/decisions/ADR-*' | grep . && exit 1 || exit 0`
 
 ### `decision-records:body-stays-within-350-words` — A decision record stays within 350 words
 
@@ -65,3 +65,11 @@ The author MUST keep a filled decision record at or below 350 words.
 - THEN it holds two decisions and becomes two records
 
 Verify: `pre-commit run adr-word-cap --all-files`
+
+## Unenforced rules
+
+| Rule                                     | Why no command decides it                                                                                                                               |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `decision-records:record-is-not-revised` | No command tells an edit that describes a later design from a citation repair or a typo fix. Only the first is forbidden, and the judgment is the rule. |
+
+The permanence check reads the change under review rather than the whole history. A repository that renamed its records once otherwise reports that rename forever, on every later change that touched nothing.

@@ -41,7 +41,12 @@ $XDG_CACHE_HOME/wipctl/
 
 $XDG_RUNTIME_DIR/wipctl/
   <project_id>.lock                  writer lock; transaction-scoped; never in the record
+
+fallback, where XDG_RUNTIME_DIR is unset or empty:
+  /tmp/wipctl-<uid>/                 created mode 0700
 ```
+
+The base-directory specification gives no default for the runtime directory, and unset is ordinary in cron jobs, containers, and remote sessions with no session manager. Those are exactly where agents run, so the fallback is stated rather than left open.
 
 ```text
 XDG_DATA_HOME    $HOME/.local/share
@@ -94,7 +99,7 @@ Verify: `cargo nextest run --test zone_layout`
 
 ### `zone-layout:the-lock-directory-has-a-stated-fallback` — The lock directory has a stated fallback
 
-Where the runtime directory is unset or empty, the implementation MUST place the lock directory at the stated temporary path, owner-only, and MUST warn.
+Where the runtime directory is unset or empty, the implementation MUST use the stated fallback path, create it mode 0700, and warn naming the replacement.
 
 #### Scenario: An agent runs from a cron job
 

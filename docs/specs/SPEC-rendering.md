@@ -145,13 +145,13 @@ Verify: `cargo nextest run --test rendering`
 
 ### `rendering:a-composite-view-has-two-layouts` — A composite view has two layouts
 
-A composite view MUST carry two layouts with one breakpoint, and MUST stack its panels and lanes below that breakpoint.
+A composite view MUST carry two layouts with one breakpoint at 100 columns, read from the terminal size at render time.
 
 #### Scenario: A narrow terminal renders the board
 
 - GIVEN a terminal below the breakpoint
 - WHEN the view renders
-- THEN the panels stack with the scheduled lane leading, because side-by-side columns below the breakpoint wrap into noise
+- THEN the panels and lanes stack, with the scheduled lane leading, because side-by-side columns below the breakpoint wrap into noise
 
 Verify: `cargo nextest run --test rendering`
 

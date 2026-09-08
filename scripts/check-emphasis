@@ -38,7 +38,12 @@ for file in "$@"; do
         # Double-backtick spans go first: a span exists in that form precisely
         # to hold a backtick, so stripping single spans first would eat its
         # delimiters and leave the content behind as prose.
-        gsub(/``.*``/, "", line)
+        #
+        # The body pattern is `([^`]|`[^`])*` rather than `.*` because awk has
+        # no non-greedy repetition: `.*` runs from the first opener to the last
+        # closer on the line, so emphasis sitting between two spans is stripped
+        # with them and never checked. This form stops at the first `` it meets.
+        gsub(/``([^`]|`[^`])*``/, "", line)
         gsub(/`[^`]*`/, "", line)
         # Link and image targets can hold underscores and asterisks.
         gsub(/\]\([^)]*\)/, "]()", line)

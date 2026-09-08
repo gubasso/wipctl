@@ -4,11 +4,13 @@
 
 - [Purpose](#purpose)
 - [Exit codes](#exit-codes)
+- [The verb surface](#the-verb-surface)
 - [Requirements](#requirements)
   - [`cli-conventions:the-exit-code-is-an-interface` — The exit code is an interface](#cli-conventionsthe-exit-code-is-an-interface--the-exit-code-is-an-interface)
   - [`cli-conventions:stdout-carries-data-alone` — Stdout carries data alone](#cli-conventionsstdout-carries-data-alone--stdout-carries-data-alone)
   - [`cli-conventions:a-diagnostic-carries-a-prefix` — A diagnostic carries a prefix](#cli-conventionsa-diagnostic-carries-a-prefix--a-diagnostic-carries-a-prefix)
   - [`cli-conventions:a-consumer-path-is-absolute` — A path printed for a consumer is absolute](#cli-conventionsa-consumer-path-is-absolute--a-path-printed-for-a-consumer-is-absolute)
+  - [`cli-conventions:the-verb-names-are-fixed` — The verb names are fixed](#cli-conventionsthe-verb-names-are-fixed--the-verb-names-are-fixed)
   - [`cli-conventions:the-verb-list-is-derived` — The verb list is derived from the build](#cli-conventionsthe-verb-list-is-derived--the-verb-list-is-derived-from-the-build)
   - [`cli-conventions:global-flags-parse-before-the-verb` — Global flags parse before the verb](#cli-conventionsglobal-flags-parse-before-the-verb--global-flags-parse-before-the-verb)
   - [`cli-conventions:there-is-no-zone-argument` — There is no zone argument](#cli-conventionsthere-is-no-zone-argument--there-is-no-zone-argument)
@@ -35,6 +37,44 @@ One command with capabilities as verbs, and the rules that bind every one of the
 2  the invocation itself was wrong
 3  the writer lock could not be acquired within the bounded wait
 ```
+
+## The verb surface
+
+The command is `wipctl`. These are its verbs and their usage. A verb's own domain states what it does. This table states what it is called and what it accepts.
+
+```text
+wipctl init [--root DIR] [--iteration-start YYYY-MM-DD] [--print-hooks] [--dry-run]
+wipctl attach <plan-repo-url>
+wipctl attach --create
+wipctl new <type> "<title>" [--id <id>] [--epic <id>] [--points <n>] [--lane <backlog|todo>]
+wipctl land [--report]
+wipctl move <id> --to <lane> [--outcome <o>] [--succeeded-by <id>] [--closed <date>] [--dry-run]
+wipctl start
+wipctl delete <id> [--dry-run]
+wipctl rename <id> "<new title>" [--id <new-id>]
+wipctl rename <id> --id <new-id>
+wipctl fix [--slots]
+wipctl sync [--json]
+wipctl resolve <id> --keep <here|remote>
+wipctl validate
+wipctl doctor
+wipctl next
+wipctl ids
+wipctl board
+wipctl dashboard
+wipctl graph [--unblocks <id>]
+wipctl flow [--lane <lane>]
+wipctl aging
+wipctl velocity
+wipctl epic [--json] [--write] [<epic-id>]
+wipctl epics [--json]
+wipctl initiative [--json] [<initiative-id>]
+wipctl initiatives [--json]
+wipctl help
+wipctl version
+```
+
+The nine writing verbs are `new`, `land`, `move`, `start`, `delete`, `rename`, `fix`, `sync`, and `resolve`. Closing is not a verb of its own. It is `move --to closed` with an outcome.
 
 ## Requirements
 
@@ -86,6 +126,18 @@ A path printed for a consumer MUST be absolute, and a path in a mutation report 
 
 Verify: `cargo nextest run --test verb_contracts`
 
+### `cli-conventions:the-verb-names-are-fixed` — The verb names are fixed
+
+The implementation MUST use the verb names and the usage grammar this specification states, for every capability it ships.
+
+#### Scenario: An implementation renames a verb it finds clearer
+
+- GIVEN an implementation that exposes capture as `capture` rather than `new`
+- WHEN a guide, a script, or another implementation's user invokes it
+- THEN the command is unknown, because the verb name is the contract and not an implementation choice
+
+Verify: `cargo nextest run --test verb_contracts`
+
 ### `cli-conventions:the-verb-list-is-derived` — The verb list is derived from the build
 
 The implementation MUST derive the shipped verb list from its own dispatch units and MUST NOT hard-code it.
@@ -100,13 +152,15 @@ Verify: `cargo nextest run --test verb_contracts`
 
 ### `cli-conventions:global-flags-parse-before-the-verb` — Global flags parse before the verb
 
-The implementation MUST parse a global flag only before the verb, and MUST treat any other leading option or unknown verb as a usage error.
+The implementation MUST answer `-h` and `--help` with help, `-V` and `--version` with the version, and MUST end option parsing at `--`.
 
 #### Scenario: The command is run bare
 
 - GIVEN an invocation with no verb
 - WHEN it runs
-- THEN help prints and the run succeeds, while an unknown leading option names the usage command and exits 2
+- THEN help prints and the run succeeds
+
+The implementation parses these tokens only before the verb. An unknown leading option and an unknown verb are both usage errors, and each names the usage command.
 
 Verify: `cargo nextest run --test verb_contracts`
 

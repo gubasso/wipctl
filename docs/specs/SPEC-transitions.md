@@ -9,6 +9,7 @@
   - [`transitions:the-preflight-runs-entire-and-in-order` — The preflight runs entire and in order](#transitionsthe-preflight-runs-entire-and-in-order--the-preflight-runs-entire-and-in-order)
   - [`transitions:a-lost-race-is-a-usage-error` — A lost race is a usage error](#transitionsa-lost-race-is-a-usage-error--a-lost-race-is-a-usage-error)
   - [`transitions:arrival-makes-no-rank-claim` — Arrival makes no rank claim](#transitionsarrival-makes-no-rank-claim--arrival-makes-no-rank-claim)
+  - [`transitions:a-closing-flag-is-required-by-its-case` — A closing flag is required by its case](#transitionsa-closing-flag-is-required-by-its-case--a-closing-flag-is-required-by-its-case)
   - [`transitions:a-close-date-is-pinned-not-backdated` — A close date is pinned, not backdated](#transitionsa-close-date-is-pinned-not-backdated--a-close-date-is-pinned-not-backdated)
   - [`transitions:an-emptied-lane-redeclares-itself` — An emptied lane redeclares itself](#transitionsan-emptied-lane-redeclares-itself--an-emptied-lane-redeclares-itself)
   - [`transitions:reopening-strips-and-records` — Reopening strips and records](#transitionsreopening-strips-and-records--reopening-strips-and-records)
@@ -30,7 +31,7 @@ The lane change as a recorded event, and the verb that takes the next entry atom
 2. The destination is a real lane.
 3. The id is in some lane.
 4. The entry is not already in the destination.
-5. The closing flags are consistent.
+5. The closing flags are consistent. An outcome is required by and only by a move to the closed lane. A successor is required by and only by a reshaped outcome.
 6. An entry entering a work lane has every dependency closed and no blocking question.
 
 ## Requirements
@@ -83,15 +84,29 @@ A moved entry's original lines MUST be appended at the bottom of the destination
 
 Verify: `cargo nextest run --test writer_guarantees`
 
+### `transitions:a-closing-flag-is-required-by-its-case` — A closing flag is required by its case
+
+The implementation MUST require an outcome by and only by a close, and a successor by and only by a reshaped outcome.
+
+#### Scenario: An outcome is passed on a move to a work lane
+
+- GIVEN a move into the in-flight lane carrying an outcome
+- WHEN the invocation parses
+- THEN it is a usage error, because a close field outside the closed lane is a record two readers read differently
+
+Verify: `cargo nextest run --test verb_contracts`
+
 ### `transitions:a-close-date-is-pinned-not-backdated` — A close date is pinned, not backdated
 
-Where a close date is given, it MUST equal the day of the once-read transition instant, and a mismatch MUST be a usage error.
+A close date MUST be accepted by and only by a close, MUST default to the current day, and MUST equal the transition instant's day.
 
 #### Scenario: An operator supplies yesterday's date
 
 - GIVEN an explicit date that is not today
 - WHEN the move runs
 - THEN it is a usage error, because the closing journal event must enter the closed lane on the entry's own close date
+
+The flag pins the date an invocation expects. It is deliberately not a backdater. An omitted value is the current day in coordinated universal time.
 
 Verify: `cargo nextest run --test verb_contracts`
 

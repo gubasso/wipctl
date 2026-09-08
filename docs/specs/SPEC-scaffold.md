@@ -105,7 +105,7 @@ Verify: `cargo nextest run --test scaffold`
 
 ### `scaffold:the-travelling-document-is-self-sufficient` — The travelling document is self-sufficient
 
-The landed method document MUST teach every subject this requirement's scenario lists, so that a reader who has only that document can work the method.
+The landed method document MUST teach every subject the list below names.
 
 #### Scenario: A reader has only ever seen a plan beside the code
 
@@ -113,7 +113,23 @@ The landed method document MUST teach every subject this requirement's scenario 
 - WHEN the reader opens it
 - THEN the two-location model is taught from zero, because it is the one channel through which the method reaches them
 
-Verify: reviewer confirms the landed document covers each subject this requirement names
+The subjects, each taught from zero:
+
+- the two-location model: one identity file in the host, one plan repository at the machine-level slot every checkout shares
+- all three heading sequences, with a one-line purpose per heading, the initiative section rule, and the depth rule
+- that membership above the story flows through the epic
+- the lane semantics, the entry field list, the points scale, and the canonical subset
+- the id grammar, the slugification function, the mint's check against the live record and every tombstone, the rephrase resolution, and the hand-mint procedure
+- eligibility, the two ranking rules, and the blocking grammar
+- the move-and-close procedure, and why an edit is not a move
+- the take verb beside the preview verb, and that an agent holds nothing while it works
+- capture and drain, which lanes a fragment claims, and what a drift report asks of a reader
+- that every plan mutation is committed to the plan trunk by the tool, with no opt-out, and that the host's history receives nothing
+- replication, and when to run it
+- the reference split: inbound, outbound, the promise marker, the optional typed rule delta, and the acceptance transfer as a same-unit-of-review obligation
+- the gate commands, their exit codes, and the explicit list of what no gate catches
+
+Verify: reviewer confirms the landed document covers each subject the list names
 
 ### `scaffold:a-gate-name-is-substituted-or-absent` — A gate name is substituted or declared absent
 

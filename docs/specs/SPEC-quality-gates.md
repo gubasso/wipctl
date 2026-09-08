@@ -170,7 +170,7 @@ The record gates MUST run at both the commit stage and the push stage of the pla
 - WHEN the branch is pushed
 - THEN the push stage still meets the gate before anything is published
 
-Verify: `grep -q 'default_stages: \[pre-commit, pre-push\]' .pre-commit-config.yaml`
+Verify: `cargo nextest run --test scaffold`
 
 ### `quality-gates:the-repository-is-self-contained` — The repository is self-contained
 

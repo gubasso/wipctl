@@ -57,6 +57,34 @@ fn emphasis_gate_rejects_bold_and_italics() {
 }
 
 #[test]
+fn emphasis_gate_sees_between_two_double_backtick_spans() {
+    // A double-backtick span exists to hold a backtick, so the gate strips it
+    // before matching. Stripping from the first opener to the last closer would
+    // take the prose between two spans with it, and the emphasis there would
+    // never be checked.
+    let hidden = accepts(
+        "check-emphasis",
+        "between",
+        "# T\n\n``a`b`` **hidden emphasis** ``c`d``\n",
+    )
+    .expect("the gate should be runnable");
+    let Some(hidden) = hidden else { return };
+    assert!(
+        !hidden,
+        "emphasis between two code spans must fail the gate"
+    );
+
+    let inner = accepts(
+        "check-emphasis",
+        "inner",
+        "# T\n\nA ``span with `ticks` inside`` and plain prose.\n",
+    )
+    .expect("the gate should be runnable")
+    .expect("the script was present a moment ago");
+    assert!(inner, "a backtick inside a double-backtick span must pass");
+}
+
+#[test]
 fn emphasis_gate_ignores_code_and_honours_the_escape_hatch() {
     // A glob inside a fence, a literal in a code span, and a snake_case
     // identifier are not emphasis. This is the false-positive case that

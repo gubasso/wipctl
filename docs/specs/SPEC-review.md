@@ -12,6 +12,7 @@
   - [`review:a-rename-is-one-reviewable-act` — A rename is one reviewable act](#reviewa-rename-is-one-reviewable-act--a-rename-is-one-reviewable-act)
   - [`review:a-container-earns-its-document` — A container earns its document](#reviewa-container-earns-its-document--a-container-earns-its-document)
   - [`review:an-unpursued-container-is-retired` — An unpursued container is retired](#reviewan-unpursued-container-is-retired--an-unpursued-container-is-retired)
+  - [`review:a-reshaped-successor-serves-its-epic` — A reshaped successor serves its epic](#reviewa-reshaped-successor-serves-its-epic--a-reshaped-successor-serves-its-epic)
   - [`review:a-drift-report-is-read-and-acted-on` — A drift report is read and acted on](#reviewa-drift-report-is-read-and-acted-on--a-drift-report-is-read-and-acted-on)
   - [`review:a-moved-host-document-carries-its-references` — A moved host document carries its references](#reviewa-moved-host-document-carries-its-references--a-moved-host-document-carries-its-references)
   - [`review:a-declared-delta-matches-the-diff` — A declared delta matches the diff](#reviewa-declared-delta-matches-the-diff--a-declared-delta-matches-the-diff)
@@ -120,6 +121,18 @@ Where nobody is pursuing an epic or an initiative, the author MUST retire it.
 - THEN it is retired, because no verb reports a staleness verdict and the question is asked here instead
 
 Verify: reviewer confirms every container in the record is still being pursued
+
+### `review:a-reshaped-successor-serves-its-epic` — A reshaped successor serves its epic
+
+Where an entry closes as reshaped, the reviewer MUST confirm that its successor carries the epic the work actually serves.
+
+#### Scenario: A successor is re-cut under a different end state
+
+- GIVEN a reshaped member of one epic whose successor joined another
+- WHEN the arithmetic follows the one link and credits the original epic
+- THEN the rollup is wrong, and no command can see it, because both entries are individually legal
+
+Verify: reviewer confirms each reshaped entry's successor carries the epic the work serves
 
 ### `review:a-drift-report-is-read-and-acted-on` — A drift report is read and acted on
 

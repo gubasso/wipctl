@@ -23,7 +23,7 @@
 
 ## Purpose
 
-What a verb that writes the record must hold, and what its transaction must end in. Nine verbs write a maintained record: capture, repair, move, close, delete, take, rename, replicate, and conflict resolution. The boundary runs at the write: this domain covers the lock, the preflight, and the commit, while each verb's own domain covers what it writes.
+What a verb that writes the record must hold, and what its transaction must end in. Nine verbs write a maintained record: `new`, `land`, `move`, `start`, `delete`, `rename`, `fix`, `sync`, and `resolve`. Closing is not a verb of its own, because it is `move --to closed`. The boundary runs at the write. This domain covers the lock, the preflight, and the commit. Each verb's own domain covers what it writes.
 
 ## The commit grammar
 
