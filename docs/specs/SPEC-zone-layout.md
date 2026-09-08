@@ -59,6 +59,7 @@ XDG_CACHE_HOME   $HOME/.cache
 ```text
 plan-repo/
   config.toml                   both identities and the configuration
+  peers.toml                    the other plans this one names; earned, not scaffolded
   sources.toml                  declared external sources; earned, not scaffolded
   README.md                     orientation for a reader arriving at the zone
   AGENTS.md                     the method, self-sufficient, written by the scaffold
@@ -136,13 +137,13 @@ Verify: `cargo nextest run --test validation`
 
 ### `zone-layout:an-earned-directory-appears-when-earned` — An earned directory appears when earned
 
-An earned directory MUST appear when its first member is created, and its absence MUST be legal.
+An earned directory or file MUST appear when its first member is created, and its absence MUST be legal.
 
-#### Scenario: A project uses two tiers
+#### Scenario: A project uses two tiers and names no peer
 
-- GIVEN a project that never declares an initiative
+- GIVEN a project that never declares an initiative and never names another plan
 - WHEN the record is validated
-- THEN the absent directory is legal and means two tiers, as an entry that never moved has no journal file rather than an empty one
+- THEN both absences are legal, and each means what it says: two tiers, and no peer. An entry that never moved has no journal file rather than an empty one
 
 Verify: `cargo nextest run --test validation`
 

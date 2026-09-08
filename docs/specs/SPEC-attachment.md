@@ -66,6 +66,8 @@ needed              inside each slot and pick the slot that matches
 
 `project_id` resolves and `plan_uid` travels. The uid is looked up inside a slot and never names one. There is no tree keyed by it, so a reader never goes looking for one. The configuration domain owns what each value is. This domain owns where each one enters an invocation.
 
+A slot holds one plan, whether it arrived as this machine's own project or as a peer another plan named. Once filled, nothing distinguishes the two. The peer attachment domain owns the walk that fills a peer's slot.
+
 ## Requirements
 
 ### `attachment:resolution-is-two-steps` — Resolution is two steps
@@ -226,13 +228,13 @@ Verify: `cargo nextest run --test scaffold`
 
 ### `attachment:attach-takes-exactly-one-form` — Attach takes exactly one form
 
-The attach verb MUST accept exactly one of a plan location, the create form, or the upgrade form, and MUST reject any other count.
+The attach verb MUST accept exactly one of the four forms the command surface states, and MUST reject any other count as a usage error.
 
 #### Scenario: Two forms are given
 
 - GIVEN a location and the create flag in one invocation
 - WHEN the verb parses them
-- THEN it is a usage error, because each form answers a different question: adopt a plan that exists, create one that does not, or give an identity to a record that predates the key
+- THEN it is a usage error, because each form answers its own question: adopt a plan, create one, give an identity to a record that predates the key, or fill the slots this plan's peers need
 
 Verify: `cargo nextest run --test verb_contracts`
 

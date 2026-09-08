@@ -47,6 +47,7 @@ wipctl init [--root DIR] [--iteration-start YYYY-MM-DD] [--print-hooks] [--dry-r
 wipctl attach <plan-repo-url>
 wipctl attach --create
 wipctl attach --mint-uid
+wipctl attach --peers
 wipctl new <type> "<title>" [--id <id>] [--epic <id>] [--points <n>] [--lane <backlog|todo>]
 wipctl land [--report]
 wipctl move <id> --to <lane> [--outcome <o>] [--succeeded-by <id>] [--closed <date>] [--dry-run]
@@ -71,12 +72,19 @@ wipctl epic [--json] [--write] [<epic-id>]
 wipctl epics [--json]
 wipctl initiative [--json] [<initiative-id>]
 wipctl initiatives [--json]
+wipctl peer add <url> [--as <alias>]
+wipctl peer alias <alias> <new-alias>
+wipctl peer url <alias> (--add <url> | --remove <url> | --set <url>...)
+wipctl peer remove <alias>
+wipctl peers [--json]
 wipctl man [<verb>]
 wipctl help
 wipctl version
 ```
 
-The nine writing verbs are `new`, `land`, `move`, `start`, `delete`, `rename`, `fix`, `sync`, and `resolve`. Closing is not a verb of its own. It is `move --to closed` with an outcome.
+Ten verbs write the record: `new`, `land`, `move`, `start`, `delete`, `rename`, `fix`, `sync`, `resolve`, and `peer`. Closing is not a verb of its own. It is `move --to closed` with an outcome.
+
+`attach` takes exactly one of four forms: a plan location, `--create`, `--mint-uid`, or `--peers`. `peer` and `peers` are a writer and a reader one letter apart, as `epic` and `epics` already are. The operation of `peer` is its first positional argument, so the verb stays one dispatchable unit and the surface gains no subcommands.
 
 ## Requirements
 
@@ -252,7 +260,7 @@ Verify: `cargo nextest run --test verb_contracts`
 
 ### `cli-conventions:completion-derives-its-candidates` — Completion derives its candidates
 
-Completion MUST derive its candidates at completion time, from the usage output, the id verb, and the five lane names.
+Completion MUST derive its candidates at completion time, from the usage output, the id verb, the peer view, and the five lane names.
 
 #### Scenario: The id source fails
 

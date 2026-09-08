@@ -143,6 +143,28 @@ fn which(tool: &str) -> io::Result<PathBuf> {
         .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, tool.to_owned()))
 }
 
+/// Copy the fixture, replace `from` with `to` in one of its files, and report
+/// whether the gate accepted the result.
+///
+/// One helper rather than one block per defect: the interesting part of each
+/// case below is the defect it plants, and repeating the copy around it hides
+/// that.
+fn accepts_fixture_with(case: &str, file: &str, from: &str, to: &str) -> io::Result<Option<bool>> {
+    let scratch = Scratch::new(case)?;
+    let fixtures = scratch.path().join("two-plans");
+    copy_tree(&repo().join("tests/fixtures/two-plans"), &fixtures)?;
+
+    let target = fixtures.join(file);
+    let body = fs::read_to_string(&target)?;
+    assert!(
+        body.contains(from),
+        "the fixture no longer holds {from:?}, so this case plants nothing"
+    );
+    fs::write(&target, body.replace(from, to))?;
+
+    accepts(&["--fixtures", &fixtures.to_string_lossy()])
+}
+
 #[test]
 fn the_gate_accepts_the_shipped_tree() {
     let ok = accepts(&[]).expect("the gate should be runnable");
@@ -157,24 +179,13 @@ fn the_gate_accepts_the_shipped_tree() {
 fn a_malformed_plan_uid_fails() {
     // The identity's whole grammar is 32 lowercase hexadecimal characters, and
     // a value one character short is the defect a hand edit produces.
-    let scratch = Scratch::new("plan-uid").expect("a scratch directory should be creatable");
-    let fixtures = scratch.path().join("two-plans");
-    copy_tree(&repo().join("tests/fixtures/two-plans"), &fixtures)
-        .expect("the fixture should be copyable");
-
-    let config = fixtures.join("alpha/config.toml");
-    let body = fs::read_to_string(&config).expect("the fixture config should be readable");
-    fs::write(
-        &config,
-        body.replace(
-            "9f2c41a08b7d4e63a15c8f02d7e4b619",
-            "9f2c41a08b7d4e63a15c8f02d7e4b61",
-        ),
+    let ok = accepts_fixture_with(
+        "plan-uid",
+        "alpha/config.toml",
+        "9f2c41a08b7d4e63a15c8f02d7e4b619",
+        "9f2c41a08b7d4e63a15c8f02d7e4b61",
     )
-    .expect("the copied config should be writable");
-
-    let fixtures = fixtures.to_string_lossy().into_owned();
-    let ok = accepts(&["--fixtures", &fixtures]).expect("the gate should be runnable");
+    .expect("the gate should be runnable");
     let Some(ok) = ok else { return };
     assert!(!ok, "a plan_uid outside its grammar must fail the gate");
 }
@@ -182,20 +193,94 @@ fn a_malformed_plan_uid_fails() {
 #[test]
 fn a_lane_entry_outside_the_schema_fails() {
     // Four points does not exist: work above three splits along its judgments.
-    let scratch = Scratch::new("lane-entry").expect("a scratch directory should be creatable");
-    let fixtures = scratch.path().join("two-plans");
-    copy_tree(&repo().join("tests/fixtures/two-plans"), &fixtures)
-        .expect("the fixture should be copyable");
-
-    let lane = fixtures.join("alpha/lanes/todo.yml");
-    let body = fs::read_to_string(&lane).expect("the fixture lane should be readable");
-    fs::write(&lane, body.replace("points: 2", "points: 4"))
-        .expect("the copied lane should be writable");
-
-    let fixtures = fixtures.to_string_lossy().into_owned();
-    let ok = accepts(&["--fixtures", &fixtures]).expect("the gate should be runnable");
+    let ok = accepts_fixture_with(
+        "lane-entry",
+        "alpha/lanes/todo.yml",
+        "points: 2",
+        "points: 4",
+    )
+    .expect("the gate should be runnable");
     let Some(ok) = ok else { return };
     assert!(!ok, "a point value off the scale must fail the gate");
+}
+
+#[test]
+fn a_peer_row_without_a_uid_fails() {
+    // A peer is identified by the uid its own plan declares. A row naming only
+    // a location names a place, not a plan.
+    let ok = accepts_fixture_with(
+        "peer-no-uid",
+        "alpha/peers.toml",
+        "uid = \"4c81d0e7f39a4b25861d7c04e9a2f358\"\n",
+        "",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a peer row with no uid must fail the gate");
+}
+
+#[test]
+fn a_peer_row_without_a_location_fails() {
+    // A peer nobody can locate is not a peer, and no default is invented for it.
+    let ok = accepts_fixture_with(
+        "peer-no-url",
+        "alpha/peers.toml",
+        "[\"https://git.example.org/acme/beta-plan.git\"]",
+        "[]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a peer row with an empty url list must fail the gate");
+}
+
+#[test]
+fn a_peer_alias_outside_the_slug_grammar_fails() {
+    // The alias is a slug. An uppercase key is the defect a hand edit produces,
+    // and it is the one a case-insensitive filesystem hides.
+    let ok = accepts_fixture_with(
+        "peer-alias",
+        "alpha/peers.toml",
+        "[peers.beta]",
+        "[peers.Beta]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "an alias outside the slug grammar must fail the gate");
+}
+
+#[test]
+fn a_peer_url_carrying_a_password_fails() {
+    // A committed file is read by everyone who clones this plan, so a password
+    // in it is a leak whatever the tool prints. A bare account name is legal,
+    // which is why the rule turns on the colon rather than on the at sign.
+    let ok = accepts_fixture_with(
+        "peer-url",
+        "alpha/peers.toml",
+        "https://git.example.org",
+        "https://someone:PLACEHOLDER@git.example.org",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a url carrying a password must fail the gate");
+}
+
+#[test]
+fn a_peer_url_hiding_a_password_in_an_escape_fails() {
+    // The rule turns on the colon, so the escape for a colon has to be
+    // refused with it. Without that, %3A carries a password past a check that
+    // reads the url as written.
+    let ok = accepts_fixture_with(
+        "peer-url-escaped",
+        "alpha/peers.toml",
+        "https://git.example.org",
+        "https://someone%3APLACEHOLDER@git.example.org",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(
+        !ok,
+        "a url hiding a password in an escape must fail the gate"
+    );
 }
 
 #[test]
