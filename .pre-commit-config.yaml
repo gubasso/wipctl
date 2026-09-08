@@ -543,6 +543,17 @@ repos:
         exclude: '^\.spec-driven-docs/'
         pass_filenames: true
 
+      # The delivered chapter gate selects numbered chapters, catalogs, and
+      # README files. This repository names its chapters for their subject, so
+      # that selector reaches none of them. This hook holds the same budget over
+      # the two zones whose documents are chapters.
+      - id: chapter-line-cap
+        name: chapter line cap (docs-format:chapter-stays-within-200-lines)
+        entry: scripts/check-chapter-lines
+        language: system
+        files: '^docs/(explanation|guides)/.*\.(md|markdown)$'
+        pass_filenames: true
+
   # --- Markdown: canonical format (dprint) + style gate (markdownlint) ---
   #
   # Universal overlay: every project carries docs/READMEs, so its markdown is

@@ -6,7 +6,7 @@ Each term links to the page that owns its full definition. A term defined here i
 - blocked: a derived condition, never a lane and never a field. An entry is dependency-blocked through `needs` and question-blocked through a `Blocks:` line. [explanation/lanes-and-ranking.md](./explanation/lanes-and-ranking.md)
 - burned id: an id held by a tombstone, for the life of the record. The mint refuses it, and a claimant is a validation failure. [specs/SPEC-ids.md](./specs/SPEC-ids.md)
 - canonical YAML subset: the narrow YAML the record accepts. It allows flat mappings, one nesting level, and one-line flow sequences for lists. [specs/SPEC-lane-file.md](./specs/SPEC-lane-file.md)
-- capture: writing a story document plus a pending fragment, without touching a lane file. [explanation/concurrency.md](./explanation/concurrency.md)
+- capture: writing a story document plus a pending fragment, without touching a lane file. [explanation/replication.md](./explanation/replication.md)
 - chore: a work type whose outcome is upkeep. It needs no worked example. [explanation/stories-and-estimation.md](./explanation/stories-and-estimation.md)
 - current story: the topmost entry of `doing.yml`, or of `todo.yml` when `doing` is empty. [specs/SPEC-reporting.md](./specs/SPEC-reporting.md)
 - cycle time: first entry into `doing` until close, read from the journal. [specs/SPEC-metrics.md](./specs/SPEC-metrics.md)

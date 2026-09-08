@@ -1,6 +1,6 @@
 # Working in parallel sessions
 
-Several agents, several worktrees, and one live record, plus a second machine when you leave the first. Nobody waits on anybody, and the record stays coherent. [explanation/concurrency.md](../explanation/concurrency.md) holds the model behind the steps. This page is the sequence.
+Several agents, several worktrees, and one live record, plus a second machine when you leave the first. Nobody waits on anybody, and the record stays coherent. [explanation/concurrency.md](../explanation/concurrency.md) holds the model behind the steps, and [explanation/replication.md](../explanation/replication.md) holds the second-machine half. This page is the sequence.
 
 ## 1 — Fan the agents out
 

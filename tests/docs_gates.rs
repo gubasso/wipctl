@@ -1,4 +1,4 @@
-//! Cases for the prose gate in `scripts/`.
+//! Cases for the local documentation gates in `scripts/`.
 //!
 //! Every shipped artifact owes a case in the test suite, and a gate owes more
 //! than that: it must be shown to fail on a deliberate defect, because a gate
@@ -41,6 +41,24 @@ fn accepts(script_name: &str, case: &str, body: &str) -> io::Result<Option<bool>
     fs::remove_file(&file).ok();
 
     status.map(|status| Some(status.success()))
+}
+
+#[test]
+fn chapter_line_cap_rejects_the_first_line_over_the_cap() {
+    // The boundary is the whole rule, so both sides of it are asserted. A cap
+    // that is off by one rejects a legal chapter or admits an illegal one, and
+    // neither shows up in a count taken well away from the edge.
+    let body = |lines: usize| "x\n".repeat(lines);
+
+    let at_cap =
+        accepts("check-chapter-lines", "at-cap", &body(200)).expect("the gate should be runnable");
+    let Some(at_cap) = at_cap else { return };
+    assert!(at_cap, "200 lines is at the cap and must pass");
+
+    let over_cap = accepts("check-chapter-lines", "over-cap", &body(201))
+        .expect("the gate should be runnable")
+        .expect("the script was present a moment ago");
+    assert!(!over_cap, "201 lines is over the cap and must fail");
 }
 
 #[test]

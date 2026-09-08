@@ -31,7 +31,7 @@ The shipped JSON Schemas live beside the spec that owns each shape, in the compa
 
 - [explanation/charter.md](./explanation/charter.md): what the product is for, its pillars, and its no-gos.
 - [explanation/overview.md](./explanation/overview.md): the method in one page. A team lead starts here.
-- [explanation/stories-and-estimation.md](./explanation/stories-and-estimation.md), [explanation/lanes-and-ranking.md](./explanation/lanes-and-ranking.md), [explanation/epics.md](./explanation/epics.md), [explanation/initiatives.md](./explanation/initiatives.md), [explanation/transitions.md](./explanation/transitions.md), and [explanation/concurrency.md](./explanation/concurrency.md): why the record is shaped this way.
+- [explanation/stories-and-estimation.md](./explanation/stories-and-estimation.md), [explanation/lanes-and-ranking.md](./explanation/lanes-and-ranking.md), [explanation/epics.md](./explanation/epics.md), [explanation/initiatives.md](./explanation/initiatives.md), [explanation/transitions.md](./explanation/transitions.md), [explanation/concurrency.md](./explanation/concurrency.md), and [explanation/replication.md](./explanation/replication.md): why the record is shaped this way.
 - [explanation/host-integration.md](./explanation/host-integration.md): the single assumption about an adopting project, and the doctrine that follows from it.
 - [explanation/architecture.md](./explanation/architecture.md): the components a conforming implementation needs, by responsibility and never by code structure.
 
