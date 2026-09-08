@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.2.0](https://github.com/gubasso/wipctl/compare/v0.1.10...v0.2.0) - 2026-09-08
+
+### Other
+
+- breaking, `changelog`: Record the break that 0.1.10 shipped undeclared ([#29](https://github.com/gubasso/wipctl/pull/29))
+
 ## [0.1.10](https://github.com/gubasso/wipctl/compare/v0.1.9...v0.1.10) - 2026-09-08
 
 ### Added
