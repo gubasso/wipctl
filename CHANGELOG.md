@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.1.6](https://github.com/gubasso/wipctl/compare/v0.1.5...v0.1.6) - 2026-09-08
+
+### Added
+
+- `record`: Give a plan a global identity ([#17](https://github.com/gubasso/wipctl/pull/17))
+
 ## [0.1.5](https://github.com/gubasso/wipctl/compare/v0.1.4...v0.1.5) - 2026-09-08
 
 ### Other
