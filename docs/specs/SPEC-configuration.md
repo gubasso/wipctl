@@ -75,6 +75,8 @@ Immutability binds verbs. Two replicas that each minted a uid before either repl
 
 The uid never names a slot. A verb resolves a plan by the two steps the attachment domain states, then reads `plan_uid` inside the slot it reached. There is no tree keyed by the uid.
 
+A peer is not configuration. `config.toml` carries facts about this plan, and a row naming another plan is a fact about that one. The peers domain owns a file of its own for them.
+
 ## Requirements
 
 ### `configuration:no-key-has-a-read-time-default` — No key has a read-time default
