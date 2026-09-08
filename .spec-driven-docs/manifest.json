@@ -61,7 +61,7 @@
     {
       "source": "_docs/specs/SPEC-decision-records.md",
       "destination": "docs/specs/SPEC-decision-records.md",
-      "sha256": "a7efe9a0468993fb7089754868b65e027ac277c9221f25c56a775dfb08a7c5f0",
+      "sha256": "833cae2f3a75f01c3f9d278354e70c06275f0f3e8aa428ebfb98b22197659638",
       "baseline_sha256": "c39e7d7f3559493ae5293c24b52f49364c657f7840c4d5002012254932aef8f3"
     },
     {
@@ -73,7 +73,7 @@
     {
       "source": "_docs/specs/SPEC-docs-format.md",
       "destination": "docs/specs/SPEC-docs-format.md",
-      "sha256": "ab0b86abfb9aa79c4c640c35fbb51fbd6ad7727dbed82a7afb7d2877490d8482",
+      "sha256": "6a0462ba74e75e10ce4a2bcc4416d5e6caad8359be408b7f478550dbd68c2fb3",
       "baseline_sha256": "bc2440a0053beefc8211684e31d76d16b8f2f936111e21971829c0caeee85a9a"
     },
     {
@@ -103,7 +103,7 @@
     {
       "source": "_docs/specs/SPEC-spec-to-code.md",
       "destination": "docs/specs/SPEC-spec-to-code.md",
-      "sha256": "beec33fb2dbf6816764f1d6cf6fbd22ee0bec5c567665e9933df7ca1e22e4f63",
+      "sha256": "128eaf3664452bbe50b1def1579585460512d76c349a7c9dc41ab316d3fac29d",
       "baseline_sha256": "76a85724cdb5f05642c4bc1e9e0c29c2082ccd703c398f28ebae0bda4b349a91"
     },
     {
