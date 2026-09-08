@@ -9,6 +9,7 @@
   - [`review:a-reference-links-to-an-anchor` — A reference links to an anchor](#reviewa-reference-links-to-an-anchor--a-reference-links-to-an-anchor)
   - [`review:the-acceptance-transfer-is-one-unit-of-review` — The acceptance transfer is one unit of review](#reviewthe-acceptance-transfer-is-one-unit-of-review--the-acceptance-transfer-is-one-unit-of-review)
   - [`review:a-code-reference-is-honest` — A code reference is honest](#reviewa-code-reference-is-honest--a-code-reference-is-honest)
+  - [`review:a-source-reference-names-the-work-it-claims` — A source reference names the work it claims](#reviewa-source-reference-names-the-work-it-claims--a-source-reference-names-the-work-it-claims)
   - [`review:a-rename-is-one-reviewable-act` — A rename is one reviewable act](#reviewa-rename-is-one-reviewable-act--a-rename-is-one-reviewable-act)
   - [`review:a-container-earns-its-document` — A container earns its document](#reviewa-container-earns-its-document--a-container-earns-its-document)
   - [`review:an-unpursued-container-is-retired` — An unpursued container is retired](#reviewan-unpursued-container-is-retired--an-unpursued-container-is-retired)
@@ -85,6 +86,18 @@ The author MUST name the branch that carried the work and the commit that landed
 - THEN it resolves to the wrong work, and no check can tell, because the record cannot verify another repository
 
 Verify: reviewer confirms the branch and delivered fields name the work that landed
+
+### `review:a-source-reference-names-the-work-it-claims` — A source reference names the work it claims
+
+The author MUST reference the outside items the artifact genuinely answers, and no others.
+
+#### Scenario: A story references a ticket it does not deliver
+
+- GIVEN a story carrying a reference copied from a neighbouring story
+- WHEN a reader follows it
+- THEN it describes different work, and no check can tell, because the record cannot see another system
+
+Verify: reviewer confirms each source reference names work the artifact delivers
 
 ### `review:a-rename-is-one-reviewable-act` — A rename is one reviewable act
 

@@ -93,7 +93,7 @@ Verify: `cargo nextest run --test scaffold`
 
 ### `scaffold:an-earned-directory-is-not-seeded` — An earned directory is not seeded
 
-The scaffold MUST NOT create the epic directory, the initiative directory, a first story, or the capture directory.
+The scaffold MUST NOT create the epic directory, the initiative directory, a first story, the capture directory, or the external sources declaration.
 
 #### Scenario: A fresh record is read for the first time
 

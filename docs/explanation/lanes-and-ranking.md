@@ -4,7 +4,7 @@
 
 The lane files are the record. The file is the lane, so there is no `status` field. The position is the ranking, so there is no `priority` field. This is what makes a lane move a reviewable diff and a rank change a one-line relocation.
 
-The lane entry carries what a scanner needs: type, points, summary, dependencies, epic, labels, and outcome. The story document carries what a session needs: goal, example, scope, sources, acceptance, and tasks. The zone holds intent, so it is allowed to become false as work moves. That is why it must hold no durable fact. Durable facts live in the host project's documents, as [host-integration.md](./host-integration.md) states.
+The lane entry carries what a scanner needs: type, points, summary, dependencies, epic, labels, and outcome. The story document carries what a session needs: goal, example, scope, references, acceptance, and tasks. The zone holds intent, so it is allowed to become false as work moves. That is why it must hold no durable fact. Durable facts live in the host project's documents, as [host-integration.md](./host-integration.md) states.
 
 ## Eligibility
 

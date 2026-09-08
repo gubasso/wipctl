@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "External sources report",
+  "description": "One run of the external sources view, as `wipctl sources --json` emits it: every declared source, the open items each one listed, and which of those items an artifact of this record references. A source whose command did not answer appears with its degradation named rather than omitted, so a consumer can tell an empty source from an unread one.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["sources"],
+  "properties": {
+    "sources": {
+      "type": "array",
+      "description": "One object per alias declared in sources.toml, in the file's own order.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["alias", "answered", "items"],
+        "properties": {
+          "alias": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "description": "The local name this plan gave the source. It is meaningful in this record alone."
+          },
+          "answered": {
+            "type": "boolean",
+            "description": "Whether the declared list command ran and produced readable output. False is a degradation and never a failure, so the report still exits zero."
+          },
+          "degradation": {
+            "type": "string",
+            "description": "Present exactly when answered is false: the same sentence the error stream carried, naming what did not answer and the reader's next step."
+          },
+          "items": {
+            "type": "array",
+            "description": "The open items the command listed, empty when the source answered with none and when it did not answer at all.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["key", "url", "referenced_by"],
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The item's own name in its system. It is opaque here, and no consumer parses its interior."
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The address the alias's url template renders for this key. It is a substitution and never a guess."
+                },
+                "referenced_by": {
+                  "type": "array",
+                  "description": "The ids of this record's artifacts whose sources section names this item. Empty means no artifact claims it, which is the reason to read several lists at once.",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -8,6 +8,8 @@ The environment report: what the build needs, what it can use, what will degrade
 
 The required set is git, plus the language runtime the implementation needs, or none. The baseline optional set holds one entry: a draft 2020-12 instance checker, probed by validation, presence-only, whose declared fallback is the named skip.
 
+Each list command a project declares under an external source is an optional dependency too. It is discovered from that project's own declaration rather than baked into the manifest. It is probed by the external sources view, presence-only, and its declared fallback is the named degradation.
+
 ## Requirements
 
 ### `doctor:a-manifest-item-is-one-line` — A manifest item is one line
