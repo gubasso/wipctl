@@ -24,4 +24,5 @@ The pages alongside this one unpack each piece:
 - [initiatives.md](./initiatives.md): the tier above, and why the ladder stops.
 - [transitions.md](./transitions.md): why lane changes are recorded events.
 - [concurrency.md](./concurrency.md): one record, many agents, no queue.
+- [replication.md](./replication.md): the same record on a second machine.
 - [host-integration.md](./host-integration.md): the contract with the adopting project.

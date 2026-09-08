@@ -31,7 +31,9 @@ The author MUST keep a chapter at or below 200 lines.
 - WHEN more rules arrive
 - THEN the excess becomes a requirement in a spec or a decision record, not a longer chapter
 
-Verify: `pre-commit run chapter-size-cap --all-files`
+The delivered gate selects numbered chapters, catalogs, and README files. This project names its chapters for their subject, so a second hook holds the same budget over the explanation and guide zones.
+
+Verify: `pre-commit run chapter-line-cap --all-files`
 
 ### `docs-format:author-instructions-stay-within-budget` — Author instructions stay within budget
 
