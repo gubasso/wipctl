@@ -13,13 +13,18 @@ categories = ["command-line-utilities", "development-tools"]
 
 # Denylist, not an allowlist: robust against dropping future source files, and an
 # `include` allowlist would silently drop README and LICENSE under an SPDX license
-# expression. Re-check `cargo package --list` whenever a top-level artifact appears.
+# expression. `tests/packaging.rs` asserts the published set, so this list is gated
+# rather than re-checked by hand.
 exclude = [
   "/docs",
   "/.github",
   "/.config",
   "/scripts",
-  "/.draft",
+  # The governance instance and the release convention of this repository. Neither
+  # is part of what a consumer builds, and the first vendors a third party under
+  # its own licence.
+  "/.spec-driven-docs",
+  "/.release-kit",
   "/deny.toml",
   "/release-plz.toml",
   "/dist-workspace.toml",

@@ -45,4 +45,14 @@ Start at [docs/explanation/overview.md](./docs/explanation/overview.md) to learn
 
 ## License
 
-Licensed under either of [LICENSE-APACHE](./LICENSE-APACHE) (Apache License 2.0) or [LICENSE-MIT](./LICENSE-MIT) (MIT license) at your option.
+Licensed under either of [LICENSE-APACHE](./LICENSE-APACHE) (Apache License 2.0) or [LICENSE-MIT](./LICENSE-MIT) (MIT license) at your option. One licence covers both deliverables, the method and the tooling. [docs/decisions/ADR-the-method-and-the-tooling-share-one-licence.md](./docs/decisions/ADR-the-method-and-the-tooling-share-one-licence.md) records why.
+
+The tree carries one third-party text under its own terms. `.spec-driven-docs/upstreams/simpleenglish/` holds a vendored writing pattern, and its `LICENSE` file sits beside the files it covers. The published package excludes that directory.
+
+## Contribution
+
+<!-- simple-english-disable: the grant reproduces the ecosystem standard wording, and a paraphrase changes what the Apache-2.0 definition of a contribution covers -->
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
+
+<!-- simple-english-enable -->
