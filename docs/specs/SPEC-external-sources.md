@@ -18,6 +18,7 @@
   - [`external-sources:the-view-marks-an-unreferenced-item` — The view marks an unreferenced item](#external-sourcesthe-view-marks-an-unreferenced-item--the-view-marks-an-unreferenced-item)
   - [`external-sources:a-missing-source-command-degrades-loudly` — A missing source command degrades loudly](#external-sourcesa-missing-source-command-degrades-loudly--a-missing-source-command-degrades-loudly)
   - [`external-sources:the-view-cache-is-authoritative-for-nothing` — The view cache is authoritative for nothing](#external-sourcesthe-view-cache-is-authoritative-for-nothing--the-view-cache-is-authoritative-for-nothing)
+  - [`external-sources:the-report-distinguishes-empty-from-unread` — The report distinguishes empty from unread](#external-sourcesthe-report-distinguishes-empty-from-unread--the-report-distinguishes-empty-from-unread)
 - [Diagnostics](#diagnostics)
 
 <!--TOC-->
@@ -204,6 +205,20 @@ Where the report is written to the cache, it MUST be rewritten on every call, re
 - THEN every answer is unchanged and nothing fails, because a file nothing believes cannot become a second store
 
 Verify: `cargo nextest run --test verb_contracts`
+
+### `external-sources:the-report-distinguishes-empty-from-unread` — The report distinguishes empty from unread
+
+The machine format MUST carry one object per declared alias, each stating whether that alias's command answered.
+
+#### Scenario: A consumer counts open work across two sources
+
+- GIVEN one source that answered with no items and one whose command was absent
+- WHEN the report is parsed
+- THEN the two are distinguishable, because a zero a reader cannot trust is worse than a stated gap
+
+Verify: `cargo nextest run --test schemas`
+
+The shape is `sources-report.schema.json`, beside this page. The obligation to ship that schema and a case validating real output against it belongs to `cli-conventions:a-machine-format-is-verb-local`, and is not restated here.
 
 ## Diagnostics
 
