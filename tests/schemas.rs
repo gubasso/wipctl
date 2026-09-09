@@ -262,7 +262,7 @@ fn a_peer_row_without_a_uid_fails() {
     // a location names a place, not a plan.
     let ok = accepts_fixture_with(
         "peer-no-uid",
-        "alpha/peers.toml",
+        "alpha/.wipctl/plan.toml",
         "uid = \"4c81d0e7f39a4b25861d7c04e9a2f358\"\n",
         "",
     )
@@ -276,7 +276,7 @@ fn a_peer_row_without_a_location_fails() {
     // A peer nobody can locate is not a peer, and no default is invented for it.
     let ok = accepts_fixture_with(
         "peer-no-url",
-        "alpha/peers.toml",
+        "alpha/.wipctl/plan.toml",
         "[\"https://git.example.org/acme/beta-plan.git\"]",
         "[]",
     )
@@ -291,7 +291,7 @@ fn a_peer_alias_outside_the_slug_grammar_fails() {
     // and it is the one a case-insensitive filesystem hides.
     let ok = accepts_fixture_with(
         "peer-alias",
-        "alpha/peers.toml",
+        "alpha/.wipctl/plan.toml",
         "[peers.beta]",
         "[peers.Beta]",
     )
@@ -307,7 +307,7 @@ fn a_peer_url_carrying_a_password_fails() {
     // which is why the rule turns on the colon rather than on the at sign.
     let ok = accepts_fixture_with(
         "peer-url",
-        "alpha/peers.toml",
+        "alpha/.wipctl/plan.toml",
         "https://git.example.org",
         "https://someone:PLACEHOLDER@git.example.org",
     )
@@ -323,7 +323,7 @@ fn a_peer_url_hiding_a_password_in_an_escape_fails() {
     // reads the url as written.
     let ok = accepts_fixture_with(
         "peer-url-escaped",
-        "alpha/peers.toml",
+        "alpha/.wipctl/plan.toml",
         "https://git.example.org",
         "https://someone%3APLACEHOLDER@git.example.org",
     )

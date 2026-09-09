@@ -4,7 +4,7 @@ One plan is one project's record. A story here can depend on a story in another 
 
 ## What a peer is
 
-A peer is another project's plan repository, named by this plan and attached on this machine. Naming it is a committed fact in `peers.toml`. Attaching it is a local fact: a slot under the data directory holds a clone.
+A peer is another project's plan repository, named by this plan and attached on this machine. Naming it is a committed fact in the plan configuration's `peers` section. Attaching it is a local fact: a slot under the data directory holds a clone.
 
 Once attached, a peer is a plan. It is validated in full, its tombstones are read, its lanes are read, and any verb that resolves a record can be pointed at it. There is one idea of a plan in this method, and a peer is an instance of it. Connected plans are one plan with several roots.
 

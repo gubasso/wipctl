@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Plan configuration file",
-  "description": "The plan repository's own configuration: .wipctl/plan.toml at the zone root. It restates the project's identity and carries every fact about the plan itself — the plan owns its own home, so its cadence and thresholds live with it, not with the host. The host repository's .wipctl/project.toml carries project_id alone and has no schema: one required key is below a schema's floor, and the cross-file checker owns its presence, grammar, and agreement with this file. Each .wipctl directory holds one file and no second one. No key has a read-time default: a tool finding a required key absent fails its check rather than assuming a value, because a value guessed on a project's behalf is a value nobody wrote down.",
+  "description": "The plan repository's whole configuration: .wipctl/plan.toml at the zone root. It restates the project's identity and carries every fact about the plan itself — the plan owns its own home, so its cadence, its thresholds, the plans it names, and the outside systems it references all live with it, not with the host. The host repository's .wipctl/project.toml carries project_id alone and has no schema: one required key is below a schema's floor, and the cross-file checker owns its presence, grammar, and agreement with this file. Each .wipctl directory holds one file and no second one. The peers and sources sections are optional, and an absent one means what its own domain says it means; a present one is complete, because no key has a read-time default and a value guessed on a project's behalf is a value nobody wrote down.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -42,6 +42,73 @@
           "type": "integer",
           "minimum": 1,
           "description": "The age in days past which an in-flight entry is marked."
+        }
+      }
+    },
+    "peers": {
+      "type": "object",
+      "description": "The other plans this plan names, one table per peer, keyed by the alias this plan chose for it. Two plans may both call a peer `payments` and mean different things, which is why a needs id carrying an alias resolves only through the record it was written in. The section is earned: its absence means the plan names no peers. Nothing here is authoritative about the peer — attaching refuses a clone whose own .wipctl/plan.toml disagrees with the row it filled.",
+      "propertyNames": { "$ref": "#/$defs/alias" },
+      "additionalProperties": { "$ref": "#/$defs/peer" }
+    },
+    "sources": {
+      "type": "object",
+      "description": "The outside systems this plan's artifacts reference, one table per alias, and the alias is local to the plan that declares it. The section states where an item lives and how to list the open ones; it never holds a copy of an item. Its absence is legal and means the project declares no source, so the section is earned rather than scaffolded.",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "patternProperties": {
+        "^[a-z0-9]+(-[a-z0-9]+)*$": { "$ref": "#/$defs/source" }
+      }
+    }
+  },
+  "$defs": {
+    "alias": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "The local name for a peer, in the slug grammar. Unique within this section, and never equal to this plan's own project_id: without that rule a prefixed needs id has two candidate meanings. The alias is also the readable name, so a row carries no second label."
+    },
+    "peer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["uid", "urls"],
+      "properties": {
+        "uid": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$",
+          "description": "The peer's plan_uid, as that plan declares it. This is the identity and everything else in the row is a hint. A uid appears in at most one row, and never equals this plan's own: both are cross-file facts the checker owns, because neither is visible to a schema reading one file."
+        },
+        "urls": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/url" },
+          "description": "Where the peer's plan repository can be cloned, in the order attaching tries them. At least one: a peer nobody can locate is not a peer, and no value is guessed on a project's behalf."
+        }
+      }
+    },
+    "url": {
+      "type": "string",
+      "pattern": "^(?:https|ssh)://(?:[A-Za-z0-9._~!$&'()*+,;=-]+@)?[A-Za-z0-9._~-]+(?::[0-9]+)?/[^\\s]*$",
+      "description": "A location carrying an explicit accepted scheme, either https or ssh. A bare account name in the userinfo is allowed because it names an account. A colon there is where a password goes, so it is refused, and the percent sign is refused with it: without that, %3A carries the same colon past the check. A committed file is read by everyone who clones this plan, so a credential in it is a leak whatever the tool prints. The url is used as written: the tool relies on no host configuration that rewrites one url into another, because a rewritten url is not the one under review."
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url_template", "list_command"],
+      "description": "One declared source. Both keys are required: a template with no command gives a reader a link and no list, and a command with no template gives a list nobody can follow.",
+      "properties": {
+        "url_template": {
+          "type": "string",
+          "pattern": "^[^{}]*\\{key\\}[^{}]*$",
+          "description": "The address of one item, with the placeholder standing where the item's key goes. The placeholder appears exactly once, so rendering a link is a substitution and never a guess."
+        },
+        "list_command": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "The command that lists the source's open items, as an argument vector rather than one string, so no shell parses it. Any command meeting the report's contract serves; the specification names none."
         }
       }
     }

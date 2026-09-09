@@ -27,3 +27,5 @@ Enforced by `peers:a-row-carries-a-uid-and-a-location`, `peers:an-alias-is-local
 ## Status
 
 Accepted
+
+Amended by ADR-a-plan-declares-everything-in-one-configuration-file.

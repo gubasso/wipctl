@@ -8,7 +8,7 @@
   "properties": {
     "sources": {
       "type": "array",
-      "description": "One object per alias declared in sources.toml, in the file's own order.",
+      "description": "One object per alias declared in the sources section of .wipctl/plan.toml, in the section's own order.",
       "items": {
         "type": "object",
         "additionalProperties": false,

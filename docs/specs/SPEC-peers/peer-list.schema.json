@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Peer view",
-  "description": "What `wipctl peers --json` emits: every plan this one declares, whether it is attached, and which entries here depend on it. This is the verb's output shape, not the file a project writes — peers.schema.json is that file. The view opens no url: it reads the table, this record's lane files, and the slot of each attached peer, so its answer is a function of committed files on this machine.",
+  "description": "What `wipctl peers --json` emits: every plan this one declares, whether it is attached, and which entries here depend on it. This is the verb's output shape, not the section a project writes — the peers half of plan.schema.json is that section. The view opens no url: it reads the table, this record's lane files, and the slot of each attached peer, so its answer is a function of committed files on this machine.",
   "type": "array",
   "items": { "$ref": "#/$defs/peer" },
   "$defs": {

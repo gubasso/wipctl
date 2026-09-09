@@ -1,6 +1,6 @@
 # The two-plan fixture
 
-Two plan records, `alpha` and `beta`, each carrying both identities, five lane files, a peer table, and one story document per entry. `scripts/check-schemas` validates every file here against the schema its name and position select, and `tests/schemas.rs` plants a defect in a copy of this tree for each rule it wants to see fail.
+Two plan records, `alpha` and `beta`. Each carries one configuration file at `.wipctl/plan.toml`, holding both identities and a peer section, plus five lane files and one story document per entry. `scripts/check-schemas` validates every file here against the schema its name and position select, and `tests/schemas.rs` plants a defect in a copy of this tree for each rule it wants to see fail.
 
 Three things in it are deliberate and must not be tidied away.
 

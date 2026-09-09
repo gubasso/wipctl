@@ -38,12 +38,11 @@ The closure is what the checker proves over. The flag selects from one table. A 
 
 ```text
 no --plan     walk upward to .wipctl/project.toml, read project_id,
-              and look it up
-              in the attachment registry
+              and look it up in the attachment registry
 
---plan <a>    resolve this project's plan as above, read its peers.toml,
-              resolve <a> to a uid, and find the slot whose plan file
-              declares that uid
+--plan <a>    resolve this project's plan as above, read its peers
+              section, resolve <a> to a uid, and find the slot whose
+              plan file declares that uid
 ```
 
 The second path still starts with the first, because the table that binds the alias lives in this plan. A caller outside any project has no table to read, so the flag there is the ordinary no-configuration usage error.
@@ -154,8 +153,8 @@ an alias a peer declares, but this plan does not                          exit 2
   wipctl: unknown plan 'gamma'
   wipctl: 'gamma' is declared by peer 'beta', not by this plan. An alias
           is local to the plan that declares it, so --plan reads this
-          plan's peers.toml only. Declare it here with 'wipctl peer add
-          <url>', or run the verb from inside that plan.
+          plan's peers section only. Declare it here with 'wipctl peer
+          add <url>', or run the verb from inside that plan.
 
 --plan on a verb that resolves nothing                                    exit 2
   wipctl: 'init' does not take --plan
