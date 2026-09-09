@@ -65,16 +65,16 @@
         "rust-overlay": "rust-overlay_3"
       },
       "locked": {
-        "lastModified": 1788619045,
-        "narHash": "sha256-5JUBSxBAnjwuBzTykInFclYq8Isye2KBVGRwJyhbaRo=",
+        "lastModified": 1788969871,
+        "narHash": "sha256-ZtHZw1dpgUB3Ju+kDuJi7x0lc4n9QiktQapvtFxZMZI=",
         "owner": "gubasso",
         "repo": "release-kit",
-        "rev": "cdff88f492653530f9f4d3a4587d6c50b4cacad9",
+        "rev": "143df4d78e0e4b4217741ec483203b78e8a4b97b",
         "type": "github"
       },
       "original": {
         "owner": "gubasso",
-        "ref": "v0.2.19",
+        "ref": "v0.3.8",
         "repo": "release-kit",
         "type": "github"
       }
@@ -181,16 +181,16 @@
         "rust-overlay": "rust-overlay_4"
       },
       "locked": {
-        "lastModified": 1788669635,
-        "narHash": "sha256-ZYwp6TchNjkiz7FVSZ4NyMwzw8L6X5r1inXxgqJJWiE=",
+        "lastModified": 1788981258,
+        "narHash": "sha256-6dLJ55RTJmSFxKgM7LQ0Qu3FqAS6zrxy9A3B8sMtbEA=",
         "owner": "gubasso",
         "repo": "spec-driven-docs",
-        "rev": "deaddb91f0689b474fa5a10d8ec60af0c2d0540a",
+        "rev": "e8ef2008214c38b8093d805848cc9342979b018e",
         "type": "github"
       },
       "original": {
         "owner": "gubasso",
-        "ref": "v0.4.13",
+        "ref": "v0.6.0",
         "repo": "spec-driven-docs",
         "type": "github"
       }

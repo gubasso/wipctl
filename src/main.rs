@@ -19,6 +19,7 @@ fn main() -> ExitCode {
 
 /// The fallible program. Every failure path returns here so that `main` stays the
 /// single place the process decides its exit status.
+// sdd: permanent the wrap is a contract of this project rather than a mask over a defect elsewhere
 #[expect(
     clippy::unnecessary_wraps,
     reason = "the entry point is fallible by contract; the first command that can \

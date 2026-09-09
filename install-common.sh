@@ -22,7 +22,7 @@ installer_color_success=""
 installer_color_warning=""
 installer_color_error=""
 installer_color_detail=""
-# shellcheck disable=SC2034 # Shared color token reserved for caller-facing UI text.
+# shellcheck disable=SC2034 # sdd: permanent the token is reserved for caller-facing UI text and this file never reads it
 installer_color_bold=""
 installer_color_reset=""
 
@@ -37,7 +37,7 @@ installer_ui_init() {
     installer_color_warning=$'\033[1;33m'
     installer_color_error=$'\033[1;31m'
     installer_color_detail=$'\033[2m'
-    # shellcheck disable=SC2034 # Shared color token reserved for caller-facing UI text.
+    # shellcheck disable=SC2034 # sdd: permanent the token is reserved for caller-facing UI text and this file never reads it
     installer_color_bold=$'\033[1m'
     installer_color_reset=$'\033[0m'
   else
@@ -46,7 +46,7 @@ installer_ui_init() {
     installer_color_warning=""
     installer_color_error=""
     installer_color_detail=""
-    # shellcheck disable=SC2034 # Shared color token reserved for caller-facing UI text.
+    # shellcheck disable=SC2034 # sdd: permanent the token is reserved for caller-facing UI text and this file never reads it
     installer_color_bold=""
     installer_color_reset=""
   fi
