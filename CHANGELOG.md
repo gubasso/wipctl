@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.4.1](https://github.com/gubasso/wipctl/compare/v0.4.0...v0.4.1) - 2026-09-09
+
+### Other
+
+- `toolchain`: Take the documentation convention to v0.6.0
+
 ## [0.4.0](https://github.com/gubasso/wipctl/compare/v0.3.0...v0.4.0) - 2026-09-09
 
 ### Added
