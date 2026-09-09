@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.4.0](https://github.com/gubasso/wipctl/compare/v0.3.0...v0.4.0) - 2026-09-09
+
+### Added
+
+- breaking, `config`: Mint uids for identity and name slots locally ([#36](https://github.com/gubasso/wipctl/pull/36)). `project_id` is a minted uid rather than a slug, `plan_uid` is renamed to `plan_id`, and a peer row's `uid` key is renamed to `plan_id`. An adopter mints both identities with `wipctl attach --mint-uid`, updates every peer row to the new key and value, and reattaches each plan so the machine mints a slot name for it.
+
+### Fixed
+
+- `changelog`: Render a breaking change's adopter guidance ([#38](https://github.com/gubasso/wipctl/pull/38))
+
 ## [0.3.0](https://github.com/gubasso/wipctl/compare/v0.2.0...v0.3.0) - 2026-09-09
 
 ### Added
