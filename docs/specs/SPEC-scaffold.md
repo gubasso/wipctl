@@ -45,6 +45,8 @@ What the scaffold lands and the contract each landed file carries. The scaffold 
 
 The zone is the plan repository's working tree, which the scaffold creates whole: the repository, the trunk, the hook set, and the initial commit.
 
+The `watches.md` file is earned when the record gains its first outside wait. It is absent from a scaffolded record.
+
 The scaffold mints and reports `project_id` and `plan_id`. Each is 128 random bits written as 32 lowercase hexadecimal characters. The slot name keeps paths readable, and messages use the derived project slug.
 
 ## The host pointer

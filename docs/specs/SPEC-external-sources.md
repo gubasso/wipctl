@@ -10,7 +10,7 @@
   - [`external-sources:a-source-ref-names-a-declared-alias` — A source reference names a declared alias](#external-sourcesa-source-ref-names-a-declared-alias--a-source-reference-names-a-declared-alias)
   - [`external-sources:a-source-ref-is-stated-and-never-verified` — A source reference is stated and never verified](#external-sourcesa-source-ref-is-stated-and-never-verified--a-source-reference-is-stated-and-never-verified)
   - [`external-sources:a-source-ref-carries-no-hierarchy` — A source reference carries no hierarchy](#external-sourcesa-source-ref-carries-no-hierarchy--a-source-reference-carries-no-hierarchy)
-  - [`external-sources:a-source-ref-never-sequences-and-never-counts` — A source reference never sequences and never counts](#external-sourcesa-source-ref-never-sequences-and-never-counts--a-source-reference-never-sequences-and-never-counts)
+  - [`external-sources:a-source-ref-never-sequences-and-never-counts` — A Sources reference never sequences and never counts](#external-sourcesa-source-ref-never-sequences-and-never-counts--a-sources-reference-never-sequences-and-never-counts)
   - [`external-sources:a-declared-source-carries-a-template-and-a-command` — A declared source carries a template and a command](#external-sourcesa-declared-source-carries-a-template-and-a-command--a-declared-source-carries-a-template-and-a-command)
   - [`external-sources:an-alias-is-unique-and-slugged` — An alias is unique and slugged](#external-sourcesan-alias-is-unique-and-slugged--an-alias-is-unique-and-slugged)
   - [`external-sources:the-sources-section-is-earned` — The sources section is earned](#external-sourcesthe-sources-section-is-earned--the-sources-section-is-earned)
@@ -110,15 +110,15 @@ The implementation MUST NOT compare one artifact's source references against ano
 
 Verify: `cargo nextest run --test validation`
 
-### `external-sources:a-source-ref-never-sequences-and-never-counts` — A source reference never sequences and never counts
+### `external-sources:a-source-ref-never-sequences-and-never-counts` — A Sources reference never sequences and never counts
 
-A source reference MUST NOT appear in `needs`, enter ranking, or contribute to any derived number.
+A source reference in a `Sources` section MUST NOT appear in `needs`, enter ranking, or contribute to any derived number. A wait belongs in a watch section, whose `Blocks` line names the affected entries.
 
 #### Scenario: An entry waits on an outside item
 
 - GIVEN work that cannot start until another team closes a ticket
 - WHEN the wait is recorded
-- THEN it is recorded as prose in the entry's note, because `needs` is the only sequencing fact and it names entries of this record
+- THEN it becomes a watch section because a source reference says what work answers while a watch says what work waits on
 
 Verify: `cargo nextest run --test validation`
 

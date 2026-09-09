@@ -70,6 +70,7 @@ plan-repo/
   AGENTS.md                     the method, self-sufficient, written by the scaffold
   charter.md                    what the project is for, pillars, no-gos, cadence
   open-questions.md             questions that block named entries
+  watches.md                    outside items that block named entries; earned
   lanes/                        backlog, todo, doing, review, closed
   stories/<id>.md               one document per story, optional sibling directory
   epics/<id>.md                 one document per epic; earned, not scaffolded
