@@ -46,7 +46,7 @@ The command is `wipctl`. These are its verbs and their usage. A verb's own domai
 ```text
 wipctl [--plan <alias>] <verb> [...]
 
-wipctl init [--root DIR] [--iteration-start YYYY-MM-DD] [--print-hooks] [--dry-run]
+wipctl init [--root DIR] [--window-start YYYY-MM-DD] [--print-hooks] [--dry-run]
 wipctl attach <plan-repo-url>
 wipctl attach --create
 wipctl attach --mint-uid
@@ -69,7 +69,7 @@ wipctl board
 wipctl dashboard
 wipctl graph [--unblocks <id>]
 wipctl flow [--lane <lane>]
-wipctl aging
+wipctl stale
 wipctl velocity
 wipctl epic [--json] [--write] [<epic-id>]
 wipctl epics [--json]

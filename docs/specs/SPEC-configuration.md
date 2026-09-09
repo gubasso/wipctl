@@ -13,8 +13,8 @@
   - [`configuration:the-two-identities-agree` — The two identities agree](#configurationthe-two-identities-agree--the-two-identities-agree)
   - [`configuration:an-unknown-key-is-rejected` — An unknown key is rejected](#configurationan-unknown-key-is-rejected--an-unknown-key-is-rejected)
   - [`configuration:an-optional-section-is-legally-absent` — An optional section is legally absent](#configurationan-optional-section-is-legally-absent--an-optional-section-is-legally-absent)
-  - [`configuration:the-iteration-window-is-required` — The iteration window is required](#configurationthe-iteration-window-is-required--the-iteration-window-is-required)
-  - [`configuration:the-aging-threshold-is-optional-and-undefaulted` — The aging threshold is optional and undefaulted](#configurationthe-aging-threshold-is-optional-and-undefaulted--the-aging-threshold-is-optional-and-undefaulted)
+  - [`configuration:the-window-is-required` — The window is required](#configurationthe-window-is-required--the-window-is-required)
+  - [`configuration:the-stale-threshold-is-optional-and-undefaulted` — The stale threshold is optional and undefaulted](#configurationthe-stale-threshold-is-optional-and-undefaulted--the-stale-threshold-is-optional-and-undefaulted)
   - [`configuration:the-project-file-owes-no-schema` — The project file owes no schema](#configurationthe-project-file-owes-no-schema--the-project-file-owes-no-schema)
   - [`configuration:the-configuration-directory-holds-one-file` — The configuration directory holds one file](#configurationthe-configuration-directory-holds-one-file--the-configuration-directory-holds-one-file)
   - [`configuration:there-is-no-commit-configuration` — There is no commit configuration](#configurationthere-is-no-commit-configuration--there-is-no-commit-configuration)
@@ -53,12 +53,12 @@ project_id = "payments-acme"
 project_id = "payments-acme"
 plan_uid = "9f2c41a08b7d4e63a15c8f02d7e4b619"
 
-[iteration]
+[window]
 start = 2026-07-06
 length_days = 14
 
-[aging]
-threshold_days = 21
+[stale_after]
+days = 21
 
 [peers.payments]
 uid = "9f2c41a08b7d4e63a15c8f02d7e4b619"
@@ -69,7 +69,7 @@ url_template = "https://tracker.example/issues/{key}"
 list_command = ["<the command that lists open items>", "--format", "json"]
 ```
 
-The file has a required core and two optional sections. The core is every key above `[peers]`, and the two sections are `peers` and `sources`.
+The file has a required core and two optional sections. The core is every key above `[peers]`, and the two sections are `peers` and `sources`. Each section name states what the operator decided. `window.length_days = 14` says the counting window is fourteen days long, and `stale_after.days = 21` says work goes stale after twenty-one days.
 
 ```text
 [peers.<alias>]     the other plans this one names. The peers domain owns
@@ -122,9 +122,9 @@ A peer row names another plan, and the peers domain owns what such a row means. 
 
 When a verb finds a required key absent, the verb MUST fail the check rather than assume a value.
 
-#### Scenario: The iteration length is missing
+#### Scenario: The window length is missing
 
-- GIVEN a plan configuration without `iteration.length_days`
+- GIVEN a plan configuration without `window.length_days`
 - WHEN a velocity window is computed
 - THEN the verb fails naming the field, because a value guessed on a project's behalf is a value nobody wrote down
 
@@ -136,7 +136,7 @@ The host repository's `.wipctl/project.toml` MUST carry `project_id` and no othe
 
 #### Scenario: A project adds a setting to the project file
 
-- GIVEN a project file gaining an iteration length
+- GIVEN a project file gaining a window length
 - WHEN the file is read
 - THEN the unknown key is rejected, because the host identifies and the plan repository configures
 
@@ -202,9 +202,9 @@ The `peers` and `sources` sections MUST be optional, each absence MUST mean what
 
 Verify: `cargo nextest run --test schemas`
 
-### `configuration:the-iteration-window-is-required` — The iteration window is required
+### `configuration:the-window-is-required` — The window is required
 
-The plan configuration MUST carry `iteration.start` as a calendar date and `iteration.length_days` as an integer of at least 1.
+The plan configuration MUST carry `window.start` as a calendar date and `window.length_days` as an integer of at least 1.
 
 #### Scenario: The cadence changes mid-project
 
@@ -214,14 +214,14 @@ The plan configuration MUST carry `iteration.start` as a calendar date and `iter
 
 Verify: `cargo nextest run --test configuration`
 
-### `configuration:the-aging-threshold-is-optional-and-undefaulted` — The aging threshold is optional and undefaulted
+### `configuration:the-stale-threshold-is-optional-and-undefaulted` — The stale threshold is optional and undefaulted
 
-Where the aging table is present, `threshold_days` MUST be an integer of at least 1, and its absence MUST leave every bar unmarked.
+Where the `stale_after` table is present, `days` MUST be an integer of at least 1, and its absence MUST leave every bar unmarked.
 
 #### Scenario: A project never sets a threshold
 
-- GIVEN a configuration with no aging table
-- WHEN the aging view renders
+- GIVEN a configuration with no `stale_after` table
+- WHEN the stale view renders
 - THEN no row is marked, because there is no default threshold to mark against
 
 Verify: `cargo nextest run --test verb_contracts`
