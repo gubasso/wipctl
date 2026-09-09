@@ -1,7 +1,7 @@
 project_id = "alpha"
 plan_uid = "9f2c41a08b7d4e63a15c8f02d7e4b619"
 
-[iteration]
+[window]
 start = 2026-07-06
 length_days = 14
 

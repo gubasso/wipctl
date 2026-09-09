@@ -1,7 +1,7 @@
 project_id = "beta"
 plan_uid = "4c81d0e7f39a4b25861d7c04e9a2f358"
 
-[iteration]
+[window]
 start = 2026-07-06
 length_days = 14
 

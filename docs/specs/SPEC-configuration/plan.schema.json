@@ -15,7 +15,7 @@
       "pattern": "^[0-9a-f]{32}$",
       "description": "This plan's global identity: 128 bits of randomness, minted once when the plan is created, written as 32 lowercase hexadecimal characters. It answers which plan anywhere, while project_id answers which plan on this machine. Another plan repository writes this value down in its own peer table, so it is never renamed, never derived from anything, and never parsed: it carries no time, no machine, and no order."
     },
-    "iteration": {
+    "window": {
       "type": "object",
       "additionalProperties": false,
       "description": "The window velocity is summed over. Changing either field restarts the series. Presence of this table and its keys is the cross-file checker's fact, not this schema's: the schema owns the types.",
@@ -23,25 +23,25 @@
         "start": {
           "type": "string",
           "format": "date",
-          "description": "First day of the first iteration, as a calendar date. Without an anchor a tool can only report rolling windows. An instance checker reading TOML presents a native date value here as its ISO string."
+          "description": "First day of the first window, as a calendar date. Without an anchor a tool can only report rolling windows. An instance checker reading TOML presents a native date value here as its ISO string."
         },
         "length_days": {
           "type": "integer",
           "minimum": 1,
-          "description": "Iteration length in days. One cadence per project."
+          "description": "Window length in days. One cadence per project."
         }
       }
     },
-    "aging": {
+    "stale_after": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["threshold_days"],
-      "description": "Opt-in: present, `wipctl aging` marks rows older than the threshold; absent, bars render with no marks. There is no default threshold.",
+      "required": ["days"],
+      "description": "Opt-in: present, `wipctl stale` marks rows older than the threshold; absent, bars render with no marks. There is no default threshold.",
       "properties": {
-        "threshold_days": {
+        "days": {
           "type": "integer",
           "minimum": 1,
-          "description": "The age in days past which an in-flight entry is marked."
+          "description": "The age in days past which an in-flight entry is called stale. The measure keeps its own name, age, because a measure and a threshold are two things."
         }
       }
     },

@@ -12,7 +12,7 @@
   - [`metrics:an-out-of-order-journal-is-not-folded` — An out-of-order journal is not folded](#metricsan-out-of-order-journal-is-not-folded--an-out-of-order-journal-is-not-folded)
   - [`metrics:a-measure-is-the-same-on-any-clone` — A measure is the same on any clone](#metricsa-measure-is-the-same-on-any-clone--a-measure-is-the-same-on-any-clone)
   - [`metrics:a-lane-without-a-measure-is-a-usage-error` — A lane without a measure is a usage error](#metricsa-lane-without-a-measure-is-a-usage-error--a-lane-without-a-measure-is-a-usage-error)
-  - [`metrics:the-age-view-shares-the-flow-fold` — The age view shares the flow fold](#metricsthe-age-view-shares-the-flow-fold--the-age-view-shares-the-flow-fold)
+  - [`metrics:the-stale-view-shares-the-flow-fold` — The stale view shares the flow fold](#metricsthe-stale-view-shares-the-flow-fold--the-stale-view-shares-the-flow-fold)
   - [`metrics:the-threshold-is-undefaulted-and-never-gates` — The threshold is undefaulted and never gates](#metricsthe-threshold-is-undefaulted-and-never-gates--the-threshold-is-undefaulted-and-never-gates)
   - [`metrics:only-a-delivered-close-counts` — Only a delivered close counts](#metricsonly-a-delivered-close-counts--only-a-delivered-close-counts)
   - [`metrics:an-empty-window-renders-at-zero` — An empty window renders at zero](#metricsan-empty-window-renders-at-zero--an-empty-window-renders-at-zero)
@@ -23,7 +23,7 @@
 
 ## Purpose
 
-Age, dwell, rework, and delivery per window. Every number here is folded from the record, never from repository archaeology. The boundary runs at the source: this domain owns the measures, the transition journal domain owns the events they fold, and the rendering domain owns how a bar is drawn.
+Age, dwell, rework, and delivery per window. Every number here is folded from the record, never from repository archaeology. Age and staleness are two things: age is the number of days, and the `stale_after` threshold is the line drawn across it. The boundary runs at the source: this domain owns the measures, the transition journal domain owns the events they fold, and the rendering domain owns how a bar is drawn.
 
 ## The three flow measures
 
@@ -51,7 +51,7 @@ Verify: `cargo nextest run --test metrics`
 
 ### `metrics:an-entry-outside-this-record-is-never-a-quantity` — An entry outside this record is never a quantity
 
-Every derived number MUST be computed from this record's own entries alone: velocity, epic and initiative arithmetic, flow, aging, and every board count.
+Every derived number MUST be computed from this record's own entries alone: velocity, epic and initiative arithmetic, flow, staleness, and every board count.
 
 #### Scenario: A peer's entry closes
 
@@ -121,9 +121,9 @@ Where a lane measure is requested for a lane that has none, the implementation M
 
 Verify: `cargo nextest run --test verb_contracts`
 
-### `metrics:the-age-view-shares-the-flow-fold` — The age view shares the flow fold
+### `metrics:the-stale-view-shares-the-flow-fold` — The stale view shares the flow fold
 
-The age view MUST take its ages from the same fold as the flow table, and MUST show an unmeasured entry with its reason.
+The stale view MUST take its ages from the same fold as the flow table, and MUST show an unmeasured entry with its reason.
 
 #### Scenario: Two views show one entry's age
 
@@ -135,11 +135,11 @@ Verify: `cargo nextest run --test metrics`
 
 ### `metrics:the-threshold-is-undefaulted-and-never-gates` — The threshold is undefaulted and never gates
 
-Where the configuration carries an age threshold, the age view MUST mark rows past it, and its absence MUST leave every row unmarked.
+Where the configuration carries a `stale_after` table, the stale view MUST mark rows past its threshold, and its absence MUST leave every row unmarked.
 
 #### Scenario: A project sets no threshold
 
-- GIVEN a configuration with no aging table
+- GIVEN a configuration with no `stale_after` table
 - WHEN the view renders
 - THEN no row is marked, because there is no default threshold to mark against
 
@@ -171,11 +171,11 @@ Verify: `cargo nextest run --test metrics`
 
 ### `metrics:a-changed-cadence-restarts-the-series` — A changed cadence restarts the series
 
-Where the iteration anchor or length changes, the implementation MUST restart the window series and MUST NOT stitch old windows onto new.
+Where the window anchor or length changes, the implementation MUST restart the window series and MUST NOT stitch old windows onto new.
 
 #### Scenario: A team changes its cadence
 
-- GIVEN a new iteration length
+- GIVEN a new window length
 - WHEN the series renders
 - THEN it starts again from the anchor, because a window redefined mid-series compares two different things
 

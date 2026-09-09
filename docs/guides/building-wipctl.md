@@ -61,7 +61,7 @@ Build the render library and the probe set first, covering pipe safety, glyph ti
 
 1. the epic rollup and the epic resolution, with their machine formats, the cache flag, and their schemas
 2. the initiative decomposition and its rollup, with theirs
-3. the board, the dependency drawing, velocity, flow, and aging
+3. the board, the dependency drawing, velocity, flow, and the stale view
 4. the diagnostic report
 5. the composite view, as pure composition
 

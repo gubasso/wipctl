@@ -27,4 +27,4 @@ A point is one unit of irreducible human judgment: a decision a test cannot sett
 
 ## Velocity is a budget, not a score
 
-Velocity is the sum of points of entries closed as done inside an iteration window, derived on every read. A cut entry counts nothing. A reshaped entry counts through its successor. The number budgets how much judgment one iteration can absorb. It measures nobody. The method deliberately does not specify planning against velocity, and it does not specify calibrating the scale between teams.
+Velocity is the sum of points of entries closed as done inside one window, derived on every read. A cut entry counts nothing. A reshaped entry counts through its successor. The number budgets how much judgment one window can absorb. It measures nobody. The method deliberately does not specify planning against velocity, and it does not specify calibrating the scale between teams.
