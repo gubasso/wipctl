@@ -36,6 +36,13 @@ semver_check = false
 # second blank line, and dprint collapses it. `{%- for` trims that newline,
 # and the blank line after the group heading is written literally. Verified
 # by generating an entry and confirming dprint leaves it byte-identical.
+#
+# A breaking entry also renders its `BREAKING CHANGE:` footer, because AGENTS.md
+# requires a changelog entry that names what breaks and what an adopter does
+# next, and the commit title alone carries neither. The footer is multi-line in
+# the commit and one physical line here, so the template replaces each newline
+# with a space before writing it. Without that replacement the footer's second
+# line leaves the list item and becomes a paragraph.
 [changelog]
 header = """# Changelog
 
@@ -50,6 +57,6 @@ body = """
 {%- for group, commits in commits | group_by(attribute="group") %}
 ### {{ group | upper_first }}
 
-{% for commit in commits %}- {% if commit.breaking %}breaking, {% endif %}{% if commit.scope %}`{{ commit.scope }}`: {% endif %}{{ commit.message | upper_first }}
+{% for commit in commits %}- {% if commit.breaking %}breaking, {% endif %}{% if commit.scope %}`{{ commit.scope }}`: {% endif %}{{ commit.message | upper_first }}{% if commit.breaking and commit.breaking_description %}. {{ commit.breaking_description | replace(from="\n", to=" ") | trim }}{% endif %}
 {% endfor %}{% endfor %}"""
 trim = true

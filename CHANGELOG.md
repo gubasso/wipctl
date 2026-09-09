@@ -6,10 +6,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-### Added
-
-- breaking, `config`: Identify projects and plans with minted uids, name slots locally, and rename `plan_uid` and peer `uid` to `plan_id`. Adopters must mint both identities, update peer rows, and reattach each plan so its machine can mint a slot name.
-
 ## [0.3.0](https://github.com/gubasso/wipctl/compare/v0.2.0...v0.3.0) - 2026-09-09
 
 ### Added
