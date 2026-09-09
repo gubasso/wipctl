@@ -6,7 +6,7 @@ Several agents, several worktrees, and one live record, plus a second machine wh
 
 Inputs: none.
 
-1. Give each agent its own checkout. Worktrees or clones both work. Every checkout carries the same committed `.wipctl.toml`, so every agent resolves the same plan repository.
+1. Give each agent its own checkout. Worktrees or clones both work. Every checkout carries the same committed `.wipctl/project.toml`, so every agent resolves the same plan repository.
 2. Each agent takes work atomically rather than reading and racing:
 
    ```text

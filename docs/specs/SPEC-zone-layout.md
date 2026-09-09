@@ -22,13 +22,13 @@
 
 ## Purpose
 
-Where a project's plan record lives on a machine, and what the zone contains. The record lives in its own repository, at a machine-level location shared by every worktree, branch, and clone of that project. The host repository keeps only the identity. The boundary runs at the tree. This domain says what exists and where, and each file's own domain says what is inside it.
+Where a project's plan record lives on a machine, and what the zone contains. The record lives in its own repository, at a machine-level location shared by every worktree, branch, and clone of that project. The host repository keeps only the identity, in a `.wipctl` directory the tool owns. The boundary runs at the tree. This domain says what exists and where, and each file's own domain says what is inside it.
 
 ## The four locations
 
 ```text
 host repo:
-  .wipctl.toml                  identity only; committed; travels with every clone
+  .wipctl/project.toml          identity only; committed; travels with every clone
 
 $XDG_DATA_HOME/wipctl/
   projects/<project_id>/plan-repo/   the plan zone, its own repository, trunk only
@@ -58,7 +58,7 @@ XDG_CACHE_HOME   $HOME/.cache
 
 ```text
 plan-repo/
-  config.toml                   both identities and the configuration
+  .wipctl/plan.toml             both identities and the configuration
   peers.toml                    the other plans this one names; earned, not scaffolded
   sources.toml                  declared external sources; earned, not scaffolded
   README.md                     orientation for a reader arriving at the zone

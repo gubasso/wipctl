@@ -169,7 +169,7 @@ Where two replicas of one plan each minted a `plan_uid`, replication MUST report
 - WHEN the next replication reads both
 - THEN both values are named and neither is chosen. A uid carries no time and no order, and history is not a store this method reads, so nothing on disk orders the two mints
 
-The resolution is an operator's edit of `config.toml` on the losing side, committed by hand. No verb performs it, because no verb changes a uid.
+The resolution is an operator's edit of `.wipctl/plan.toml` on the losing side, committed by hand. No verb performs it, because no verb changes a uid.
 
 That settles the two replicas and nothing beyond them. A uid another plan already wrote into its own peer table stays written there, and no verb changes a row's uid. So this is cheap while the plan is young and expensive once other plans name it. The message says which case the operator is in.
 

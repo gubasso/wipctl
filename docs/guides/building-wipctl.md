@@ -6,7 +6,7 @@ A milestone sequence from zero to the full surface, for a team implementing the 
 
 Build the data model first:
 
-- the configuration reader for both identity files
+- the configuration reader for both configuration files
 - the record library over the canonical subset, with the caller-supplied sink
 - the checker, with the identity, lane-parse, story, epic, initiative, graph, and open-questions rules
 

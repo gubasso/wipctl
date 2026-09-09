@@ -203,7 +203,7 @@ fn a_malformed_plan_uid_fails() {
     // a value one character short is the defect a hand edit produces.
     let ok = accepts_fixture_with(
         "plan-uid",
-        "alpha/config.toml",
+        "alpha/.wipctl/plan.toml",
         "9f2c41a08b7d4e63a15c8f02d7e4b619",
         "9f2c41a08b7d4e63a15c8f02d7e4b61",
     )
@@ -495,7 +495,7 @@ fn a_schema_the_draft_rejects_fails() {
     let schemas = scratch.path().join("specs");
     copy_tree(&repo().join("docs/specs"), &schemas).expect("the schema tree should be copyable");
 
-    let schema = schemas.join("SPEC-configuration/config.schema.json");
+    let schema = schemas.join("SPEC-configuration/plan.schema.json");
     let body = fs::read_to_string(&schema).expect("the shipped schema should be readable");
     fs::write(
         &schema,

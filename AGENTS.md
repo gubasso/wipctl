@@ -6,7 +6,7 @@ Entry point for anyone, human or agent, working in this repository. `README.md` 
 
 wipctl is two deliverables that ship together and are judged as one: a planning method, and the tooling that proves a project's plan record obeys it. Neither one changes alone. The full statement of pillars and no-gos is `docs/explanation/charter.md`.
 
-The project plans with the method it ships. Its own plan record lives in the project's plan repository, resolved through `.wipctl.toml` at the root, per `docs/specs/SPEC-attachment.md`. The record is not in this tree. A clone of this repository carries the identity, and the record is one attach away.
+The project plans with the method it ships. Its own plan record lives in the project's plan repository, resolved through `.wipctl/project.toml` at the root, per `docs/specs/SPEC-attachment.md`. The record is not in this tree. A clone of this repository carries the identity, and the record is one attach away.
 
 ## The spec is normative
 

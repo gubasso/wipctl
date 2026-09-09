@@ -25,7 +25,7 @@ The table a plan keeps of the other plans it names. A peer is another project's 
 
 ## The file
 
-`peers.toml` sits at the plan zone root, beside `config.toml`. There is one table per peer, keyed by the alias.
+`peers.toml` sits at the plan zone root, beside the `.wipctl` directory. There is one table per peer, keyed by the alias.
 
 ```toml
 [peers.payments]
@@ -76,7 +76,7 @@ The split follows the two jobs. Attaching is an operator saying which plans they
 ## What the table is not
 
 - The table is not a registry. Nothing allocates an alias, nothing approves a uid, and no service is consulted. Two plans that name one peer write two independent rows.
-- The table is not authoritative about the peer. The peer's own `config.toml` is, and the walk refuses a clone that disagrees with the row.
+- The table is not authoritative about the peer. The peer's own `.wipctl/plan.toml` is, and the walk refuses a clone that disagrees with the row.
 - The table is not a cache. Reading a peer is a read of that peer's slot, and no peer state is stored here.
 
 ## The view
@@ -202,7 +202,7 @@ Each failure names its resolution. The validation domain owns the check catalog,
 a peer row with no uid                                                    exit 1
   wipctl: peer 'payments' declares no uid
   wipctl: a peer is identified by its plan_uid, not by its url; read the
-          uid from that plan's config.toml and add it to peers.toml
+          uid from that plan's plan file and add it to peers.toml
 
 a peer row with an empty url list                                         exit 1
   wipctl: peer 'payments' declares no url

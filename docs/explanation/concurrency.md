@@ -39,7 +39,7 @@ The critical section is exactly four steps:
    ~/src/payments-oauth/      worktree, branch agent/oauth    ├─ all resolve
    ~/src/payments-review/     separate clone                  ┘  the same id
 
-        each carries .wipctl.toml:  project_id = "payments-acme"
+        each carries .wipctl/project.toml:  project_id = "payments-acme"
                              │
                              ▼
    ~/.local/share/wipctl/projects/payments-acme/plan-repo/     the one live record

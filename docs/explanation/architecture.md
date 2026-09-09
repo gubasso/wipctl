@@ -4,7 +4,7 @@ The components a conforming implementation needs, by responsibility. Nothing her
 
 ## The two-repository shape
 
-Every project the tool touches spans two repositories. The host carries one identity file and nothing else of the tool's. The plan repository carries the record, its configuration, and its own hooks, at a machine-level slot every checkout of the project resolves to.
+Every project the tool touches spans two repositories. The host carries one project file and nothing else of the tool's. The plan repository carries the record, its configuration, and its own hooks, at a machine-level slot every checkout of the project resolves to.
 
 The components below split along that line. Resolution and the identity live at the boundary. Everything that reads or writes the record lives on the plan side. Nothing lives on the host side, by design.
 
@@ -14,7 +14,7 @@ One executable entry point resolves the invocation: global flags, verb selection
 
 ## Project resolution
 
-One implementation of the two-step resolution, used by every verb that touches a record. It covers the upward walk to the identity file and the attachment registry lookup. It also covers the identity agreement and the split between a usage error and a failed check. The scaffold bypasses it by design.
+One implementation of the two-step resolution, used by every verb that touches a record. It covers the upward walk to the project file and the attachment registry lookup. It also covers the identity agreement and the split between a usage error and a failed check. The scaffold bypasses it by design.
 
 It owns the third path too. Where an invocation names a peer, the component resolves this plan first and reads its peer table. It then finds the slot whose configuration declares the uid that alias binds. A slot holds one plan, whether it arrived as this machine's project or as a peer, so nothing downstream distinguishes the two.
 
@@ -53,7 +53,7 @@ One shared implementation of the dependency and environment probes. The diagnost
 
 ## Data shipped with the product
 
-The schemas, the scaffold payload, and the worked example, under the product's data directory. The worked example is a complete host project with its plan repository: an identity file and a populated zone. The zone carries one permanently pending fragment, so the pending gates demonstrably select something. The example is both documentation and a test fixture.
+The schemas, the scaffold payload, and the worked example, under the product's data directory. The worked example is a complete host project with its plan repository: a project file and a populated zone. The zone carries one permanently pending fragment, so the pending gates demonstrably select something. The example is both documentation and a test fixture.
 
 ## What is deliberately absent
 
