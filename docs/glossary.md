@@ -17,6 +17,7 @@ Each term links to the page that owns its full definition. A term defined here i
 - eligible: every id in `needs` is closed and no open question blocks the entry. [explanation/lanes-and-ranking.md](./explanation/lanes-and-ranking.md)
 - epic: an end state no single story delivers. It is one document plus an `epic` field on entries. [explanation/epics.md](./explanation/epics.md)
 - external source: a system outside the plan repository holding items the project's work answers, declared once in the plan configuration's `sources` section under a local alias. [specs/SPEC-external-sources.md](./specs/SPEC-external-sources.md)
+- exit condition: the testable condition that removes a watch after the outside action reaches the required result. [specs/SPEC-watches.md](./specs/SPEC-watches.md)
 - fragment: one file under `pending/` stating where a captured entry wants to land. [specs/SPEC-pending-fragment.md](./specs/SPEC-pending-fragment.md)
 - host: the project whose identity the plan serves. It carries `.wipctl/project.toml` and nothing else of the tool's. [explanation/host-integration.md](./explanation/host-integration.md)
 - id: an entry id when unqualified. The terms `project id` and `plan id` always name their distinct identities. [specs/SPEC-ids.md](./specs/SPEC-ids.md)
@@ -63,3 +64,4 @@ Each term links to the page that owns its full definition. A term defined here i
 - window: the stretch of time every count is totalled inside, fixed by an anchor date and a length in days. The plan configuration declares both. [specs/SPEC-metrics.md](./specs/SPEC-metrics.md)
 - workflow verb: a verb that operates the record. `help`, `version`, and `man` operate the program instead. [specs/SPEC-cli-conventions.md](./specs/SPEC-cli-conventions.md)
 - warning: a diagnostic that reaches the reader and never the exit code. The repair can resolve one on request, and the drain handles a drift as stated. [specs/SPEC-validation.md](./specs/SPEC-validation.md)
+- watch: an outside item or actor that blocks named entries until a person confirms its exit condition. [specs/SPEC-watches.md](./specs/SPEC-watches.md)
