@@ -22,6 +22,7 @@
   - [`repair:the-repair-never-changes-a-lane` — The repair never changes a lane](#repairthe-repair-never-changes-a-lane--the-repair-never-changes-a-lane)
   - [`repair:the-repair-never-names-a-plan-or-a-dependency` — The repair never names a plan or a dependency](#repairthe-repair-never-names-a-plan-or-a-dependency--the-repair-never-names-a-plan-or-a-dependency)
   - [`repair:the-slot-report-writes-nothing` — The slot report writes nothing](#repairthe-slot-report-writes-nothing--the-slot-report-writes-nothing)
+  - [`repair:the-repair-removes-an-orphaned-suppression` — The repair removes an orphaned suppression](#repairthe-repair-removes-an-orphaned-suppression--the-repair-removes-an-orphaned-suppression)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -261,6 +262,18 @@ The slot report MUST write nothing and MUST refuse when content checks fail, exi
 - THEN it refuses, because a slot report over a broken record is advice about garbage
 
 Verify: `cargo nextest run --test verb_contracts`
+
+### `repair:the-repair-removes-an-orphaned-suppression` — The repair removes an orphaned suppression
+
+When the repair finds a suppression whose id names no entry, the implementation MUST remove that suppression and report its id.
+
+#### Scenario: A suppressed entry is deleted
+
+- GIVEN a suppression whose entry no longer exists
+- WHEN the repair runs
+- THEN it removes and reports the suppression, because local state has no reminder left to hide
+
+Verify: `cargo nextest run --test writer_guarantees`
 
 ## Unenforced rules
 

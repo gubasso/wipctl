@@ -4,6 +4,8 @@
 
 - [Purpose](#purpose)
 - [Payload inventory](#payload-inventory)
+- [The host pointer](#the-host-pointer)
+- [The stale conversation](#the-stale-conversation)
 - [Requirements](#requirements)
   - [`scaffold:the-host-receives-one-file` — The host receives one file](#scaffoldthe-host-receives-one-file--the-host-receives-one-file)
   - [`scaffold:the-payload-names-no-documentation-method` — The payload names no documentation method](#scaffoldthe-payload-names-no-documentation-method--the-payload-names-no-documentation-method)
@@ -16,6 +18,8 @@
   - [`scaffold:the-hook-set-installs-into-the-plan-repository` — The hook set installs into the plan repository](#scaffoldthe-hook-set-installs-into-the-plan-repository--the-hook-set-installs-into-the-plan-repository)
   - [`scaffold:a-hook-never-invokes-a-writer` — A hook never invokes a writer](#scaffolda-hook-never-invokes-a-writer--a-hook-never-invokes-a-writer)
   - [`scaffold:the-hook-set-is-printable-and-checked` — The hook set is printable and checked](#scaffoldthe-hook-set-is-printable-and-checked--the-hook-set-is-printable-and-checked)
+  - [`scaffold:the-host-pointer-names-a-command-and-not-a-path` — The host pointer names a command and not a path](#scaffoldthe-host-pointer-names-a-command-and-not-a-path--the-host-pointer-names-a-command-and-not-a-path)
+  - [`scaffold:the-host-pointer-is-placed-where-the-operator-says` — The host pointer is placed where the operator says](#scaffoldthe-host-pointer-is-placed-where-the-operator-says--the-host-pointer-is-placed-where-the-operator-says)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -42,6 +46,49 @@ What the scaffold lands and the contract each landed file carries. The scaffold 
 The zone is the plan repository's working tree, which the scaffold creates whole: the repository, the trunk, the hook set, and the initial commit.
 
 The scaffold mints and reports `project_id` and `plan_id`. Each is 128 random bits written as 32 lowercase hexadecimal characters. The slot name keeps paths readable, and messages use the derived project slug.
+
+## The host pointer
+
+The scaffold asks which existing file carries the host project's instructions. It accepts a repository-relative path or an empty answer that skips the pointer.
+
+The scaffold created neither that file nor its repository, so it prints the block for the operator to place. It leaves the host file unchanged.
+
+```text
+<!-- wipctl:begin -->
+## Planning
+
+This project plans with wipctl. Before you read, change, or take any
+planning work, run `wipctl man` and follow the method it prints.
+
+Take work with `wipctl start`. Never edit a lane file by hand.
+<!-- wipctl:end -->
+```
+
+A later placement replaces the content between the markers instead of appending another block. The command reaches the travelling document without exposing a machine-specific path.
+
+## The stale conversation
+
+The travelling document gives an agent this protocol in the order it runs:
+
+1. At session start, run `wipctl stale` before reading what work is next.
+2. Read the rows rather than the exit code. The command exits 0 both with marked rows and with none.
+3. Gather evidence for each row. Check whether it names a branch, whether that branch has recent commits, and whether a needed peer entry remains open.
+4. Offer options for that row from its own evidence. Use the action vocabulary below, without treating it as a lookup table.
+5. Ask a person what to do. Perform the answer only after it arrives.
+
+The action vocabulary is:
+
+- `return to todo`
+- `record the wait`
+- `split`
+- `cut`
+- `keep`
+
+Illustration one: recent commits on a named branch support offering `keep`. After a person confirms the row is alive, the agent can suppress its local reminder.
+
+Illustration two: an open peer entry supports offering `record the wait`. A missing branch can also support offering `return to todo` for that row.
+
+The agent changes no record fact before the answer. A suppression also waits until a person confirms that the row is alive.
 
 ## Requirements
 
@@ -195,10 +242,35 @@ The implementation MUST print the hook set for inspection on request, and MUST r
 
 Verify: `cargo nextest run --test verb_contracts`
 
+### `scaffold:the-host-pointer-names-a-command-and-not-a-path` — The host pointer names a command and not a path
+
+When the scaffold prepares a host pointer, it MUST print one replaceable marked block that names `wipctl man` and contains no filesystem path.
+
+#### Scenario: The data directory differs between two machines
+
+- GIVEN two operators whose travelling documents live at different absolute paths
+- WHEN each places the printed host pointer
+- THEN both pointers name the same command, because the command resolves the installed method on either machine
+
+Verify: `cargo nextest run --test scaffold`
+
+### `scaffold:the-host-pointer-is-placed-where-the-operator-says` — The host pointer is placed where the operator says
+
+When the scaffold asks for a host instruction file, it MUST accept the operator's repository-relative path for the printed block and an empty answer as a skip.
+
+#### Scenario: The host already carries an instruction file
+
+- GIVEN a host repository with its own instruction file
+- WHEN the operator names that file
+- THEN the scaffold prints the marked block and leaves the host unchanged, because only the operator owns placement in that file
+
+Verify: `cargo nextest run --test journey`
+
 ## Unenforced rules
 
-| Rule                                                  | Why no command decides it                                                                |
-| ----------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `scaffold:the-travelling-document-is-self-sufficient` | Whether a subject is taught from zero is a reading of the prose, not a match against it. |
+| Rule                                                          | Why no command decides it                                                                |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `scaffold:the-travelling-document-is-self-sufficient`         | Whether a subject is taught from zero is a reading of the prose, not a match against it. |
+| `scaffold:the-host-pointer-is-placed-where-the-operator-says` | Whether a path names the host's instruction file depends on the operator's answer.       |
 
 Naming a document class the host keeps or does not keep is the same fault as naming a method, at a smaller scale. A specification and a decision record are two such classes. This project's own specification states such a class only as one option among alternatives.

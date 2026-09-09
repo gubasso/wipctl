@@ -35,6 +35,7 @@ $XDG_DATA_HOME/wipctl/
 
 $XDG_STATE_HOME/wipctl/
   projects/<slot name>/             replication bookkeeping, diagnostics
+    suppressions.toml               stale reminders hidden on this machine
 
 $XDG_CACHE_HOME/wipctl/
   projects/<slot name>/             derived views; disposable; no verb reads it back
@@ -47,6 +48,10 @@ fallback, where XDG_RUNTIME_DIR is unset or empty:
 ```
 
 The base-directory specification gives no default for the runtime directory, and unset is ordinary in cron jobs, containers, and remote sessions with no session manager. Those are exactly where agents run, so the fallback is stated rather than left open.
+
+A suppression belongs in state because it changes one machine's reminders. The plan configuration would replicate the silence to every clone. A lane entry has fixed fields and holds no durable local fact. The cache is disposable, and no verb reads it back.
+
+The transaction lock covers the plan record. A suppression file is local state outside that record, so its writers do not take the record lock.
 
 ```text
 XDG_DATA_HOME    $HOME/.local/share

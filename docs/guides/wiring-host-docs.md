@@ -3,15 +3,22 @@
 How a story references what your project already has. Nothing here requires reorganising anything. [explanation/host-integration.md](../explanation/host-integration.md) holds the doctrine behind the steps.
 
 1. Confirm the root. `.wipctl/project.toml` sits at the project root, and its `project_id` agrees with the plan configuration found by identity. A disagreement fails validation naming both sides.
-2. Choose documents from what exists. A project keeping structured reference pages points stories at those. A project keeping a flat notes tree points stories at the notes. Both are correct. The method validates that a named path resolves, and nothing more.
-3. Write `Reads`. State the claim, not the coordinates:
+2. Answer the scaffold's host instruction prompt:
+   - Enter `<path>` for the repository-relative path of the file the project already uses.
+   - Enter an empty answer to skip the host pointer.
+
+   The scaffold prints a marked block for a path and prints nothing for a skip. It leaves the host file unchanged.
+
+3. Place the printed block in the named file. Check that it names `wipctl man` and no filesystem path.
+4. Choose documents from what exists. A project keeping structured reference pages points stories at those. A project keeping a flat notes tree points stories at the notes. Both are correct. The method validates that a named path resolves, and nothing more.
+5. Write `Reads`. State the claim, not the coordinates:
    - Link to a stable heading anchor, never to a line number.
    - Name the page that owns a rule, rather than the eleven records that shaped it.
    - Write `None.` when nothing genuinely must be loaded.
 
    Where the host's documentation method rules a class of document out of a work session's load set, that exclusion binds here too. No gate reads an inbound path, so honouring it is the reviewer's.
 
-4. Write `Amends`. There are three gated rules:
+6. Write `Amends`. There are three gated rules:
    - the path is relative
    - it resolves against the root, unless the assertion opens with `new:`
    - only the leading inline-code token is the path
@@ -22,8 +29,8 @@ How a story references what your project already has. Nothing here requires reor
    - `docs/specs/SPEC-auth.md` — ADDED `auth:token-expiry-is-bounded`
    ```
 
-5. Complete the transfer when the story closes. Rewrite the acceptance assertions in the present tense into the amended documents, in the same change as the behavior. This is the step the whole doctrine depends on, and the one no tool sees.
-6. Verify, then prove the check is non-vacuous once. Break one `Amends` path, watch the gate fail, and restore it:
+7. Complete the transfer when the story closes. Rewrite the acceptance assertions in the present tense into the amended documents, in the same change as the behavior. This is the step the whole doctrine depends on, and the one no tool sees.
+8. Verify, then prove the check is non-vacuous once. Break one `Amends` path, watch the gate fail, and restore it:
 
    ```text
    $ wipctl validate
