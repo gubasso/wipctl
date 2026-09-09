@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Peer table",
-  "description": "The other plans this plan names: peers.toml at the plan zone root. A peer is another project's plan repository, bound here to a local alias and identified by the plan_uid that plan declares in its own config.toml. The alias is local and means nothing outside this file; the uid is the identity and never changes; a url is a locator and is replaceable. The file is earned, not scaffolded: its absence is legal and means the plan names no peers. Nothing here is authoritative about the peer — attaching refuses a clone whose config.toml disagrees with the row it filled.",
+  "description": "The other plans this plan names: peers.toml at the plan zone root. A peer is another project's plan repository, bound here to a local alias and identified by the plan_uid that plan declares in its own .wipctl/plan.toml. The alias is local and means nothing outside this file; the uid is the identity and never changes; a url is a locator and is replaceable. The file is earned, not scaffolded: its absence is legal and means the plan names no peers. Nothing here is authoritative about the peer — attaching refuses a clone whose .wipctl/plan.toml disagrees with the row it filled.",
   "type": "object",
   "additionalProperties": false,
   "required": ["peers"],

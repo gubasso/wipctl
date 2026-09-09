@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Plan repository config file",
-  "description": "The plan repository's own configuration: config.toml at the zone root. It restates the project's identity and carries every fact about the plan itself — the plan owns its own home, so its cadence and thresholds live with it, not with the host. The host repository's .wipctl.toml carries project_id alone and has no schema: one required key is below a schema's floor, and the cross-file checker owns its presence, grammar, and agreement with this file. No key has a read-time default: a tool finding a required key absent fails its check rather than assuming a value, because a value guessed on a project's behalf is a value nobody wrote down.",
+  "title": "Plan configuration file",
+  "description": "The plan repository's own configuration: .wipctl/plan.toml at the zone root. It restates the project's identity and carries every fact about the plan itself — the plan owns its own home, so its cadence and thresholds live with it, not with the host. The host repository's .wipctl/project.toml carries project_id alone and has no schema: one required key is below a schema's floor, and the cross-file checker owns its presence, grammar, and agreement with this file. Each .wipctl directory holds one file and no second one. No key has a read-time default: a tool finding a required key absent fails its check rather than assuming a value, because a value guessed on a project's behalf is a value nobody wrote down.",
   "type": "object",
   "additionalProperties": false,
   "properties": {

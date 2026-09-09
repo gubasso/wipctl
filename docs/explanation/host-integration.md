@@ -2,13 +2,13 @@
 
 ## The single assumption
 
-wipctl asks the host project to carry one committed file: `.wipctl.toml` at its root, naming the project's identity. That is the entire footprint. The plan itself lives in the project's own plan repository, resolved through that identity, as [../specs/SPEC-attachment.md](../specs/SPEC-attachment.md) states. The host's layout, its document kinds, its conventions, and its history stay untouched. No verb commits to the host, ever. The configuration has no defaults for anything a project must declare, and no default is ever added.
+wipctl asks the host project to carry one committed file: `.wipctl/project.toml` at its root, naming the project's identity. That is the entire footprint. The plan itself lives in the project's own plan repository, resolved through that identity, as [../specs/SPEC-attachment.md](../specs/SPEC-attachment.md) states. The host's layout, its document kinds, its conventions, and its history stay untouched. No verb commits to the host, ever. The configuration has no defaults for anything a project must declare, and no default is ever added.
 
 The scaffold writes exactly that one file into the host. It owns the plan repository it creates, including the method document that travels with it. Host-owned files are read at most. Content intended for them is printed for a person to place.
 
 ## Two directions into the host
 
-Stories reference the host's documents across the two repositories. The paths resolve against the host's project root, which is the directory holding the identity file.
+Stories reference the host's documents across the two repositories. The paths resolve against the host's project root, which is the directory holding the project file.
 
 `Reads` is the inbound direction. It names the individual documents a work session must load before starting. The gate does not check it, because the right documents are a judgment about the host's own tree. That makes it entirely a review responsibility.
 
@@ -36,7 +36,7 @@ The transfer's same-change guarantee becomes a same-unit-of-review obligation. N
 
 ## What the gate checks here, and what it does not
 
-The gate checks the outbound direction's shape and resolution, including the shape of a declared rule-delta clause. It checks the identity file's presence, its grammar, and its agreement with the plan repository. It checks a source reference's shape and its alias against the declaration file, and stops there.
+The gate checks the outbound direction's shape and resolution, including the shape of a declared rule-delta clause. It checks the project file's presence, its grammar, and its agreement with the plan repository. It checks a source reference's shape and its alias against the declaration file, and stops there.
 
 These are review responsibilities instead, and are stated as such:
 

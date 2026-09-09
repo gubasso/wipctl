@@ -23,6 +23,8 @@ Chosen option: one hidden TOML file at the root — one file marks the root, pla
 
 ## Status
 
-Accepted
+Superseded
 
 Amended by ADR-a-project-is-identified-by-a-minted-slug — the root file declares `project_id` in place of `plan_dir`; one hidden TOML file still marks the root, and the plan repository carries its own `config.toml`.
+
+Superseded by [ADR-configuration-lives-in-a-directory-the-tool-owns.md](./ADR-configuration-lives-in-a-directory-the-tool-owns.md) — the marker is a `.wipctl` directory. TOML and one self-consistent marker survive.

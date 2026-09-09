@@ -69,7 +69,7 @@ For each row whose uid sits in no slot on this machine, the verb clones from the
 
 ```text
 1. clone the url into a temporary directory outside every slot
-2. read the clone's config.toml and verify the uid and the project_id
+2. read the clone's .wipctl/plan.toml and verify the uid and the project_id
 3. take this plan's writer lock, and re-read peers.toml under it
 4. promote the temporary directory into the slot, create-only: a slot
    that appeared meanwhile is a lost race, and the loser removes its
@@ -215,7 +215,7 @@ the clone declares another uid                                            exit 1
   wipctl: peer 'payments' cloned from
           https://git.example.org/acme/payments-plan.git
   wipctl:   peers.toml expects 9f2c41a08b7d4e63a15c8f02d7e4b619
-  wipctl:   config.toml declares 4c81d0e7f39a4b25861d7c04e9a2f358
+  wipctl:   plan.toml declares 4c81d0e7f39a4b25861d7c04e9a2f358
   wipctl: the url serves a different plan; fix the url or the uid
 
 two plans minted one slug                                                 exit 1

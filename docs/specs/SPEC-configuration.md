@@ -7,14 +7,15 @@
 - [The two identities](#the-two-identities)
 - [Requirements](#requirements)
   - [`configuration:no-key-has-a-read-time-default` — No key has a read-time default](#configurationno-key-has-a-read-time-default--no-key-has-a-read-time-default)
-  - [`configuration:the-identity-file-carries-one-key` — The identity file carries one key](#configurationthe-identity-file-carries-one-key--the-identity-file-carries-one-key)
-  - [`configuration:the-identity-file-marks-the-root` — The identity file marks the project root](#configurationthe-identity-file-marks-the-root--the-identity-file-marks-the-project-root)
+  - [`configuration:the-project-file-carries-one-key` — The project file carries one key](#configurationthe-project-file-carries-one-key--the-project-file-carries-one-key)
+  - [`configuration:the-project-file-marks-the-root` — The project file marks the project root](#configurationthe-project-file-marks-the-root--the-project-file-marks-the-project-root)
   - [`configuration:the-plan-declares-a-global-identity` — The plan declares a global identity](#configurationthe-plan-declares-a-global-identity--the-plan-declares-a-global-identity)
   - [`configuration:the-two-identities-agree` — The two identities agree](#configurationthe-two-identities-agree--the-two-identities-agree)
   - [`configuration:an-unknown-key-is-rejected` — An unknown key is rejected](#configurationan-unknown-key-is-rejected--an-unknown-key-is-rejected)
   - [`configuration:the-iteration-window-is-required` — The iteration window is required](#configurationthe-iteration-window-is-required--the-iteration-window-is-required)
   - [`configuration:the-aging-threshold-is-optional-and-undefaulted` — The aging threshold is optional and undefaulted](#configurationthe-aging-threshold-is-optional-and-undefaulted--the-aging-threshold-is-optional-and-undefaulted)
-  - [`configuration:the-identity-file-owes-no-schema` — The identity file owes no schema](#configurationthe-identity-file-owes-no-schema--the-identity-file-owes-no-schema)
+  - [`configuration:the-project-file-owes-no-schema` — The project file owes no schema](#configurationthe-project-file-owes-no-schema--the-project-file-owes-no-schema)
+  - [`configuration:the-configuration-directory-holds-one-file` — The configuration directory holds one file](#configurationthe-configuration-directory-holds-one-file--the-configuration-directory-holds-one-file)
   - [`configuration:there-is-no-commit-configuration` — There is no commit configuration](#configurationthere-is-no-commit-configuration--there-is-no-commit-configuration)
   - [`configuration:the-schema-owns-types-and-the-checker-owns-agreement` — The schema owns types and the checker owns agreement](#configurationthe-schema-owns-types-and-the-checker-owns-agreement--the-schema-owns-types-and-the-checker-owns-agreement)
 - [Diagnostics](#diagnostics)
@@ -23,17 +24,29 @@
 
 ## Purpose
 
-The two configuration files and what each one owns. The host file identifies, and the plan repository configures. The boundary runs at ownership. This domain says what each key means and what rejects a bad one. The attachment domain says how an invocation reaches the plan repository.
+The two configuration files and what each one owns. The project file identifies, and the plan file configures. The boundary runs at ownership. This domain says what each key means and what rejects a bad one. The attachment domain says how an invocation reaches the plan repository.
 
 ## The two files
 
-`.wipctl.toml` lives at the project root of the host repository. It is hidden, committed, and travels with every clone.
+wipctl reads its configuration from a `.wipctl` directory, in both places. The directory carries the product's name, so the file inside it is free to carry the name of the domain it serves. The product has two domains that own committed state, and they are the project and the plan.
+
+```text
+host repo/
+  .wipctl/
+    project.toml       the project's configuration
+
+plan zone/
+  .wipctl/
+    plan.toml          the plan's configuration
+```
+
+`.wipctl/project.toml` lives at the project root of the host repository. It is committed and travels with every clone.
 
 ```toml
 project_id = "payments-acme"
 ```
 
-`config.toml` lives at the zone root, inside the plan repository. It restates the identity, declares the plan's own global identity, and carries every fact about the plan itself, because the plan owns its own home.
+`.wipctl/plan.toml` lives at the zone root, inside the plan repository. It restates the identity, declares the plan's own global identity, and carries every fact about the plan itself, because the plan owns its own home.
 
 ```toml
 project_id = "payments-acme"
@@ -46,6 +59,10 @@ length_days = 14
 [aging]
 threshold_days = 21
 ```
+
+Each directory holds one file and nothing else. The cost is stated rather than hidden: a genuine later need for a second file is a change to this specification, not a quiet addition. That price buys the property the whole shape rests on, which is that a plan declares itself in one place.
+
+A `.wipctl` directory holding no configuration file is not a root and is not silence. It arrives from a partial copy, a failed scaffold, or a person who made the directory by hand. The walk reports it rather than passing over it.
 
 ## The two identities
 
@@ -75,7 +92,7 @@ Immutability binds verbs. Two replicas that each minted a uid before either repl
 
 The uid never names a slot. A verb resolves a plan by the two steps the attachment domain states, then reads `plan_uid` inside the slot it reached. There is no tree keyed by the uid.
 
-A peer is not configuration. `config.toml` carries facts about this plan, and a row naming another plan is a fact about that one. The peers domain owns a file of its own for them.
+A peer is not configuration. `.wipctl/plan.toml` carries facts about this plan, and a row naming another plan is a fact about that one. The peers domain owns a file of its own for them.
 
 ## Requirements
 
@@ -91,27 +108,27 @@ When a verb finds a required key absent, the verb MUST fail the check rather tha
 
 Verify: `cargo nextest run --test configuration`
 
-### `configuration:the-identity-file-carries-one-key` — The identity file carries one key
+### `configuration:the-project-file-carries-one-key` — The project file carries one key
 
-The host identity file MUST carry `project_id` and no other key, in the slug grammar `[a-z0-9]+(-[a-z0-9]+)*`.
+The host repository's `.wipctl/project.toml` MUST carry `project_id` and no other key, in the slug grammar `[a-z0-9]+(-[a-z0-9]+)*`.
 
-#### Scenario: A project adds a setting to the host file
+#### Scenario: A project adds a setting to the project file
 
-- GIVEN a host file gaining an iteration length
+- GIVEN a project file gaining an iteration length
 - WHEN the file is read
 - THEN the unknown key is rejected, because the host identifies and the plan repository configures
 
 Verify: `cargo nextest run --test configuration`
 
-### `configuration:the-identity-file-marks-the-root` — The identity file marks the project root
+### `configuration:the-project-file-marks-the-root` — The project file marks the project root
 
-The directory holding the host identity file MUST be the project root, and nothing else MUST mark it.
+The directory holding `.wipctl/project.toml` MUST be the project root, and nothing else MUST mark it.
 
 #### Scenario: A verb runs from a nested directory
 
 - GIVEN an invocation deep inside the source tree
 - WHEN the verb resolves the project
-- THEN the upward walk stops at the identity file, because a second root marker lets two directories both claim the root
+- THEN the upward walk stops at the first directory holding `.wipctl/project.toml`, because a second root marker lets two directories both claim the root
 
 Verify: `cargo nextest run --test attachment`
 
@@ -129,7 +146,7 @@ Verify: `cargo nextest run --test schemas`
 
 ### `configuration:the-two-identities-agree` — The two identities agree
 
-The plan configuration's `project_id` MUST equal the host identity file's value, checked at every resolution.
+The plan configuration's `project_id` MUST equal the project file's value, checked at every resolution.
 
 #### Scenario: A slot holds another project's plan
 
@@ -175,9 +192,9 @@ Where the aging table is present, `threshold_days` MUST be an integer of at leas
 
 Verify: `cargo nextest run --test verb_contracts`
 
-### `configuration:the-identity-file-owes-no-schema` — The identity file owes no schema
+### `configuration:the-project-file-owes-no-schema` — The project file owes no schema
 
-The host identity file MUST NOT carry a schema of its own, and the cross-file checker MUST own its presence, its grammar, and its agreement.
+The project file MUST NOT carry a schema of its own, and the cross-file checker MUST own its presence, its grammar, and its agreement.
 
 #### Scenario: Someone proposes a schema for one key
 
@@ -185,7 +202,19 @@ The host identity file MUST NOT carry a schema of its own, and the cross-file ch
 - WHEN a schema is proposed for it
 - THEN the file is below a schema's floor, the same reasoning under which a one-line output owes no machine format
 
-Verify: `test ! -e docs/specs/SPEC-configuration/wipctl.schema.json`
+Verify: `test ! -e docs/specs/SPEC-configuration/project.schema.json`
+
+### `configuration:the-configuration-directory-holds-one-file` — The configuration directory holds one file
+
+A `.wipctl` directory MUST hold the one configuration file its place names, and MUST NOT hold a second file.
+
+#### Scenario: A project wants a second file beside the plan configuration
+
+- GIVEN a request to put another wipctl file inside the zone's `.wipctl` directory
+- WHEN the request is read
+- THEN it is refused, because a directory invites a second file, and that is how a split configuration returns one addition at a time
+
+Verify: `cargo nextest run --test validation`
 
 ### `configuration:there-is-no-commit-configuration` — There is no commit configuration
 
@@ -213,7 +242,9 @@ Verify: `cargo nextest run --test validation`
 
 ## Diagnostics
 
-- No identity file at or above the working directory. This is a usage error, exit 2. The message names the scaffold as the resolution.
+- No `.wipctl/project.toml` at or above the working directory. This is a usage error, exit 2. The message names the scaffold as the resolution.
+- A `.wipctl` directory with no `project.toml` inside it. This is a usage error, exit 2, naming the directory. The message says that the project root is the directory holding `.wipctl/project.toml`, and it offers two resolutions: run the scaffold here, or remove the empty directory and let the walk continue upward.
+- A second file inside a `.wipctl` directory. A failed check naming the file and the rule that binds it.
 - `project_id` absent or outside the slug grammar, in either file. A failed check naming the file and the field.
 - The two `project_id` values disagree. A failed check naming both files, both values, and the choice between re-attaching and correcting whichever file is wrong.
 - A required key absent from the plan configuration. A failed check naming the field.

@@ -57,11 +57,12 @@ scope != username (acme/payments)      scope == username (gbasso/wipctl)
 ## Where each identity enters resolution
 
 ```text
-the ordinary path   walk upward to .wipctl.toml for project_id, then find
-                    that slug in the attachment registry
+the ordinary path   walk upward to .wipctl/project.toml for project_id,
+                    then find that slug in the attachment registry
 
-where a uid is      resolve as above, then read plan_uid from config.toml
-needed              inside each slot and pick the slot that matches
+where a uid is      resolve as above, then read plan_uid from
+needed              .wipctl/plan.toml inside each slot and pick the slot
+                    that matches
 ```
 
 `project_id` resolves and `plan_uid` travels. The uid is looked up inside a slot and never names one. There is no tree keyed by it, so a reader never goes looking for one. The configuration domain owns what each value is. This domain owns where each one enters an invocation.
@@ -76,7 +77,7 @@ When a verb touches a record, the verb MUST resolve the project id by an upward 
 
 #### Scenario: A verb runs outside any project
 
-- GIVEN a working directory with no identity file at or above it
+- GIVEN a working directory with no `.wipctl/project.toml` at or above it
 - WHEN the verb resolves
 - THEN it is a usage error, because the invocation named no project. An unattached id is a failed check instead, naming the attachment that fixes it
 
@@ -196,7 +197,7 @@ The scaffold MUST write a path only where it is absent, MUST report an existing 
 
 #### Scenario: The scaffold runs twice over a complete project
 
-- GIVEN a project already carrying its identity and plan repository
+- GIVEN a project already carrying its project file and plan repository
 - WHEN the scaffold runs again
 - THEN it writes nothing and succeeds, because a second run is a question and not a command
 
@@ -208,7 +209,7 @@ When the scaffold's preflight finds more than one refusal, the implementation MU
 
 #### Scenario: Two preflight faults are present at once
 
-- GIVEN an existing identity file and a registry slot holding another project
+- GIVEN an existing project file and a registry slot holding another project
 - WHEN the scaffold runs
 - THEN both are reported in one run, because fixing one at a time is the loop a collected report removes
 
@@ -278,11 +279,12 @@ Verify: `cargo nextest run --test attachment`
 
 Each resolution failure names its own resolution.
 
-- No identity file on the upward walk. Exit 2, naming the scaffold at the project root.
+- No `.wipctl/project.toml` on the upward walk. Exit 2, naming the scaffold at the project root.
+- A `.wipctl` directory on the walk with no `project.toml` in it. Exit 2, naming that directory. The walk reports and stops rather than passing over it. Passing over it attaches the operator to a project further up the tree.
 - The project is not attached on this machine. Exit 1, naming both attach forms.
 - The attached plan repository is gone from disk. Exit 1, naming re-attachment.
-- The identity files disagree. Exit 1, naming the host value, the plan value, and the choice between re-attaching and correcting whichever file is wrong.
-- The scaffold finds an existing identity. Exit 1, reporting the id it found and naming attach for a machine that lacks the plan.
+- The two configuration files disagree. Exit 1, naming the host value, the plan value, and the choice between re-attaching and correcting whichever file is wrong.
+- The scaffold finds an existing project file. Exit 1, reporting the id it found and naming attach for a machine that lacks the plan.
 - A clone that is not a plan repository. Exit 1, naming the create form as the way to start one.
 - A clone carrying no `plan_uid`. Exit 1, naming the upgrade form that gives a record which predates the key an identity of its own.
 - A clone whose uid is already in a slot. Exit 1, naming the slot that holds the plan and the location offered. The message says that one plan gets one slot. A copy meant to be a plan of its own needs an identity of its own, which no verb mints yet.

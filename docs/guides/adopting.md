@@ -1,6 +1,6 @@
 # Adopting wipctl
 
-The sequence that gives your project a validated plan. It lands one identity file in your repository, and a plan repository of its own on this machine. It assumes only what the method assumes: your project can carry one committed file at its root.
+The sequence that gives your project a validated plan. It lands one project file in your repository, and a plan repository of its own on this machine. It assumes only what the method assumes: your project can carry one committed file at its root.
 
 ## 1 — Install and scaffold
 
@@ -19,15 +19,16 @@ Inputs: none.
    $ wipctl init
    ```
 
-   The scaffold writes into two places. It writes `.wipctl.toml` into your repository, carrying the minted project id. That is the only file your repository receives. It writes the plan repository into this machine's registry slot, with its zone, its configuration, its hook set, and its first commit. The scaffold is create-only, so a second run writes nothing. It ends with a self-check of the zone it emitted.
+   The scaffold writes into two places. It writes `.wipctl/project.toml` into your repository, carrying the minted project id. That is the only file your repository receives. It writes the plan repository into this machine's registry slot, with its zone, its configuration, its hook set, and its first commit. The scaffold is create-only, so a second run writes nothing. It ends with a self-check of the zone it emitted.
 
-3. Commit `.wipctl.toml`, so every clone and worktree of your project resolves the same plan.
+3. Commit `.wipctl/project.toml`, so every clone and worktree of your project resolves the same plan.
 4. Note the shipped template location the scaffold prints. The first story starts from it.
 
 Outputs of this phase:
 
 ```text
-<PROJECT_ID> — the minted identity; printed by init and recorded in .wipctl.toml
+<PROJECT_ID> — the minted identity; printed by init and recorded in
+               .wipctl/project.toml
 <PLAN_REPO_PATH> — where the plan lives on this machine; printed by init
 <STORY_TEMPLATE_PATH> — where the shipped story template lives; printed by init
 ```
@@ -75,7 +76,7 @@ Outputs: none. An entry can now depend on a peer's entry by writing `"<alias>#<i
 
 Inputs: `<PLAN_REPO_PATH>` (§1).
 
-1. Open `charter.md` in the plan repository. Replace every angle-bracketed placeholder: what your project is for, its pillars, its no-gos, and its cadence. The cadence also lives in the plan repository's `config.toml`, where the tool reads it.
+1. Open `charter.md` in the plan repository. Replace every angle-bracketed placeholder: what your project is for, its pillars, its no-gos, and its cadence. The cadence also lives in the plan repository's `.wipctl/plan.toml`, where the tool reads it.
 
 Outputs: none. The charter is read in review, not by a later phase.
 

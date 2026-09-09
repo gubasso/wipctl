@@ -4,7 +4,7 @@ wipctl is a planning method and the tooling that proves a project's plan record 
 
 A project's plan lives in a plan repository of its own. That is a plain git repository. It holds five lane files, one document per story, epic, and initiative, a charter, open questions, a transition journal, and an on-demand capture directory. Every worktree and clone of the project on a machine shares it, and its operator chooses where it is hosted.
 
-The project itself carries exactly one committed file, `.wipctl.toml`, naming its identity. That file is the entire footprint. Everything else belongs to the project.
+The project itself carries exactly one committed file, `.wipctl/project.toml`, naming its identity. That file is the entire footprint. Everything else belongs to the project.
 
 ## Install
 

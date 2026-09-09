@@ -37,11 +37,12 @@ The closure is what the checker proves over. The flag selects from one table. A 
 ## The third resolution path
 
 ```text
-no --plan     walk upward to .wipctl.toml, read project_id, look it up
+no --plan     walk upward to .wipctl/project.toml, read project_id,
+              and look it up
               in the attachment registry
 
 --plan <a>    resolve this project's plan as above, read its peers.toml,
-              resolve <a> to a uid, and find the slot whose config.toml
+              resolve <a> to a uid, and find the slot whose plan file
               declares that uid
 ```
 

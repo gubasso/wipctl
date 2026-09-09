@@ -22,22 +22,22 @@
 
 ## Purpose
 
-What the scaffold lands and the contract each landed file carries. The scaffold writes into two places: one identity file into the host repository, and the plan repository into this machine's attachment registry. The boundary runs at creation. This domain says what the scaffold produces, while the attachment domain says how a later run finds it again.
+What the scaffold lands and the contract each landed file carries. The scaffold writes into two places: one project file, inside a `.wipctl` directory it creates in the host repository, and the plan repository into this machine's attachment registry. The boundary runs at creation. This domain says what the scaffold produces, while the attachment domain says how a later run finds it again.
 
 ## Payload inventory
 
-| Payload member      | Lands at                   | Notes                                                                                                                                |
-| ------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| host identity file  | `<root>/.wipctl.toml`      | generated, not copied: the minted `project_id` and nothing else                                                                      |
-| plan config         | `<zone>/config.toml`       | generated: the minted id restated, the minted `plan_uid`, the given or today's start date, `length_days = 14` as the one baked value |
-| zone `README.md`    | `<zone>/README.md`         | orientation: where to start, what bounds it, what stops it, what already happened                                                    |
-| `AGENTS.md`         | `<zone>/AGENTS.md`         | the travelling method; gate placeholders substituted at emission                                                                     |
-| `charter.md`        | `<zone>/charter.md`        | angle-bracketed placeholders for a person to fill                                                                                    |
-| `open-questions.md` | `<zone>/open-questions.md` | heading plus the `Blocks:` grammar; ships without a sample question                                                                  |
-| lane files          | `<zone>/lanes/*.yml`       | each exactly `lane: <name>` plus `stories: []`                                                                                       |
-| stories directory   | `<zone>/stories/`          | created empty                                                                                                                        |
-| hook set            | the plan repository        | the record gate at both stages, the schema checks, the three heading-shape checks, the single-branch guard, the no-force guard       |
-| templates           | not copied                 | shipped location printed for a person to copy                                                                                        |
+| Payload member      | Lands at                      | Notes                                                                                                                                |
+| ------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| host project file   | `<root>/.wipctl/project.toml` | generated, not copied: the minted `project_id` and nothing else. The scaffold creates the directory and the file together            |
+| plan config         | `<zone>/.wipctl/plan.toml`    | generated: the minted id restated, the minted `plan_uid`, the given or today's start date, `length_days = 14` as the one baked value |
+| zone `README.md`    | `<zone>/README.md`            | orientation: where to start, what bounds it, what stops it, what already happened                                                    |
+| `AGENTS.md`         | `<zone>/AGENTS.md`            | the travelling method; gate placeholders substituted at emission                                                                     |
+| `charter.md`        | `<zone>/charter.md`           | angle-bracketed placeholders for a person to fill                                                                                    |
+| `open-questions.md` | `<zone>/open-questions.md`    | heading plus the `Blocks:` grammar; ships without a sample question                                                                  |
+| lane files          | `<zone>/lanes/*.yml`          | each exactly `lane: <name>` plus `stories: []`                                                                                       |
+| stories directory   | `<zone>/stories/`             | created empty                                                                                                                        |
+| hook set            | the plan repository           | the record gate at both stages, the schema checks, the three heading-shape checks, the single-branch guard, the no-force guard       |
+| templates           | not copied                    | shipped location printed for a person to copy                                                                                        |
 
 The zone is the plan repository's working tree, which the scaffold creates whole: the repository, the trunk, the hook set, and the initial commit.
 
@@ -53,7 +53,7 @@ When the scaffold runs, the host repository MUST gain exactly one file it did no
 
 - GIVEN a host repository with its own documents and configuration
 - WHEN the scaffold runs
-- THEN the host gains the identity file alone, because merging into a file the host owns makes the tool a co-author of that file
+- THEN the host gains `.wipctl/project.toml` alone, because merging into a file the host owns makes the tool a co-author of that file
 
 Verify: `cargo nextest run --test journey`
 
@@ -117,7 +117,7 @@ The landed method document MUST teach every subject the list below names.
 
 The subjects, each taught from zero:
 
-- the two-location model: one identity file in the host, one plan repository at the machine-level slot every checkout shares
+- the two-location model: one project file in the host, one plan repository at the machine-level slot every checkout shares
 - all three heading sequences, with a one-line purpose per heading, the initiative section rule, and the depth rule
 - that membership above the story flows through the epic
 - the lane semantics, the entry field list, the points scale, and the canonical subset
