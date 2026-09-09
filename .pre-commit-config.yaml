@@ -832,6 +832,12 @@ repos:
         language: system
         always_run: true
         pass_filenames: false
+      - id: ki-checked-date
+        name: 'known issue last-check date'
+        entry: sdd gate ki-checked-date
+        language: system
+        always_run: true
+        pass_filenames: false
       - id: ki-filename-shape
         name: 'known issue filename shape'
         entry: sdd gate ki-filename-shape
@@ -884,6 +890,12 @@ repos:
         language: system
         types: [markdown]
         exclude: '(?:^|/)CHANGELOG\.md$'
+      - id: spec-change-is-typed
+        name: 'spec changes are typed'
+        entry: sdd gate spec-change-is-typed
+        language: system
+        always_run: true
+        pass_filenames: false
       - id: spec-requirement-parts
         name: 'spec requirement parts'
         entry: sdd gate spec-requirement-parts
@@ -913,12 +925,6 @@ repos:
         language: system
         always_run: true
         pass_filenames: false
-      - id: simple-english
-        name: 'prose follows SimpleEnglish'
-        entry: sdd gate simple-english
-        language: system
-        types: [markdown]
-        exclude: '^_docs/decisions/|^docs/decisions/|(?:^|/)CHANGELOG\.md$|^third-party/|^\.spec-driven-docs/|(?:^|/)tests/fixtures/'
       - id: tracking-registry
         name: 'tracking registry is valid and current'
         entry: sdd gate tracking-registry

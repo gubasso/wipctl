@@ -51,8 +51,4 @@ The tree carries one third-party text under its own terms. `.spec-driven-docs/up
 
 ## Contribution
 
-<!-- simple-english-disable: the grant reproduces the ecosystem standard wording, and a paraphrase changes what the Apache-2.0 definition of a contribution covers -->
-
 Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
-
-<!-- simple-english-enable -->

@@ -105,7 +105,7 @@ installer_ok "Install crate"
 
 bin_dir="$resolved_root/bin"
 
-# shellcheck disable=SC2154 # installer_quiet is assigned in the sourced install-common.sh
+# shellcheck disable=SC2154 # sdd: permanent installer_quiet is assigned in the sourced install-common.sh, which shellcheck does not follow
 if ((installer_quiet != 1)); then
   installer_note "Installed:"
   installer_note "    project: $project_name (via cargo install)"
