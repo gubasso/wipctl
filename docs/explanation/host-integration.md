@@ -22,7 +22,7 @@ A host that keeps requirement-level specifications identifies each rule by an id
 
 A project rarely plans in one list. Forge issues, ticket-system items, and bug reports name pending work at the same time. The record needs a way to say which of them a piece of work answers. `Sources` is that way, and it runs in a third direction. It points out to a system neither repository can see.
 
-The shape holds the same doctrine as the branch and the commit. The record stores the item's key and nothing else. The remote system stays the source of truth, so nothing here goes stale behind it. A reference is `<alias>#<key>`, and the alias is declared once in `sources.toml` at the plan zone root, per [../specs/SPEC-external-sources.md](../specs/SPEC-external-sources.md). The host's footprint does not grow: the declaration lives with the plan, and the host still carries one file.
+The shape holds the same doctrine as the branch and the commit. The record stores the item's key and nothing else. The remote system stays the source of truth, so nothing here goes stale behind it. A reference is `<alias>#<key>`, and the alias is declared once in the plan configuration's `sources` section, per [../specs/SPEC-external-sources.md](../specs/SPEC-external-sources.md). The host's footprint does not grow: the declaration lives with the plan, and the host still carries one file.
 
 Two rules keep the tier ladder intact. A reference never sequences and never counts, so `needs` stays the one sequencing fact. A reference also carries no hierarchy, so a story's reference is never checked against its epic's. Membership runs one way through the local ladder, and a remote tree read as membership becomes a second store of it. The cost is stated rather than hidden. Nothing tells a reader that a story and its epic point at unrelated outside trees, and that stays a review question.
 
@@ -36,7 +36,7 @@ The transfer's same-change guarantee becomes a same-unit-of-review obligation. N
 
 ## What the gate checks here, and what it does not
 
-The gate checks the outbound direction's shape and resolution, including the shape of a declared rule-delta clause. It checks the project file's presence, its grammar, and its agreement with the plan repository. It checks a source reference's shape and its alias against the declaration file, and stops there.
+The gate checks the outbound direction's shape and resolution, including the shape of a declared rule-delta clause. It checks the project file's presence, its grammar, and its agreement with the plan repository. It checks a source reference's shape and its alias against the declared sources, and stops there.
 
 These are review responsibilities instead, and are stated as such:
 

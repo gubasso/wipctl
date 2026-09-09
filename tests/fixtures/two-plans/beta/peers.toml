@@ -1,6 +1,0 @@
-[peers.alpha]
-uid = "9f2c41a08b7d4e63a15c8f02d7e4b619"
-urls = [
-  "https://git.example.org/acme/alpha-plan.git",
-  "ssh://git@git.example.net/mirrors/alpha-plan.git",
-]

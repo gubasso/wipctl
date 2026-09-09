@@ -3,7 +3,7 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The file](#the-file)
+- [The section](#the-section)
 - [Two sets, named once](#two-sets-named-once)
 - [What the table is not](#what-the-table-is-not)
 - [The view](#the-view)
@@ -21,11 +21,11 @@
 
 ## Purpose
 
-The table a plan keeps of the other plans it names. A peer is another project's plan repository, named here by a local alias and identified by the uid that plan declares. The boundary runs at the table. This domain owns the file, its keys, and its shape. The peer attachment domain owns the verb that writes a row and the walk that fills a peer's slot. The validation domain owns the checks that read the table.
+The table a plan keeps of the other plans it names. A peer is another project's plan repository, named here by a local alias and identified by the uid that plan declares. The boundary runs at the table. This domain owns the section, its keys, and its shape. The configuration domain owns the file the section sits in. The peer attachment domain owns the verb that writes a row and the walk that fills a peer's slot. The validation domain owns the checks that read the table.
 
-## The file
+## The section
 
-`peers.toml` sits at the plan zone root, beside the `.wipctl` directory. There is one table per peer, keyed by the alias.
+The `peers` section sits in `.wipctl/plan.toml` at the plan zone root. There is one table per peer, keyed by the alias.
 
 ```toml
 [peers.payments]
@@ -55,13 +55,13 @@ Two schemes are accepted for a peer url, `https` and `ssh`, and each MUST be wri
 
 A peer has three names, and they are three separate facts. The alias is chosen here. The uid is declared by the peer, and it never changes. The url is a locator that changes when the plan moves host, and changing it changes nothing else.
 
-This table is the only place an alias resolves. A dependency written as `<alias>#<id>` reads the alias here, in the record the dependency was written in, and never in any other plan's table.
+This table is the only place an alias resolves. A dependency written as `<alias>#<id>` reads the alias here, in the record the dependency was written in, and never in any other plan's table. The shape is the `peers` half of `plan.schema.json`, in the configuration spec's companion directory.
 
 ## Two sets, named once
 
 ```text
-the declared set   every row of this plan's peers.toml, plus every row of
-                   each of their peers.toml files, transitively. This is
+the declared set   every row of this plan's peers section, plus every row
+                   of each of their peers sections, transitively. This is
                    what the peer attachment walk fills.
 
 the read set       every peer a prefixed needs id in this record reaches,
@@ -136,7 +136,7 @@ Verify: `cargo nextest run --test schemas`
 
 ### `peers:an-alias-is-local-and-unique` — An alias is local and unique
 
-Every alias MUST parse under the slug grammar, MUST be unique within the file, and MUST NOT equal this plan's own `project_id`.
+Every alias MUST parse under the slug grammar, MUST be unique within the section, and MUST NOT equal this plan's own `project_id`.
 
 #### Scenario: A plan gives a peer the name it calls itself
 
@@ -202,7 +202,8 @@ Each failure names its resolution. The validation domain owns the check catalog,
 a peer row with no uid                                                    exit 1
   wipctl: peer 'payments' declares no uid
   wipctl: a peer is identified by its plan_uid, not by its url; read the
-          uid from that plan's plan file and add it to peers.toml
+          uid from that plan's plan file and add it to the peers
+          section
 
 a peer row with an empty url list                                         exit 1
   wipctl: peer 'payments' declares no url
@@ -235,6 +236,6 @@ two rows claiming one uid                                                 exit 1
 
 the view runs against a plan with no table                                exit 0
   wipctl: this plan names no peers
-  wipctl: a peer is declared in peers.toml at the plan zone root; see
-          'wipctl help peers'
+  wipctl: a peer is declared in the peers section of .wipctl/plan.toml;
+          see 'wipctl help peers'
 ```

@@ -14,7 +14,7 @@ A source reference is `<alias>#<key>`, so the alias needs a home that binds it t
 
 Chosen option: `sources.toml at the zone root, with its own schema` — a declaration that most projects never write belongs in a file most projects never have. The file is earned: its absence is legal and means the project declares no external source, exactly as an absent initiative directory means the project uses two tiers. It carries one table per alias, each with a url template and a list command, and both keys are required because no value is guessed on a project's behalf. The alias is local to the plan that declares it, so two plans can use one alias for different systems and neither is wrong. The configuration keeps its closed key list and its meaning: identity and cadence, complete and required.
 
-Enforced by `external-sources:the-declaration-file-is-earned` and `external-sources:an-alias-is-unique-and-slugged`.
+Enforced by `external-sources:the-sources-section-is-earned` and `external-sources:an-alias-is-unique-and-slugged`.
 
 ## Consequences
 
@@ -23,4 +23,6 @@ Enforced by `external-sources:the-declaration-file-is-earned` and `external-sour
 
 ## Status
 
-Accepted
+Superseded
+
+Superseded by [ADR-a-plan-declares-everything-in-one-configuration-file.md](./ADR-a-plan-declares-everything-in-one-configuration-file.md) — the declaration is a section of the plan configuration. It is still earned, and its absence still means the project declares no source.

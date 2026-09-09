@@ -12,6 +12,7 @@
   - [`configuration:the-plan-declares-a-global-identity` — The plan declares a global identity](#configurationthe-plan-declares-a-global-identity--the-plan-declares-a-global-identity)
   - [`configuration:the-two-identities-agree` — The two identities agree](#configurationthe-two-identities-agree--the-two-identities-agree)
   - [`configuration:an-unknown-key-is-rejected` — An unknown key is rejected](#configurationan-unknown-key-is-rejected--an-unknown-key-is-rejected)
+  - [`configuration:an-optional-section-is-legally-absent` — An optional section is legally absent](#configurationan-optional-section-is-legally-absent--an-optional-section-is-legally-absent)
   - [`configuration:the-iteration-window-is-required` — The iteration window is required](#configurationthe-iteration-window-is-required--the-iteration-window-is-required)
   - [`configuration:the-aging-threshold-is-optional-and-undefaulted` — The aging threshold is optional and undefaulted](#configurationthe-aging-threshold-is-optional-and-undefaulted--the-aging-threshold-is-optional-and-undefaulted)
   - [`configuration:the-project-file-owes-no-schema` — The project file owes no schema](#configurationthe-project-file-owes-no-schema--the-project-file-owes-no-schema)
@@ -58,7 +59,28 @@ length_days = 14
 
 [aging]
 threshold_days = 21
+
+[peers.payments]
+uid = "9f2c41a08b7d4e63a15c8f02d7e4b619"
+urls = ["https://git.example.org/acme/payments-plan.git"]
+
+[sources.issues]
+url_template = "https://tracker.example/issues/{key}"
+list_command = ["<the command that lists open items>", "--format", "json"]
 ```
+
+The file has a required core and two optional sections. The core is every key above `[peers]`, and the two sections are `peers` and `sources`.
+
+```text
+[peers.<alias>]     the other plans this one names. The peers domain owns
+                    every rule about an alias, a uid, and a url.
+
+[sources.<alias>]   the outside systems this plan's artifacts reference.
+                    The external sources domain owns every rule about a
+                    reference and a command.
+```
+
+This domain owns the file: where it lives, which sections it holds, and what an absent section means. It gains no semantics. A reader who wants to know what a url can contain reads the peers page.
 
 Each directory holds one file and nothing else. The cost is stated rather than hidden: a genuine later need for a second file is a change to this specification, not a quiet addition. That price buys the property the whole shape rests on, which is that a plan declares itself in one place.
 
@@ -92,7 +114,7 @@ Immutability binds verbs. Two replicas that each minted a uid before either repl
 
 The uid never names a slot. A verb resolves a plan by the two steps the attachment domain states, then reads `plan_uid` inside the slot it reached. There is no tree keyed by the uid.
 
-A peer is not configuration. `.wipctl/plan.toml` carries facts about this plan, and a row naming another plan is a fact about that one. The peers domain owns a file of its own for them.
+A peer row names another plan, and the peers domain owns what such a row means. This file is where the row is written, and the section reference above is all this domain says about it.
 
 ## Requirements
 
@@ -162,9 +184,21 @@ The implementation MUST reject an unknown key at every level of either file.
 
 #### Scenario: A key is misspelled
 
-- GIVEN `threshold_dayz` under the aging table
+- GIVEN `[peer.payments]` written in the singular
 - WHEN the configuration is read
-- THEN the key is rejected, because silently ignoring it makes a typo look like a setting that had no effect
+- THEN the key is rejected, because silently ignoring it makes a typo look like a section that had no effect
+
+Verify: `cargo nextest run --test schemas`
+
+### `configuration:an-optional-section-is-legally-absent` — An optional section is legally absent
+
+The `peers` and `sources` sections MUST be optional, each absence MUST mean what its own domain states, and a present section MUST be complete.
+
+#### Scenario: A plan names no peer and declares no source
+
+- GIVEN a scaffolded plan repository carrying the core alone
+- WHEN the configuration is read
+- THEN it is valid and each absence carries its stated meaning, because an empty section is a statement nobody made
 
 Verify: `cargo nextest run --test schemas`
 
@@ -247,6 +281,6 @@ Verify: `cargo nextest run --test validation`
 - A second file inside a `.wipctl` directory. A failed check naming the file and the rule that binds it.
 - `project_id` absent or outside the slug grammar, in either file. A failed check naming the file and the field.
 - The two `project_id` values disagree. A failed check naming both files, both values, and the choice between re-attaching and correcting whichever file is wrong.
-- A required key absent from the plan configuration. A failed check naming the field.
+- A required key absent from the plan configuration, including a required key of a present optional section. A failed check naming the field.
 - `plan_uid` absent or outside its grammar. A failed check naming the file and the key. The message names the one verb form that gives an identity to a record that predates the key.
 - A malformed value. The schema half of validation reports it.

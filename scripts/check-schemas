@@ -106,7 +106,6 @@ schema_for() {
     */lanes/*.yml) printf '%s/SPEC-lane-file/lane.schema.json\n' "$schema_root" ;;
     */pending/*.yml) printf '%s/SPEC-pending-fragment/pending.schema.json\n' "$schema_root" ;;
     */.wipctl/plan.toml) printf '%s/SPEC-configuration/plan.schema.json\n' "$schema_root" ;;
-    */peers.toml) printf '%s/SPEC-peers/peers.schema.json\n' "$schema_root" ;;
     *.md) ;;
     *) return 1 ;;
   esac

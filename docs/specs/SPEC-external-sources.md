@@ -13,7 +13,7 @@
   - [`external-sources:a-source-ref-never-sequences-and-never-counts` — A source reference never sequences and never counts](#external-sourcesa-source-ref-never-sequences-and-never-counts--a-source-reference-never-sequences-and-never-counts)
   - [`external-sources:a-declared-source-carries-a-template-and-a-command` — A declared source carries a template and a command](#external-sourcesa-declared-source-carries-a-template-and-a-command--a-declared-source-carries-a-template-and-a-command)
   - [`external-sources:an-alias-is-unique-and-slugged` — An alias is unique and slugged](#external-sourcesan-alias-is-unique-and-slugged--an-alias-is-unique-and-slugged)
-  - [`external-sources:the-declaration-file-is-earned` — The declaration file is earned](#external-sourcesthe-declaration-file-is-earned--the-declaration-file-is-earned)
+  - [`external-sources:the-sources-section-is-earned` — The sources section is earned](#external-sourcesthe-sources-section-is-earned--the-sources-section-is-earned)
   - [`external-sources:the-view-runs-each-declared-command` — The view runs each declared command](#external-sourcesthe-view-runs-each-declared-command--the-view-runs-each-declared-command)
   - [`external-sources:the-view-marks-an-unreferenced-item` — The view marks an unreferenced item](#external-sourcesthe-view-marks-an-unreferenced-item--the-view-marks-an-unreferenced-item)
   - [`external-sources:a-missing-source-command-degrades-loudly` — A missing source command degrades loudly](#external-sourcesa-missing-source-command-degrades-loudly--a-missing-source-command-degrades-loudly)
@@ -25,16 +25,16 @@
 
 ## Purpose
 
-A project plans in one record and often carries pending work in other systems at the same time. This domain lets a story, an epic, or an initiative name the outside items it answers. It also lets the plan repository declare where those items live. The boundary runs at the reference. This domain owns the declaration file, the reference grammar, the checks over both, and the view that reports a declared source's open items. The documents domain owns the heading sequence that carries the reference. The zone layout domain owns where the declaration file sits and where a derived view is cached. The rendering domain owns the table, and the messages domain owns the wording of a diagnostic.
+A project plans in one record and often carries pending work in other systems at the same time. This domain lets a story, an epic, or an initiative name the outside items it answers. It also lets the plan repository declare where those items live. The boundary runs at the reference. This domain owns the declaration, the reference grammar, the checks over both, and the view that reports a declared source's open items. The configuration domain owns the file the declaration sits in. The documents domain owns the heading sequence that carries the reference. The zone layout domain owns where a derived view is cached. The rendering domain owns the table, and the messages domain owns the wording of a diagnostic.
 
-The declaration file is stated by a person, never derived from anything, so the rule against storing derived state in the zone is satisfied. The remote system keeps its own items, and this record keeps a key.
+The declaration is stated by a person, never derived from anything, so the rule against storing derived state in the zone is satisfied. The remote system keeps its own items, and this record keeps a key.
 
 ## The declared source
 
-`sources.toml` lives at the zone root, inside the plan repository. It names each system the project's artifacts reference, one table per alias. The host repository gains nothing: its footprint stays the one identity file.
+The `sources` section sits in `.wipctl/plan.toml` at the plan zone root. It names each system the project's artifacts reference, one table per alias. The host repository gains nothing: its footprint stays the one project file.
 
 ```toml
-# sources.toml, at the plan zone root
+# the sources section of .wipctl/plan.toml
 
 [sources.issues]
 url_template = "https://tracker.example/issues/{key}"
@@ -45,11 +45,11 @@ url_template = "https://tickets.example/browse/{key}"
 list_command = ["<the command that lists open items>"]
 ```
 
-`sources.schema.json` owns the file's shape. The cross-file checker owns every fact spanning the file and a document.
+The `sources` half of `plan.schema.json` owns the section's shape, in the configuration spec's companion directory. The cross-file checker owns every fact spanning the section and a document.
 
 ## The reference
 
-A source reference is one token, `<alias>#<key>`. The alias names a table in `sources.toml`. The key is the item's own name in that system, and this record never parses it.
+A source reference is one token, `<alias>#<key>`. The alias names a table in the `sources` section. The key is the item's own name in that system, and this record never parses it.
 
 ```markdown
 ## Sources
@@ -76,13 +76,13 @@ Verify: `cargo nextest run --test schemas`
 
 ### `external-sources:a-source-ref-names-a-declared-alias` — A source reference names a declared alias
 
-Every alias appearing in a source reference MUST name a table that `sources.toml` declares.
+Every alias appearing in a source reference MUST name a table that the `sources` section declares.
 
-#### Scenario: An alias is dropped from the declaration file
+#### Scenario: An alias is dropped from the declaration
 
-- GIVEN a document referencing an alias the file no longer declares
+- GIVEN a document referencing an alias the section no longer declares
 - WHEN validation runs
-- THEN it fails naming the alias and the file, because a reference nobody can resolve points at nothing
+- THEN it fails naming the alias and the section, because a reference nobody can resolve points at nothing
 
 Verify: `cargo nextest run --test validation`
 
@@ -136,7 +136,7 @@ Verify: `cargo nextest run --test schemas`
 
 ### `external-sources:an-alias-is-unique-and-slugged` — An alias is unique and slugged
 
-An alias MUST match the slug grammar and MUST be unique within `sources.toml`.
+An alias MUST match the slug grammar and MUST be unique within the `sources` section.
 
 #### Scenario: Two projects choose the same alias
 
@@ -146,15 +146,15 @@ An alias MUST match the slug grammar and MUST be unique within `sources.toml`.
 
 Verify: `cargo nextest run --test schemas`
 
-### `external-sources:the-declaration-file-is-earned` — The declaration file is earned
+### `external-sources:the-sources-section-is-earned` — The sources section is earned
 
-Where the project declares no source, `sources.toml` MUST be absent, and its absence MUST fail no check.
+Where the project declares no source, the `sources` section MUST be absent, and its absence MUST fail no check.
 
 #### Scenario: A project references no outside system
 
 - GIVEN a scaffolded plan repository
 - WHEN validation runs
-- THEN it passes with no declaration file, because an empty file is a statement nobody made
+- THEN it passes with no sources section, because an empty section is a statement nobody made
 
 Verify: `cargo nextest run --test validation`
 
@@ -224,8 +224,8 @@ The shape is `sources-report.schema.json`, beside this page. The obligation to s
 
 Each fault names its own resolution.
 
-- A source reference naming an undeclared alias. This is a failure, exit 1. The message names the alias, the document, and `sources.toml`, and offers the two resolutions: declare the alias, or correct the reference.
+- A source reference naming an undeclared alias. This is a failure, exit 1. The message names the alias, the document, and the `sources` section, and offers the two resolutions: declare the alias, or correct the reference.
 - A malformed reference token. This is a failure, exit 1. The message shows the token and the `<alias>#<key>` shape it must carry.
-- A declaration file that no reference reaches. This is a warning. It reaches the reader and never the exit code, because a source declared before its first reference is a legal first draft.
+- A declared source that no reference reaches. This is a warning. It reaches the reader and never the exit code, because a source declared before its first reference is a legal first draft.
 - A list command that is absent, exits non-zero, or emits unreadable output. This is a degradation, not a failure. One line on the error stream names the alias, the command, and the reader's next step. The view still exits on what the other sources answered.
-- A view run where the declaration file is absent. This is a usage error, exit 2. The message names the file and says that the project declares no source yet.
+- A view run where the `sources` section is absent. This is a usage error, exit 2. The message names the section and says that the project declares no source yet.

@@ -57,7 +57,7 @@
     "needs_id": {
       "type": "string",
       "pattern": "^([a-z0-9]+(-[a-z0-9]+)*#)?[a-z0-9]+(-[a-z0-9]+)*$",
-      "description": "A dependency target: a bare id naming an entry in this record, or <alias>#<id> naming an entry in the peer that peers.toml binds to that alias. The two forms mean the same thing, which is closed before this entry is eligible, and the graph, the eligibility rule, and the acyclicity proof treat them identically. The prefixed form is split exactly once, on the first separator: the alias half resolves in the peer table and the id half is carried whole, so the rule that no consumer parses an id survives. A prefixed id must be written double-quoted, which no schema can check because a schema reads a value the parser already unquoted; the canonical-subset parser holds that rule."
+      "description": "A dependency target: a bare id naming an entry in this record, or <alias>#<id> naming an entry in the peer that the plan configuration's peers section binds to that alias. The two forms mean the same thing, which is closed before this entry is eligible, and the graph, the eligibility rule, and the acyclicity proof treat them identically. The prefixed form is split exactly once, on the first separator: the alias half resolves in the peer table and the id half is carried whole, so the rule that no consumer parses an id survives. A prefixed id must be written double-quoted, which no schema can check because a schema reads a value the parser already unquoted; the canonical-subset parser holds that rule."
     },
     "story": {
       "type": "object",

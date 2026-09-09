@@ -58,9 +58,9 @@ XDG_CACHE_HOME   $HOME/.cache
 
 ```text
 plan-repo/
-  .wipctl/plan.toml             both identities and the configuration
-  peers.toml                    the other plans this one names; earned, not scaffolded
-  sources.toml                  declared external sources; earned, not scaffolded
+  .wipctl/plan.toml             the plan's whole configuration: both
+                                identities, the cadence, the peers it
+                                names, and the sources it references
   README.md                     orientation for a reader arriving at the zone
   AGENTS.md                     the method, self-sufficient, written by the scaffold
   charter.md                    what the project is for, pillars, no-gos, cadence

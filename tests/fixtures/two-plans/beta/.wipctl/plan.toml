@@ -4,3 +4,10 @@ plan_uid = "4c81d0e7f39a4b25861d7c04e9a2f358"
 [iteration]
 start = 2026-07-06
 length_days = 14
+
+[peers.alpha]
+uid = "9f2c41a08b7d4e63a15c8f02d7e4b619"
+urls = [
+  "https://git.example.org/acme/alpha-plan.git",
+  "ssh://git@git.example.net/mirrors/alpha-plan.git",
+]
