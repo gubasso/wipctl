@@ -69,7 +69,9 @@ wipctl board
 wipctl dashboard
 wipctl graph [--unblocks <id>]
 wipctl flow [--lane <lane>]
-wipctl stale
+wipctl stale [--all]
+wipctl stale --hide <id> (--for <duration> | --forever)
+wipctl stale --show <id>
 wipctl velocity
 wipctl epic [--json] [--write] [<epic-id>]
 wipctl epics [--json]
@@ -85,7 +87,9 @@ wipctl help
 wipctl version
 ```
 
-Ten verbs write the record: `new`, `land`, `move`, `start`, `delete`, `rename`, `fix`, `sync`, `resolve`, and `peer`. Closing is not a verb of its own. It is `move --to closed` with an outcome.
+Every verb except `help`, `version`, and `man` is a workflow verb. A workflow verb operates the record. The other three operate the program and resolve nothing, so they cannot inspect staleness.
+
+Ten workflow verbs write the record: `new`, `land`, `move`, `start`, `delete`, `rename`, `fix`, `sync`, `resolve`, and `peer`. Closing is not a verb of its own. It is `move --to closed` with an outcome.
 
 `attach` takes exactly one of four forms: a plan location, `--create`, `--mint-uid`, or `--peers`. The identity-minting form commits `plan_id` and `project_id` to the plan trunk, then prints the project file line. It does not write the host. The `peer` operation is its first positional argument, so the surface gains no subcommands.
 

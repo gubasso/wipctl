@@ -6,6 +6,7 @@
 - [Relaying another tool's output](#relaying-another-tools-output)
 - [Requirements](#requirements)
   - [`messages:a-failure-names-its-resolution` — A failure names its resolution](#messagesa-failure-names-its-resolution--a-failure-names-its-resolution)
+  - [`messages:a-warning-names-its-resolution` — A warning names its resolution](#messagesa-warning-names-its-resolution--a-warning-names-its-resolution)
   - [`messages:a-refusal-names-what-unblocks-it` — A refusal names what unblocks it](#messagesa-refusal-names-what-unblocks-it--a-refusal-names-what-unblocks-it)
   - [`messages:relayed-output-is-redacted-and-bounded` — Relayed output is redacted and bounded](#messagesrelayed-output-is-redacted-and-bounded--relayed-output-is-redacted-and-bounded)
   - [`messages:success-states-what-changed` — Success states what changed](#messagessuccess-states-what-changed--success-states-what-changed)
@@ -86,6 +87,25 @@ When a verb reports a failure, the message MUST name where, what was expected, w
 - GIVEN a diagnostic naming a file, a line, and a mismatch
 - WHEN it stops there
 - THEN the message is unfinished, because a reader who knows what broke and not what to do is still stuck
+
+Verify: `cargo nextest run --test verb_contracts`
+
+### `messages:a-warning-names-its-resolution` — A warning names its resolution
+
+When a stale warning is emitted, the message MUST state the number of entries past the stale line and name `wipctl stale` as the resolution.
+
+#### Scenario: Four entries are stale
+
+- GIVEN four rows that the ordinary stale view shows
+- WHEN a workflow verb finishes
+- THEN the warning states the count and the command that shows the rows, because a warning without a resolution leaves the reader stuck
+
+The warning is exactly:
+
+```text
+wipctl: warning: 4 entries are past the stale line
+wipctl: run `wipctl stale` to see them
+```
 
 Verify: `cargo nextest run --test verb_contracts`
 

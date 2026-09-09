@@ -4,6 +4,7 @@
 
 - [Purpose](#purpose)
 - [The three flow measures](#the-three-flow-measures)
+- [Suppressions](#suppressions)
 - [Requirements](#requirements)
   - [`metrics:a-measure-is-folded-from-the-journal` — A measure is folded from the journal](#metricsa-measure-is-folded-from-the-journal--a-measure-is-folded-from-the-journal)
   - [`metrics:an-entry-outside-this-record-is-never-a-quantity` — An entry outside this record is never a quantity](#metricsan-entry-outside-this-record-is-never-a-quantity--an-entry-outside-this-record-is-never-a-quantity)
@@ -14,6 +15,11 @@
   - [`metrics:a-lane-without-a-measure-is-a-usage-error` — A lane without a measure is a usage error](#metricsa-lane-without-a-measure-is-a-usage-error--a-lane-without-a-measure-is-a-usage-error)
   - [`metrics:the-stale-view-shares-the-flow-fold` — The stale view shares the flow fold](#metricsthe-stale-view-shares-the-flow-fold--the-stale-view-shares-the-flow-fold)
   - [`metrics:the-threshold-is-undefaulted-and-never-gates` — The threshold is undefaulted and never gates](#metricsthe-threshold-is-undefaulted-and-never-gates--the-threshold-is-undefaulted-and-never-gates)
+  - [`metrics:a-stale-row-is-announced-once-per-invocation` — A stale row is announced once per invocation](#metricsa-stale-row-is-announced-once-per-invocation--a-stale-row-is-announced-once-per-invocation)
+  - [`metrics:a-suppression-is-local-and-never-replicates` — A suppression is local and never replicates](#metricsa-suppression-is-local-and-never-replicates--a-suppression-is-local-and-never-replicates)
+  - [`metrics:a-suppression-hides-a-reminder-and-never-a-number` — A suppression hides a reminder and never a number](#metricsa-suppression-hides-a-reminder-and-never-a-number--a-suppression-hides-a-reminder-and-never-a-number)
+  - [`metrics:a-suppression-is-announced-in-the-view-it-hides` — A suppression is announced in the view it hides](#metricsa-suppression-is-announced-in-the-view-it-hides--a-suppression-is-announced-in-the-view-it-hides)
+  - [`metrics:a-marked-row-is-never-acted-on-without-an-answer` — A marked row is never acted on without an answer](#metricsa-marked-row-is-never-acted-on-without-an-answer--a-marked-row-is-never-acted-on-without-an-answer)
   - [`metrics:only-a-delivered-close-counts` — Only a delivered close counts](#metricsonly-a-delivered-close-counts--only-a-delivered-close-counts)
   - [`metrics:an-empty-window-renders-at-zero` — An empty window renders at zero](#metricsan-empty-window-renders-at-zero--an-empty-window-renders-at-zero)
   - [`metrics:a-changed-cadence-restarts-the-series` — A changed cadence restarts the series](#metricsa-changed-cadence-restarts-the-series--a-changed-cadence-restarts-the-series)
@@ -34,6 +40,28 @@ Age, dwell, rework, and delivery per window. Every number here is folded from th
 | rework  | entries into the in-flight lane beyond the first                                                     |
 
 A duration is displayed in whole days, floored.
+
+## Suppressions
+
+The suppression file lives at `$XDG_STATE_HOME/wipctl/projects/<slot name>/suppressions.toml`. Each `[[suppression]]` table carries an entry `id` and exactly one end condition.
+
+```toml
+[[suppression]]
+id = "the-stale-alarm"
+until = "2026-10-09T12:00:00Z"
+
+[[suppression]]
+id = "keep-the-live-story"
+forever = true
+```
+
+`wipctl stale --hide <id> --for <duration>` records an expiry in the transition journal's stated UTC textual form. `wipctl stale --hide <id> --forever` records a permanent suppression. `wipctl stale --show <id>` removes either form.
+
+The hide form has no default duration. A hide request with neither end condition is a usage error that names both flags. An id that names no entry is a usage error.
+
+Only the hide and show forms write the file. Read paths leave it unchanged. They ignore and report a suppression whose id names no entry.
+
+The file is local state, not a plan record or a machine output. It owes no schema. The metrics cases own its shape and behavior.
 
 ## Requirements
 
@@ -145,6 +173,76 @@ Where the configuration carries a `stale_after` table, the stale view MUST mark 
 
 Verify: `cargo nextest run --test metrics`
 
+### `metrics:a-stale-row-is-announced-once-per-invocation` — A stale row is announced once per invocation
+
+When a workflow verb other than `stale` finds rows that the ordinary stale view shows, it MUST announce their count once per invocation on stderr at exit 0 and name `wipctl stale` as the resolution.
+
+#### Scenario: A workflow verb renders several views
+
+- GIVEN four rows that the ordinary stale view shows
+- WHEN one workflow verb renders several views
+- THEN one warning announces four stale entries and names the stale verb, because repeated warnings hide the fact they report
+
+Verify: `cargo nextest run --test verb_contracts`
+
+The warning makes every workflow verb perform the age fold before it prints. A verb that did not read the journal before now reads it.
+
+The fold reads the transition journal and reads the clock once under the existing rules. A cached count would duplicate state that the record already holds.
+
+### `metrics:a-suppression-is-local-and-never-replicates` — A suppression is local and never replicates
+
+When an operator hides or shows a stale row, the implementation MUST write only this machine's suppression file and leave the plan record, cache, and remote unchanged.
+
+#### Scenario: An operator hides a stale row on one clone
+
+- GIVEN two machines attached to the same plan
+- WHEN an operator hides one stale row on the first machine
+- THEN the second machine still shows the row, because a local reminder is not a team decision
+
+Verify: `cargo nextest run --test metrics`
+
+### `metrics:a-suppression-hides-a-reminder-and-never-a-number` — A suppression hides a reminder and never a number
+
+While a suppression is active, the implementation MUST omit its row from the ordinary stale view and warning count while preserving it on the board, in flow, in `wipctl doctor`, and in `stale --all`.
+
+#### Scenario: A suppressed row appears on the board
+
+- GIVEN a stale row with an active suppression
+- WHEN the board and flow table render
+- THEN the row and its age remain visible, because a suppression removes a reminder rather than work or a measure
+
+Verify: `cargo nextest run --test metrics`
+
+### `metrics:a-suppression-is-announced-in-the-view-it-hides` — A suppression is announced in the view it hides
+
+When the ordinary stale view omits active suppressions, it MUST report their count on stderr and name `wipctl stale --all` as the view that shows them.
+
+#### Scenario: Three stale rows are suppressed
+
+- GIVEN three active suppressions and one visible stale row
+- WHEN the ordinary stale view renders
+- THEN stderr reports three suppressed rows and names the complete view, because an invisible silence can outlive its reason
+
+The announcement is exactly:
+
+```text
+wipctl: 3 rows are suppressed; `wipctl stale --all` shows them
+```
+
+Verify: `cargo nextest run --test verb_contracts`
+
+### `metrics:a-marked-row-is-never-acted-on-without-an-answer` — A marked row is never acted on without an answer
+
+When an agent reads a marked row, it MUST NOT close, cut, split, reshape, or move that entry before a person answers what the record should do.
+
+#### Scenario: An old row has no recent branch commits
+
+- GIVEN a stale entry with an inactive named branch
+- WHEN an agent gathers that evidence
+- THEN it offers evidence-based options and waits for an answer, because age and branch activity cannot decide what the business still wants
+
+Verify: reviewer confirms the agent protocol requires a person's answer before any record change
+
 ### `metrics:only-a-delivered-close-counts` — Only a delivered close counts
 
 The delivery measure MUST count only entries closed as done, at their own points, in the window of their own close date.
@@ -183,8 +281,9 @@ Verify: `cargo nextest run --test metrics`
 
 ## Unenforced rules
 
-| Rule                                         | Why no command decides it                                                                    |
-| -------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `metrics:a-measure-is-the-same-on-any-clone` | Whether a proposed consumer of a measure gates on it is a reading of what the consumer does. |
+| Rule                                                       | Why no command decides it                                                                    |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `metrics:a-measure-is-the-same-on-any-clone`               | Whether a proposed consumer of a measure gates on it is a reading of what the consumer does. |
+| `metrics:a-marked-row-is-never-acted-on-without-an-answer` | Whether an action follows a person's answer is a reading of the interaction.                 |
 
 The measures are the three flow numbers and delivery per window. Forecasting, averaging, and counting anything but points are outside this domain.
