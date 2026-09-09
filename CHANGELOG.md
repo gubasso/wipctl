@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.3.0](https://github.com/gubasso/wipctl/compare/v0.2.0...v0.3.0) - 2026-09-09
+
+### Added
+
+- breaking, `config`: Name each configuration section for what it decides ([#35](https://github.com/gubasso/wipctl/pull/35))
+- breaking, `config`: Declare peers and sources in the plan configuration ([#34](https://github.com/gubasso/wipctl/pull/34))
+- breaking, `config`: Move each configuration file into a wipctl directory ([#32](https://github.com/gubasso/wipctl/pull/32))
+
 ## [0.2.0](https://github.com/gubasso/wipctl/compare/v0.1.10...v0.2.0) - 2026-09-08
 
 ### Other
