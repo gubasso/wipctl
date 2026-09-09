@@ -175,15 +175,15 @@ Verify: reviewer confirms every reference to a moved document names its new home
 
 ### `review:a-peer-row-is-read-from-the-plan-it-names` — A peer row is read from the plan it names
 
-When a change adds a peer row, the reviewer MUST confirm that its uid came from that plan's own configuration.
+When a change adds a peer row, the reviewer MUST confirm that its `plan_id` came from that plan's own configuration.
 
-#### Scenario: A uid is typed from memory
+#### Scenario: A plan identity is typed from memory
 
-- GIVEN a row whose uid is one character off
+- GIVEN a row whose `plan_id` is one character off
 - WHEN the walk runs on a machine that already holds that plan
 - THEN it clones and refuses, and no earlier check tells a wrong uid from a plan nobody has yet. The reviewer also confirms that the alias reads for this project, and that one location is reachable by the people who run the walk
 
-Verify: reviewer confirms the uid came from the peer's configuration and the alias reads for this project
+Verify: reviewer confirms the plan identity came from the peer's configuration and the alias reads for this project
 
 ### `review:the-other-team-learns-they-are-depended-on` — The other team learns they are depended on
 

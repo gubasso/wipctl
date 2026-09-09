@@ -3,8 +3,8 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The two files](#the-two-files)
-- [The two identities](#the-two-identities)
+- [Configuration shape](#configuration-shape)
+- [Open question](#open-question)
 - [Requirements](#requirements)
   - [`configuration:no-key-has-a-read-time-default` — No key has a read-time default](#configurationno-key-has-a-read-time-default--no-key-has-a-read-time-default)
   - [`configuration:the-project-file-carries-one-key` — The project file carries one key](#configurationthe-project-file-carries-one-key--the-project-file-carries-one-key)
@@ -19,102 +19,39 @@
   - [`configuration:the-configuration-directory-holds-one-file` — The configuration directory holds one file](#configurationthe-configuration-directory-holds-one-file--the-configuration-directory-holds-one-file)
   - [`configuration:there-is-no-commit-configuration` — There is no commit configuration](#configurationthere-is-no-commit-configuration--there-is-no-commit-configuration)
   - [`configuration:the-schema-owns-types-and-the-checker-owns-agreement` — The schema owns types and the checker owns agreement](#configurationthe-schema-owns-types-and-the-checker-owns-agreement--the-schema-owns-types-and-the-checker-owns-agreement)
-- [Diagnostics](#diagnostics)
+  - [`configuration:a-superseded-plan-id-has-the-identity-grammar` — A superseded plan id has the identity grammar](#configurationa-superseded-plan-id-has-the-identity-grammar--a-superseded-plan-id-has-the-identity-grammar)
+  - [`configuration:the-current-plan-id-is-not-superseded` — The current plan id is not superseded](#configurationthe-current-plan-id-is-not-superseded--the-current-plan-id-is-not-superseded)
+  - [`configuration:a-superseded-plan-id-appears-once` — A superseded plan id appears once](#configurationa-superseded-plan-id-appears-once--a-superseded-plan-id-appears-once)
+  - [`configuration:superseded-plan-ids-are-append-only` — Superseded plan ids are append-only](#configurationsuperseded-plan-ids-are-append-only--superseded-plan-ids-are-append-only)
+  - [`configuration:only-mint-settlement-adds-a-superseded-id` — Only mint settlement adds a superseded id](#configurationonly-mint-settlement-adds-a-superseded-id--only-mint-settlement-adds-a-superseded-id)
+  - [`configuration:plan-identity-claims-are-disjoint` — Plan identity claims are disjoint](#configurationplan-identity-claims-are-disjoint--plan-identity-claims-are-disjoint)
+  - [`configuration:a-peer-row-resolves-to-one-canonical-plan` — A peer row resolves to one canonical plan](#configurationa-peer-row-resolves-to-one-canonical-plan--a-peer-row-resolves-to-one-canonical-plan)
 
 <!--TOC-->
 
 ## Purpose
 
-The two configuration files and what each one owns. The project file identifies, and the plan file configures. The boundary runs at ownership. This domain says what each key means and what rejects a bad one. The attachment domain says how an invocation reaches the plan repository.
+The project file identifies the project, and the plan file configures its plan. The attachment domain owns how an invocation reaches the plan.
 
-## The two files
-
-wipctl reads its configuration from a `.wipctl` directory, in both places. The directory carries the product's name, so the file inside it is free to carry the name of the domain it serves. The product has two domains that own committed state, and they are the project and the plan.
-
-```text
-host repo/
-  .wipctl/
-    project.toml       the project's configuration
-
-plan zone/
-  .wipctl/
-    plan.toml          the plan's configuration
-```
-
-`.wipctl/project.toml` lives at the project root of the host repository. It is committed and travels with every clone.
+## Configuration shape
 
 ```toml
-project_id = "payments-acme"
+# .wipctl/project.toml
+project_id = "a1b2c3d4e5f60718293a4b5c6d7e8f90"
+
+# .wipctl/plan.toml
+project_id = "a1b2c3d4e5f60718293a4b5c6d7e8f90"
+plan_id = "9f2c41a08b7d4e63a15c8f02d7e4b619"
+superseded_plan_ids = ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"]
 ```
 
-`.wipctl/plan.toml` lives at the zone root, inside the plan repository. It restates the identity, declares the plan's own global identity, and carries every fact about the plan itself, because the plan owns its own home.
+Both identities are 128 random bits written as exactly 32 lowercase hexadecimal characters. Each is minted once, immutable, opaque, and parsed by nothing.
 
-```toml
-project_id = "payments-acme"
-plan_uid = "9f2c41a08b7d4e63a15c8f02d7e4b619"
+The plan file also holds its window and optional tables. The superseded list keeps discarded plan identities resolvable.
 
-[window]
-start = 2026-07-06
-length_days = 14
+## Open question
 
-[stale_after]
-days = 21
-
-[peers.payments]
-uid = "9f2c41a08b7d4e63a15c8f02d7e4b619"
-urls = ["https://git.example.org/acme/payments-plan.git"]
-
-[sources.issues]
-url_template = "https://tracker.example/issues/{key}"
-list_command = ["<the command that lists open items>", "--format", "json"]
-```
-
-The file has a required core and two optional sections. The core is every key above `[peers]`, and the two sections are `peers` and `sources`. Each section name states what the operator decided. `window.length_days = 14` says the counting window is fourteen days long, and `stale_after.days = 21` says work goes stale after twenty-one days.
-
-```text
-[peers.<alias>]     the other plans this one names. The peers domain owns
-                    every rule about an alias, a uid, and a url.
-
-[sources.<alias>]   the outside systems this plan's artifacts reference.
-                    The external sources domain owns every rule about a
-                    reference and a command.
-```
-
-This domain owns the file: where it lives, which sections it holds, and what an absent section means. It gains no semantics. A reader who wants to know what a url can contain reads the peers page.
-
-Each directory holds one file and nothing else. The cost is stated rather than hidden: a genuine later need for a second file is a change to this specification, not a quiet addition. That price buys the property the whole shape rests on, which is that a plan declares itself in one place.
-
-A `.wipctl` directory holding no configuration file is not a root and is not silence. It arrives from a partial copy, a failed scaffold, or a person who made the directory by hand. The walk reports it rather than passing over it.
-
-## The two identities
-
-A plan carries two names, and they answer two questions.
-
-```text
-project_id    slug         resolution key and human name; unique on THIS
-                           machine; renaming it is an explicit operation
-plan_uid      32 hex       global identity; written down by other plans;
-                           never renamed, never derived, never parsed
-```
-
-`project_id` answers which plan on this machine. `plan_uid` answers which plan anywhere. The first is a path segment under the data directory. The second is a value another repository commits. A machine-local slug cannot be the second one. Two operators mint the same slug without ever meeting, because uniqueness is decided against this machine's registry and not globally.
-
-`plan_uid` has four properties and no more:
-
-```text
-grammar      exactly 32 lowercase hexadecimal characters
-mint         128 bits from the machine's random source, at creation, once
-immutable    no verb changes it, and there is no rename operation for it
-opaque       nothing parses it; it carries no time, no machine, no order
-```
-
-Thirty-two hexadecimal characters sit inside the slug grammar as one segment, so no other grammar widens to hold the value. The mint size is stated as a fact. 128 bits of randomness makes a collision between two independently minted plans a risk no operator thinks about. No coordination between machines buys anything more.
-
-Immutability binds verbs. Two replicas that each minted a uid before either replicated are a disagreement in one committed file. An operator settles it by editing that file and committing. There is no verb for it, and the reason is the same one that makes the value useful. Other plans write it down, and a verb that rewrites it rewrites one they already hold.
-
-The uid never names a slot. A verb resolves a plan by the two steps the attachment domain states, then reads `plan_uid` inside the slot it reached. There is no tree keyed by the uid.
-
-A peer row names another plan, and the peers domain owns what such a row means. This file is where the row is written, and the section reference above is all this domain says about it.
+A plan cloned outside a host or peer table can derive a name only from its directory. Whether a plan repository carries a human name of its own remains open. No optional name key is added.
 
 ## Requirements
 
@@ -132,7 +69,7 @@ Verify: `cargo nextest run --test configuration`
 
 ### `configuration:the-project-file-carries-one-key` — The project file carries one key
 
-The host repository's `.wipctl/project.toml` MUST carry `project_id` and no other key, in the slug grammar `[a-z0-9]+(-[a-z0-9]+)*`.
+The host repository's `.wipctl/project.toml` MUST carry only `project_id`, written as exactly 32 lowercase hexadecimal characters.
 
 #### Scenario: A project adds a setting to the project file
 
@@ -156,7 +93,7 @@ Verify: `cargo nextest run --test attachment`
 
 ### `configuration:the-plan-declares-a-global-identity` — The plan declares a global identity
 
-The plan configuration MUST carry `plan_uid` as exactly 32 lowercase hexadecimal characters, minted once when the plan is created.
+The plan configuration MUST carry `plan_id` as exactly 32 lowercase hexadecimal characters, minted once when the plan is created.
 
 #### Scenario: A plan another plan named moves to a new forge
 
@@ -250,6 +187,90 @@ A `.wipctl` directory MUST hold the one configuration file its place names, and 
 
 Verify: `cargo nextest run --test validation`
 
+### `configuration:a-superseded-plan-id-has-the-identity-grammar` — A superseded plan id has the identity grammar
+
+Every `superseded_plan_ids` entry MUST contain exactly 32 lowercase hexadecimal characters.
+
+#### Scenario: A discarded identity is malformed
+
+- GIVEN an array entry with 31 characters
+- WHEN the schema reads the plan configuration
+- THEN the value fails the same grammar as the canonical plan identity
+
+Verify: `cargo nextest run --test schemas`
+
+### `configuration:the-current-plan-id-is-not-superseded` — The current plan id is not superseded
+
+The `superseded_plan_ids` array MUST exclude the current `plan_id`.
+
+#### Scenario: The canonical identity appears in both places
+
+- GIVEN one value used as `plan_id` and as an array entry
+- WHEN the checker reads the configuration
+- THEN it fails because one identity cannot be both current and discarded
+
+Verify: `cargo nextest run --test configuration`
+
+### `configuration:a-superseded-plan-id-appears-once` — A superseded plan id appears once
+
+Every value in `superseded_plan_ids` MUST appear once.
+
+#### Scenario: Settlement appends an existing value
+
+- GIVEN an array that already records the discarded identity
+- WHEN the schema reads a repeated entry
+- THEN it rejects the duplicate because repetition states no new equivalence
+
+Verify: `cargo nextest run --test schemas`
+
+### `configuration:superseded-plan-ids-are-append-only` — Superseded plan ids are append-only
+
+After an identity enters `superseded_plan_ids`, every verb MUST retain it.
+
+#### Scenario: No current peer row uses an old identity
+
+- GIVEN a superseded value with no visible consumer
+- WHEN a writer edits the plan configuration
+- THEN the value remains because an unknown plan can still have written it down
+
+Verify: `cargo nextest run --test sync`
+
+### `configuration:only-mint-settlement-adds-a-superseded-id` — Only mint settlement adds a superseded id
+
+The implementation MUST add a superseded identity only when it settles two plan identities minted for one plan.
+
+#### Scenario: An operator tries to claim another plan's identity
+
+- GIVEN an identity with no two-mint conflict
+- WHEN a verb is asked to append it
+- THEN the verb refuses because unrestricted equivalence can claim another plan
+
+Verify: `cargo nextest run --test sync`
+
+### `configuration:plan-identity-claims-are-disjoint` — Plan identity claims are disjoint
+
+Across attached slots, the checker MUST let each canonical or superseded plan identity belong to one plan only.
+
+#### Scenario: Two plans claim one discarded identity
+
+- GIVEN two attached plans whose identity sets overlap
+- WHEN validation reads the registry
+- THEN it fails naming both slots and the shared value
+
+Verify: `cargo nextest run --test validation`
+
+### `configuration:a-peer-row-resolves-to-one-canonical-plan` — A peer row resolves to one canonical plan
+
+When a peer row carries a superseded value, the implementation MUST resolve it and report the plan's canonical `plan_id`.
+
+#### Scenario: A peer row predates identity settlement
+
+- GIVEN a row carrying the discarded identity
+- WHEN the peer is resolved
+- THEN it reaches the plan and reports the canonical identity without changing the row
+
+Verify: `cargo nextest run --test validation`
+
 ### `configuration:there-is-no-commit-configuration` — There is no commit configuration
 
 The configuration MUST NOT carry a table that turns the plan trunk's commit off.
@@ -273,14 +294,3 @@ The plan configuration's schema MUST own its types and constraints, and the cros
 - THEN the schema half reports the malformed value and the cross-file half reports the missing identity, each in its own class
 
 Verify: `cargo nextest run --test validation`
-
-## Diagnostics
-
-- No `.wipctl/project.toml` at or above the working directory. This is a usage error, exit 2. The message names the scaffold as the resolution.
-- A `.wipctl` directory with no `project.toml` inside it. This is a usage error, exit 2, naming the directory. The message says that the project root is the directory holding `.wipctl/project.toml`, and it offers two resolutions: run the scaffold here, or remove the empty directory and let the walk continue upward.
-- A second file inside a `.wipctl` directory. A failed check naming the file and the rule that binds it.
-- `project_id` absent or outside the slug grammar, in either file. A failed check naming the file and the field.
-- The two `project_id` values disagree. A failed check naming both files, both values, and the choice between re-attaching and correcting whichever file is wrong.
-- A required key absent from the plan configuration, including a required key of a present optional section. A failed check naming the field.
-- `plan_uid` absent or outside its grammar. A failed check naming the file and the key. The message names the one verb form that gives an identity to a record that predates the key.
-- A malformed value. The schema half of validation reports it.

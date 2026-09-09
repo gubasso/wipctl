@@ -78,8 +78,8 @@ The example mixes both forms in one list on purpose. They sit side by side, and 
 ```text
 bare id       the five lane files of this record
 
-alias#id      1. the alias resolves in the peers section to a uid
-              2. the uid resolves in the attachment registry to a slot
+alias#id      1. the alias resolves in the peers section to a plan_id
+              2. the plan_id resolves in the attachment registry to a slot
               3. the id resolves in that slot's five lane files, read at
                  the tree of its current commit
 ```

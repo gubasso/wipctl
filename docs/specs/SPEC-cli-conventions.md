@@ -58,7 +58,7 @@ wipctl start
 wipctl delete <id> [--dry-run]
 wipctl rename <id> "<new title>" [--id <new-id>]
 wipctl rename <id> --id <new-id>
-wipctl fix [--slots]
+wipctl fix [--slots | --registry [<name>]]
 wipctl sync [--all] [--json]
 wipctl resolve <id> --keep <here|remote>
 wipctl validate
@@ -87,7 +87,7 @@ wipctl version
 
 Ten verbs write the record: `new`, `land`, `move`, `start`, `delete`, `rename`, `fix`, `sync`, `resolve`, and `peer`. Closing is not a verb of its own. It is `move --to closed` with an outcome.
 
-`attach` takes exactly one of four forms: a plan location, `--create`, `--mint-uid`, or `--peers`. `peer` and `peers` are a writer and a reader one letter apart, as `epic` and `epics` already are. The operation of `peer` is its first positional argument, so the verb stays one dispatchable unit and the surface gains no subcommands.
+`attach` takes exactly one of four forms: a plan location, `--create`, `--mint-uid`, or `--peers`. The identity-minting form commits `plan_id` and `project_id` to the plan trunk, then prints the project file line. It does not write the host. The `peer` operation is its first positional argument, so the surface gains no subcommands.
 
 ## Requirements
 

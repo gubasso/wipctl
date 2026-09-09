@@ -21,7 +21,7 @@
 
 ## Purpose
 
-The table a plan keeps of the other plans it names. A peer is another project's plan repository, named here by a local alias and identified by the uid that plan declares. The boundary runs at the table. This domain owns the section, its keys, and its shape. The configuration domain owns the file the section sits in. The peer attachment domain owns the verb that writes a row and the walk that fills a peer's slot. The validation domain owns the checks that read the table.
+The table a plan keeps of the other plans it names. A local alias names each peer, and the peer's declared plan identity identifies it. This domain owns the section, keys, and shape.
 
 ## The section
 
@@ -29,11 +29,11 @@ The `peers` section sits in `.wipctl/plan.toml` at the plan zone root. There is 
 
 ```toml
 [peers.payments]
-uid = "9f2c41a08b7d4e63a15c8f02d7e4b619"
+plan_id = "9f2c41a08b7d4e63a15c8f02d7e4b619"
 urls = ["https://git.example.org/acme/payments-plan.git"]
 
 [peers.platform]
-uid = "4c81d0e7f39a4b25861d7c04e9a2f358"
+plan_id = "4c81d0e7f39a4b25861d7c04e9a2f358"
 urls = [
   "https://git.example.org/acme/platform-plan.git",
   "https://git.example.net/mirrors/platform-plan.git",
@@ -44,7 +44,7 @@ urls = [
 <alias>    the table key. The slug grammar, [a-z0-9]+(-[a-z0-9]+)*. Local
            to this plan and meaningful nowhere else.
 
-uid        REQUIRED. The peer's plan_uid, 32 lowercase hexadecimal
+plan_id    REQUIRED. The peer's plan identity, 32 lowercase hexadecimal
            characters. This is the identity, and everything else is a hint.
 
 urls       REQUIRED. A non-empty array of locations where the peer's plan
@@ -53,7 +53,7 @@ urls       REQUIRED. A non-empty array of locations where the peer's plan
 
 Two schemes are accepted for a peer url, `https` and `ssh`, and each MUST be written out. A bare account name in the userinfo is allowed, because it names an account. A colon there is where a password goes, so a url carrying one is refused rather than redacted. The percent sign is refused there too, because `%3A` carries the same colon past a check that reads the url as written. A committed file is read by everyone who clones this plan, so a credential in it is a leak whatever the tool prints.
 
-A peer has three names, and they are three separate facts. The alias is chosen here. The uid is declared by the peer, and it never changes. The url is a locator that changes when the plan moves host, and changing it changes nothing else.
+A peer has three names. This plan chooses the alias. The peer declares its plan identity. The url is a replaceable locator.
 
 This table is the only place an alias resolves. A dependency written as `<alias>#<id>` reads the alias here, in the record the dependency was written in, and never in any other plan's table. The shape is the `peers` half of `plan.schema.json`, in the configuration spec's companion directory.
 
@@ -75,7 +75,7 @@ The split follows the two jobs. Attaching is an operator saying which plans they
 
 ## What the table is not
 
-- The table is not a registry. Nothing allocates an alias, nothing approves a uid, and no service is consulted. Two plans that name one peer write two independent rows.
+- The table is not a registry. Nothing allocates an alias or approves an identity. Two plans that name one peer write independent rows.
 - The table is not authoritative about the peer. The peer's own `.wipctl/plan.toml` is, and the walk refuses a clone that disagrees with the row.
 - The table is not a cache. Reading a peer is a read of that peer's slot, and no peer state is stored here.
 
@@ -124,35 +124,35 @@ Verify: `cargo nextest run --test verb_contracts`
 
 ### `peers:a-row-carries-a-uid-and-a-location` — A row carries a uid and a location
 
-Every peer row MUST carry a `uid` of 32 lowercase hexadecimal characters and a non-empty `urls` array, and MUST carry no other key.
+Every peer row MUST carry `plan_id` and non-empty `urls`, use the canonical identity when written, and resolve a superseded identity when read.
 
-#### Scenario: A row is written with a location and no uid
+#### Scenario: A row is written with a location and no plan identity
 
 - GIVEN a row naming a location and no identity
 - WHEN the record is checked
-- THEN it fails, because a peer is identified by the uid its own plan declares and a location is a hint beside it
+- THEN it fails because the location is a hint beside the identity that the peer declares
 
 Verify: `cargo nextest run --test schemas`
 
 ### `peers:an-alias-is-local-and-unique` — An alias is local and unique
 
-Every alias MUST parse under the slug grammar, MUST be unique within the section, and MUST NOT equal this plan's own `project_id`.
+Every alias MUST parse under the slug grammar and MUST be unique within the section.
 
-#### Scenario: A plan gives a peer the name it calls itself
+#### Scenario: Two rows use one alias
 
-- GIVEN a row keyed by this plan's own project id
-- WHEN a prefixed dependency uses that alias
-- THEN the string has two candidate meanings, so the alias is refused and the ambiguity is closed
+- GIVEN two rows keyed by `payments`
+- WHEN the section is read
+- THEN the duplicate is refused because an alias resolves to one row in this plan
 
 Verify: `cargo nextest run --test validation`
 
 ### `peers:one-row-names-one-other-plan` — One row names one other plan
 
-Each uid MUST appear in at most one row, and a row's uid MUST NOT equal this plan's own `plan_uid`.
+Each `plan_id` MUST appear in at most one row, and a row's value MUST differ from this plan's own `plan_id`.
 
 #### Scenario: A row is added under the alias `mirror`
 
-- GIVEN a row whose uid is this plan's own
+- GIVEN a row whose plan identity is this plan's own
 - WHEN the record is checked
 - THEN it fails, because the alias rule stops one spelling of a self-reference and this rule stops every other
 
@@ -199,10 +199,10 @@ Verify: `cargo nextest run --test validation`
 Each failure names its resolution. The validation domain owns the check catalog, and this page owns the message text for the table's own shape.
 
 ```text
-a peer row with no uid                                                    exit 1
-  wipctl: peer 'payments' declares no uid
-  wipctl: a peer is identified by its plan_uid, not by its url; read the
-          uid from that plan's plan file and add it to the peers
+a peer row with no plan_id                                                exit 1
+  wipctl: peer 'payments' declares no plan_id
+  wipctl: a peer is identified by its plan_id, not by its url; read the
+          identity from that plan's plan file and add it to the peers
           section
 
 a peer row with an empty url list                                         exit 1
@@ -212,7 +212,7 @@ a peer row with an empty url list                                         exit 1
 
 a row naming this plan                                                    exit 1
   wipctl: peer 'mirror' names this plan
-  wipctl:   uid 9f2c41a08b7d4e63a15c8f02d7e4b619 is this plan's own
+  wipctl:   plan_id 9f2c41a08b7d4e63a15c8f02d7e4b619 is this plan's own
   wipctl: a peer is another plan; a dependency inside this record is a
           bare needs id, so remove the row
 
@@ -229,9 +229,9 @@ a url with an unaccepted scheme                                           exit 1
   wipctl: a peer url carries one of the schemes the specification accepts;
           correct the row, and the url is not attempted meanwhile
 
-two rows claiming one uid                                                 exit 1
+two rows claiming one plan_id                                             exit 1
   wipctl: peers 'payments' and 'billing' name one plan
-  wipctl:   uid 9f2c41a08b7d4e63a15c8f02d7e4b619
+  wipctl:   plan_id 9f2c41a08b7d4e63a15c8f02d7e4b619
   wipctl: one plan gets one alias; drop the row you do not use
 
 the view runs against a plan with no table                                exit 0

@@ -2,7 +2,7 @@
 
 How a story references what your project already has. Nothing here requires reorganising anything. [explanation/host-integration.md](../explanation/host-integration.md) holds the doctrine behind the steps.
 
-1. Confirm the root. `.wipctl/project.toml` sits at the project root, and its `project_id` agrees with the plan repository it resolves to. A disagreement fails validation naming both sides.
+1. Confirm the root. `.wipctl/project.toml` sits at the project root, and its `project_id` agrees with the plan configuration found by identity. A disagreement fails validation naming both sides.
 2. Choose documents from what exists. A project keeping structured reference pages points stories at those. A project keeping a flat notes tree points stories at the notes. Both are correct. The method validates that a named path resolves, and nothing more.
 3. Write `Reads`. State the claim, not the coordinates:
    - Link to a stable heading anchor, never to a line number.

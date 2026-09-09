@@ -22,6 +22,8 @@ Chosen option: the minted slug with an attachment registry. `project_id` is the 
 
 ## Status
 
-Accepted
+Superseded
 
 Supersedes ADR-the-plan-directory-is-discovered.
+
+Superseded by [ADR-an-identity-is-a-minted-uid-and-a-name-is-derived.md](./ADR-an-identity-is-a-minted-uid-and-a-name-is-derived.md) — identities are minted uids, names are local or derived, and no identity names a path.

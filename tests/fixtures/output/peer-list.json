@@ -1,7 +1,7 @@
 [
   {
     "alias": "payments",
-    "uid": "9f2c41a08b7d4e63a15c8f02d7e4b619",
+    "plan_id": "9f2c41a08b7d4e63a15c8f02d7e4b619",
     "urls": ["https://git.example.org/acme/payments-plan.git"],
     "attached": true,
     "slot": "/data/wipctl/projects/payments-acme/plan-repo",
@@ -24,7 +24,7 @@
   },
   {
     "alias": "platform",
-    "uid": "4c81d0e7f39a4b25861d7c04e9a2f358",
+    "plan_id": "4c81d0e7f39a4b25861d7c04e9a2f358",
     "urls": ["https://git.example.net/mirrors/platform-plan.git"],
     "attached": false,
     "stale": true,

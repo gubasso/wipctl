@@ -1,10 +1,10 @@
 # Plans and peers
 
-One plan is one project's record. A story here can depend on a story in another project's plan, and the two records stay separate. This chapter says what a peer is, why a plan carries two names, and why the checker refuses rather than fetches.
+One plan is one project's record. A story here can depend on a story in another project's plan, and the two records stay separate. This chapter explains the two identities, the local names, and the checker's refusal to fetch.
 
 ## What a peer is
 
-A peer is another project's plan repository, named by this plan and attached on this machine. Naming it is a committed fact in the plan configuration's `peers` section. Attaching it is a local fact: a slot under the data directory holds a clone.
+A peer is another project's plan repository, named by this plan and attached on this machine. Naming it is a committed fact in the plan configuration's `peers` section. Attaching it is a local fact: a locally named slot under the data directory holds a clone.
 
 Once attached, a peer is a plan. It is validated in full, its tombstones are read, its lanes are read, and any verb that resolves a record can be pointed at it. There is one idea of a plan in this method, and a peer is an instance of it. Connected plans are one plan with several roots.
 
@@ -20,13 +20,15 @@ An entry depends on a peer's entry through the field it already has.
 
 Both ids mean one thing: closed before this entry is eligible. The first is looked up in this record. The second is looked up in the peer's. Eligibility, the graph, and the acyclicity proof treat them identically, because they are the same edge. [../specs/SPEC-lane-file.md](../specs/SPEC-lane-file.md) states the field and its two forms.
 
-## Why a plan carries two names
+## Why a plan carries two identities
 
-`project_id` answers which plan on this machine. `plan_uid` answers which plan anywhere.
+`project_id` answers which project this working tree belongs to. `plan_id` answers which plan record this is.
 
-The first is a slug, minted against this machine's registry, and it is a path segment under the data directory. The second is 128 bits of randomness, minted once when the plan is created, and it is a value another repository commits.
+Each identity is 128 bits of randomness, minted once and written as 32 lowercase hexadecimal characters. Each is committed by the repository that owns the fact.
 
-A machine-local slug cannot be the second one. Two operators mint the same slug without ever meeting, because uniqueness is decided against one machine's registry and not globally. Two names for one thing is a real cost. It is paid because a reference outward has to survive a rename, a rehost, and a move between forges, and no server allocates it.
+Two identities keep settlement local. A changed plan identity edits the plan repository, while the host keeps its project identity unchanged.
+
+The opaque values cost readability. The slot name restores a readable path, and the derived project slug supplies messages. An identity appears only where identity is the subject.
 
 [../specs/SPEC-configuration.md](../specs/SPEC-configuration.md) holds both, and [../specs/SPEC-attachment.md](../specs/SPEC-attachment.md) says where each one enters an invocation.
 
@@ -36,11 +38,11 @@ A peer row binds three names, and they are three separate facts.
 
 ```text
 payments                                     alias      chosen by THIS plan
-9f2c41a08b7d4e63a15c8f02d7e4b619             uid        declared by THAT plan
+9f2c41a08b7d4e63a15c8f02d7e4b619             plan id    declared by THAT plan
 https://git.example.org/acme/payments.git    url        a hint; replaceable
 ```
 
-Two plans can both call a peer `payments` and mean different things, and nothing has to agree for that to be safe. The alias resolves in the file it was written beside, and nowhere else. The uid is the identity, and it never changes. The url is a locator, and changing it changes nothing else.
+Two plans can both call a peer `payments` and mean different things. The alias resolves only in its file. The plan id is immutable, while the url remains replaceable.
 
 The well-known systems that solve this problem separate the same three names. Bazel shipped without the alias layer, hit name clashes in diamond dependencies, and retrofitted repository mapping. Nix binds a local input name to a flake reference. Go declares the module path in the module itself. Each is a citation for further reading, and this page is complete without following any of them.
 

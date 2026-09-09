@@ -69,7 +69,7 @@ Verify: `cargo nextest run --test validation`
 
 ### `validation:the-read-set-is-attached-or-the-run-fails` — The read set is attached, or the run fails
 
-Where a peer in the read set has no slot, or its slot declares another uid, validation MUST fail, naming the alias.
+Where a peer in the read set has no slot, or its slot declares another `plan_id`, validation MUST fail, naming the alias.
 
 #### Scenario: A machine has attached less than the closure
 
@@ -286,6 +286,13 @@ a declared row nothing references                                         exit 0
   wipctl: stale: no entry needs anything from peer 'platform'
   wipctl: drop the row with 'wipctl peer remove platform', or leave it
           for the work that will use it
+
+a peer row naming a settled identity                                      exit 0
+  wipctl: peer 'payments' names an identity that plan superseded
+  wipctl:   the row says   aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  wipctl:   the plan says  22222222222222222222222222222222
+  wipctl: the row still resolves; update it when you next edit this
+          table, and nothing breaks if you do not
 ```
 
 Three answers replace one guess. The third names the revision, because at that point the slot being behind is the likeliest explanation left.

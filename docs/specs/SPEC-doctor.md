@@ -1,5 +1,22 @@
 # Doctor Specification
 
+<!--TOC-->
+
+- [Purpose](#purpose)
+- [The dependency manifest](#the-dependency-manifest)
+- [Requirements](#requirements)
+  - [`doctor:a-manifest-item-is-one-line` — A manifest item is one line](#doctora-manifest-item-is-one-line--a-manifest-item-is-one-line)
+  - [`doctor:a-missing-item-names-its-remediation` — A missing item names its remediation](#doctora-missing-item-names-its-remediation--a-missing-item-names-its-remediation)
+  - [`doctor:only-a-required-absence-fails` — Only a required absence fails](#doctoronly-a-required-absence-fails--only-a-required-absence-fails)
+  - [`doctor:a-probe-covers-three-classes` — A probe covers three classes](#doctora-probe-covers-three-classes--a-probe-covers-three-classes)
+  - [`doctor:a-probe-only-reports` — A probe only reports](#doctora-probe-only-reports--a-probe-only-reports)
+  - [`doctor:the-report-covers-the-plan-machinery` — The report covers the plan machinery](#doctorthe-report-covers-the-plan-machinery--the-report-covers-the-plan-machinery)
+  - [`doctor:a-new-optional-tool-lands-whole` — A new optional tool lands whole](#doctora-new-optional-tool-lands-whole--a-new-optional-tool-lands-whole)
+  - [`doctor:a-drifted-slot-is-healthy` — A drifted slot is healthy](#doctora-drifted-slot-is-healthy--a-drifted-slot-is-healthy)
+- [Slot diagnostics](#slot-diagnostics)
+
+<!--TOC-->
+
 ## Purpose
 
 The environment report: what the build needs, what it can use, what will degrade, and whether this project's plan machinery is sound. The boundary runs at aggregation: this domain owns the report and the dependency manifest, while the command surface domain owns what an optional dependency owes at any other verb's entry.
@@ -97,3 +114,26 @@ When the implementation adds an optional dependency, it MUST add the manifest ro
 - THEN its absence degrades something nobody declared, so the three land together
 
 Verify: `cargo nextest run --test verb_contracts`
+
+### `doctor:a-drifted-slot-is-healthy` — A drifted slot is healthy
+
+Where a slot name differs from its derived project slug, the report MUST name both values and exit zero.
+
+#### Scenario: A project is renamed
+
+- GIVEN a `payments` slot whose project slug now derives as `payments-ben`
+- WHEN the health report runs
+- THEN it says that the record is intact and the slot keeps its minted name
+
+Verify: `cargo nextest run --test verb_contracts`
+
+## Slot diagnostics
+
+```text
+a slot name that no longer matches its project                    exit 0
+  wipctl: slot 'payments' holds a project whose name derives as
+          'payments-ben'
+  wipctl: the slot keeps the name it was given, and nothing is wrong
+          with the record; run 'wipctl fix --registry' when you want the
+          tree to read the new name
+```

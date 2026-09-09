@@ -26,22 +26,22 @@ What the scaffold lands and the contract each landed file carries. The scaffold 
 
 ## Payload inventory
 
-| Payload member      | Lands at                      | Notes                                                                                                                                                 |
-| ------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| host project file   | `<root>/.wipctl/project.toml` | generated, not copied: the minted `project_id` and nothing else. The scaffold creates the directory and the file together                             |
-| plan config         | `<zone>/.wipctl/plan.toml`    | generated: the minted id restated, the minted `plan_uid`, the given or today's start date under `[window]`, `length_days = 14` as the one baked value |
-| zone `README.md`    | `<zone>/README.md`            | orientation: where to start, what bounds it, what stops it, what already happened                                                                     |
-| `AGENTS.md`         | `<zone>/AGENTS.md`            | the travelling method; gate placeholders substituted at emission                                                                                      |
-| `charter.md`        | `<zone>/charter.md`           | angle-bracketed placeholders for a person to fill                                                                                                     |
-| `open-questions.md` | `<zone>/open-questions.md`    | heading plus the `Blocks:` grammar; ships without a sample question                                                                                   |
-| lane files          | `<zone>/lanes/*.yml`          | each exactly `lane: <name>` plus `stories: []`                                                                                                        |
-| stories directory   | `<zone>/stories/`             | created empty                                                                                                                                         |
-| hook set            | the plan repository           | the record gate at both stages, the schema checks, the three heading-shape checks, the single-branch guard, the no-force guard                        |
-| templates           | not copied                    | shipped location printed for a person to copy                                                                                                         |
+| Payload member      | Lands at                      | Notes                                                                                                                          |
+| ------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| host project file   | `<root>/.wipctl/project.toml` | generated, not copied: the minted `project_id` and nothing else. The scaffold creates the directory and the file together      |
+| plan configuration  | `<zone>/.wipctl/plan.toml`    | generated: both minted identities, the given or today's start date under `[window]`, and the one baked window length           |
+| zone `README.md`    | `<zone>/README.md`            | orientation: where to start, what bounds it, what stops it, what already happened                                              |
+| `AGENTS.md`         | `<zone>/AGENTS.md`            | the travelling method; gate placeholders substituted at emission                                                               |
+| `charter.md`        | `<zone>/charter.md`           | angle-bracketed placeholders for a person to fill                                                                              |
+| `open-questions.md` | `<zone>/open-questions.md`    | heading plus the `Blocks:` grammar; ships without a sample question                                                            |
+| lane files          | `<zone>/lanes/*.yml`          | each exactly `lane: <name>` plus `stories: []`                                                                                 |
+| stories directory   | `<zone>/stories/`             | created empty                                                                                                                  |
+| hook set            | the plan repository           | the record gate at both stages, the schema checks, the three heading-shape checks, the single-branch guard, the no-force guard |
+| templates           | not copied                    | shipped location printed for a person to copy                                                                                  |
 
 The zone is the plan repository's working tree, which the scaffold creates whole: the repository, the trunk, the hook set, and the initial commit.
 
-The scaffold mints both identities and reports both. `project_id` is minted against this machine's registry, and `plan_uid` is minted from the machine's random source. The uid is reported because another plan repository writes it down. An operator who cannot read it in the report reads it out of a file instead.
+The scaffold mints and reports `project_id` and `plan_id`. Each is 128 random bits written as 32 lowercase hexadecimal characters. The slot name keeps paths readable, and messages use the derived project slug.
 
 ## Requirements
 
