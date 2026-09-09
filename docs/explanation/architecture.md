@@ -16,7 +16,7 @@ One executable entry point resolves the invocation: global flags, verb selection
 
 One implementation of the two-step resolution, used by every verb that touches a record. It covers the upward walk to the project file and the attachment registry lookup. It also covers the identity agreement and the split between a usage error and a failed check. The scaffold bypasses it by design.
 
-It owns the third path too. Where an invocation names a peer, the component resolves this plan first and reads its peer table. It then finds the slot whose configuration declares the uid that alias binds. A slot holds one plan, whether it arrived as this machine's project or as a peer, so nothing downstream distinguishes the two.
+It owns the third path too. Where an invocation names a peer, the component resolves this plan first and reads its peer table. It then finds the slot whose configuration declares the `plan_id` that alias binds. A slot holds one plan, whether it arrived from this project or as a peer, so nothing downstream distinguishes the two.
 
 ## The record library
 

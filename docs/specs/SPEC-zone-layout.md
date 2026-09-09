@@ -31,16 +31,16 @@ host repo:
   .wipctl/project.toml          identity only; committed; travels with every clone
 
 $XDG_DATA_HOME/wipctl/
-  projects/<project_id>/plan-repo/   the plan zone, its own repository, trunk only
+  projects/<slot name>/plan-repo/   the plan zone, its own repository, trunk only
 
 $XDG_STATE_HOME/wipctl/
-  projects/<project_id>/             replication bookkeeping, diagnostics
+  projects/<slot name>/             replication bookkeeping, diagnostics
 
 $XDG_CACHE_HOME/wipctl/
-  projects/<project_id>/             derived views; disposable; no verb reads it back
+  projects/<slot name>/             derived views; disposable; no verb reads it back
 
 $XDG_RUNTIME_DIR/wipctl/
-  <project_id>.lock                  writer lock; transaction-scoped; never in the record
+  <slot name>.lock                  writer lock; transaction-scoped; never in the record
 
 fallback, where XDG_RUNTIME_DIR is unset or empty:
   /tmp/wipctl-<uid>/                 created mode 0700

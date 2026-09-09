@@ -25,7 +25,7 @@ What makes an entry eligible, and what a legal lane order is. Eligibility is der
 The graph is built over pairs, and the pair is what makes the proof sound.
 
 ```text
-a node       (plan_uid, entry_id). The uid, not the alias, because an
+a node       (plan_id, entry_id). The plan id, not the alias, because an
              alias is local to the plan that declares it and two plans
              can spell one peer two ways.
 
@@ -38,13 +38,12 @@ Rendering is the other half, and it is relative to the plan the invocation resol
 ```text
 the invoking plan's own entry     the bare id
 a peer this plan declares         <alias>#<id>, using THIS plan's alias
-a plan no row of this plan names  <uid>:<id>, with that plan's project_id
-                                  on the following line
+a plan no row of this plan names  <plan_id>:<id>
 ```
 
 The third case is real whenever a cycle runs through a plan two hops away. Reprinting the middle plan's own alias prints a name that resolves in no table the reader has.
 
-The third form uses a separator no dependency accepts, so it cannot be read back as a local one. A project id is a slug, and an alias is a slug, so `<project_id>#<id>` parses as a prefixed dependency. Where this plan's table happens to bind that same slug to a different peer, that form names the wrong plan while looking correct. The uid resolves everywhere and belongs to no table, so it leads.
+The third form uses a separator no dependency accepts, so it cannot be read as a local dependency. The plan identity resolves everywhere and belongs to no alias table.
 
 This is also why a cycle report is stable when the same cycle is found from either side. The nodes are the same pairs, and only the rendering changes.
 

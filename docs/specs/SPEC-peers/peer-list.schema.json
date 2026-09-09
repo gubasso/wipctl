@@ -8,17 +8,17 @@
     "peer": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["alias", "uid", "urls", "attached", "stale", "references"],
+      "required": ["alias", "plan_id", "urls", "attached", "stale", "references"],
       "properties": {
         "alias": {
           "type": "string",
           "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
           "description": "The row's key: the local name this plan gives the peer."
         },
-        "uid": {
+        "plan_id": {
           "type": "string",
           "pattern": "^[0-9a-f]{32}$",
-          "description": "The peer's plan_uid, as the row states it."
+          "description": "The peer's plan_id, as the row states it."
         },
         "urls": {
           "type": "array",
@@ -28,7 +28,7 @@
         },
         "attached": {
           "type": "boolean",
-          "description": "Whether a slot on this machine holds the plan this uid names."
+          "description": "Whether a slot on this machine holds the plan this plan_id names."
         },
         "slot": {
           "type": "string",

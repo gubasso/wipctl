@@ -3,19 +3,15 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The postfix escalation](#the-postfix-escalation)
 - [Where each identity enters resolution](#where-each-identity-enters-resolution)
 - [Requirements](#requirements)
   - [`attachment:resolution-is-two-steps` — Resolution is two steps](#attachmentresolution-is-two-steps--resolution-is-two-steps)
   - [`attachment:a-plan-uid-is-minted-only-at-creation` — A global identity is minted only at creation](#attachmenta-plan-uid-is-minted-only-at-creation--a-global-identity-is-minted-only-at-creation)
   - [`attachment:one-plan-occupies-one-slot` — One plan occupies one slot](#attachmentone-plan-occupies-one-slot--one-plan-occupies-one-slot)
+  - [`attachment:duplicate-project-identities-are-ambiguous` — Duplicate project identities are ambiguous](#attachmentduplicate-project-identities-are-ambiguous--duplicate-project-identities-are-ambiguous)
   - [`attachment:git-is-the-only-version-control` — Git is the only version control](#attachmentgit-is-the-only-version-control--git-is-the-only-version-control)
   - [`attachment:the-registry-is-the-filesystem` — The registry is the filesystem](#attachmentthe-registry-is-the-filesystem--the-registry-is-the-filesystem)
   - [`attachment:the-scaffold-does-not-walk-upward` — The scaffold does not walk upward](#attachmentthe-scaffold-does-not-walk-upward--the-scaffold-does-not-walk-upward)
-  - [`attachment:an-id-is-minted-by-postfix-escalation` — An id is minted by postfix escalation](#attachmentan-id-is-minted-by-postfix-escalation--an-id-is-minted-by-postfix-escalation)
-  - [`attachment:an-empty-or-repeated-segment-is-skipped` — An empty or repeated segment is skipped](#attachmentan-empty-or-repeated-segment-is-skipped--an-empty-or-repeated-segment-is-skipped)
-  - [`attachment:a-minted-id-is-stable` — A minted id is stable](#attachmenta-minted-id-is-stable--a-minted-id-is-stable)
-  - [`attachment:an-id-is-one-opaque-token` — An id is one opaque token](#attachmentan-id-is-one-opaque-token--an-id-is-one-opaque-token)
   - [`attachment:the-scaffold-is-create-only` — The scaffold is create-only](#attachmentthe-scaffold-is-create-only--the-scaffold-is-create-only)
   - [`attachment:refusals-are-collected-before-exit` — Refusals are collected before exit](#attachmentrefusals-are-collected-before-exit--refusals-are-collected-before-exit)
   - [`attachment:the-scaffold-self-checks-its-emission` — The scaffold self-checks its emission](#attachmentthe-scaffold-self-checks-its-emission--the-scaffold-self-checks-its-emission)
@@ -31,41 +27,19 @@
 
 How an invocation finds the plan repository it acts on, and how that repository comes to exist on a machine. Resolution replaces discovery: no verb takes a zone argument, because there is no zone on the invocation's path to point at. The boundary runs at the identity. This domain mints it and resolves through it. The configuration domain says what the two files holding it contain.
 
-## The postfix escalation
-
-An id is derived from the project's name and made unique against this machine's registry by appending postfixes, one at a time, in this order:
-
-```text
-1. <slug>                    the project name alone
-2. + <parent-scope>          the forge namespace: the user or organisation, or the
-                             group and subgroups, slugged
-3. + <username>              the operator's forge account name
-4. + <forge>                 the forge's own name
-5. + NN                      01, 02, ... — last resort only
-```
-
-```text
-scope != username (acme/payments)      scope == username (gbasso/wipctl)
-
-1. payments                            1. wipctl
-2. payments-acme                       2. wipctl-gbasso
-3. payments-acme-gbasso                3. skipped — gbasso is already there
-4. payments-acme-gbasso-github         4. wipctl-gbasso-github
-5. payments-acme-gbasso-github-01      5. wipctl-gbasso-github-01
-```
-
 ## Where each identity enters resolution
 
 ```text
-the ordinary path   walk upward to .wipctl/project.toml for project_id,
-                    then find that slug in the attachment registry
+the ordinary path   walk upward to .wipctl/project.toml, read project_id,
+                    then find the slot whose plan file declares that value
 
-where a uid is      resolve as above, then read plan_uid from
-needed              .wipctl/plan.toml inside each slot and pick the slot
-                    that matches
+where a plan id     read plan_id from the peer row, then find the slot whose
+is given            plan file declares that value
 ```
 
-`project_id` resolves and `plan_uid` travels. The uid is looked up inside a slot and never names one. There is no tree keyed by it, so a reader never goes looking for one. The configuration domain owns what each value is. This domain owns where each one enters an invocation.
+The search reads `projects/*/plan-repo/.wipctl/plan.toml`, where both identities sit at a fixed depth. Two slots claiming one project are an ambiguity and never a choice.
+
+The directory that resolution opens carries a slot name, as [the slot naming domain](./SPEC-slot-naming.md) defines. Neither identity appears in a path.
 
 A slot holds one plan, whether it arrived as this machine's own project or as a peer another plan named. Once filled, nothing distinguishes the two. The peer attachment domain owns the walk that fills a peer's slot. The plan targeting domain owns the third resolution path, where an invocation names one of this plan's peers.
 
@@ -73,7 +47,7 @@ A slot holds one plan, whether it arrived as this machine's own project or as a 
 
 ### `attachment:resolution-is-two-steps` — Resolution is two steps
 
-When a verb touches a record, the verb MUST resolve the project id by an upward walk, then find it in the attachment registry.
+When a verb touches a record, it MUST walk to the project id and find the one slot whose plan configuration declares it.
 
 #### Scenario: A verb runs outside any project
 
@@ -83,13 +57,25 @@ When a verb touches a record, the verb MUST resolve the project id by an upward 
 
 Verify: `cargo nextest run --test attachment`
 
-### `attachment:a-plan-uid-is-minted-only-at-creation` — A global identity is minted only at creation
+### `attachment:duplicate-project-identities-are-ambiguous` — Duplicate project identities are ambiguous
 
-When a verb creates a plan, it MUST mint a fresh `plan_uid`, and a verb that adopts one MUST read the uid it carries.
+Where two slots declare one `project_id`, the implementation MUST fail resolution and name both slots and both plan identities.
+
+#### Scenario: A plan repository is copied into another slot
+
+- GIVEN `payments` and `payments-old` declaring one project identity
+- WHEN a verb resolves that project
+- THEN it chooses neither and tells the operator to detach the copy
+
+Verify: `cargo nextest run --test attachment`
+
+### `attachment:a-plan-uid-is-minted-only-at-creation` — A plan identity is minted only at creation
+
+When a verb creates a plan, it MUST mint a fresh `plan_id`, and a verb that adopts one MUST read the identity it carries.
 
 #### Scenario: A record that predates the key is upgraded
 
-- GIVEN a plan repository whose configuration carries no `plan_uid`
+- GIVEN a plan repository whose configuration carries no `plan_id`
 - WHEN the operator runs the one explicit upgrade form
 - THEN a uid is minted once, committed to the plan trunk, and reported. A second run is refused, because a value other plans can carry is never replaced by a verb
 
@@ -142,54 +128,6 @@ The scaffold MUST NOT walk upward from the working directory.
 - THEN it scaffolds where it stands, because a walk scaffolds a parent project by surprise
 
 Verify: `cargo nextest run --test scaffold`
-
-### `attachment:an-id-is-minted-by-postfix-escalation` — An id is minted by postfix escalation
-
-When an id collides at mint time, the implementation MUST append postfixes in priority order until the id is unique on this machine.
-
-#### Scenario: Two projects share a repository name
-
-- GIVEN a second project also named `payments`
-- WHEN its id is minted
-- THEN the forge namespace is appended first, because uniqueness is decided against this machine and not globally
-
-Verify: `cargo nextest run --test attachment`
-
-### `attachment:an-empty-or-repeated-segment-is-skipped` — An empty or repeated segment is skipped
-
-Where an escalation step's segment is already in the id or does not exist, the implementation MUST skip that step and move to the next.
-
-#### Scenario: A personal repository whose namespace is the account name
-
-- GIVEN `gbasso/wipctl`, minted to `wipctl-gbasso`
-- WHEN the next step appends the username a second time
-- THEN the step is skipped, because a repeated segment adds no disambiguation, and a project with no forge remote falls through the same way
-
-Verify: `cargo nextest run --test attachment`
-
-### `attachment:a-minted-id-is-stable` — A minted id is stable
-
-Once minted, the id MUST NOT change when the repository, the owner, or the directory is renamed.
-
-#### Scenario: A repository is renamed at the forge
-
-- GIVEN a project whose forge name changes
-- WHEN any verb resolves afterwards
-- THEN the id is unchanged, because the derivation is a naming convenience at mint time and not a live binding. Renaming the id is its own recorded operation
-
-Verify: `cargo nextest run --test attachment`
-
-### `attachment:an-id-is-one-opaque-token` — An id is one opaque token
-
-A consumer MUST treat a project id as one opaque token and MUST NOT parse it into parts.
-
-#### Scenario: A report wants the forge name
-
-- GIVEN an id minted with a forge postfix
-- WHEN a consumer wants that part back
-- THEN it reads the forge from the remote rather than from the id, because the parts are known at mint time only
-
-Verify: reviewer confirms no code splits a project id on its separator
 
 ### `attachment:the-scaffold-is-create-only` — The scaffold is create-only
 
@@ -286,5 +224,14 @@ Each resolution failure names its own resolution.
 - The two configuration files disagree. Exit 1, naming the host value, the plan value, and the choice between re-attaching and correcting whichever file is wrong.
 - The scaffold finds an existing project file. Exit 1, reporting the id it found and naming attach for a machine that lacks the plan.
 - A clone that is not a plan repository. Exit 1, naming the create form as the way to start one.
-- A clone carrying no `plan_uid`. Exit 1, naming the upgrade form that gives a record which predates the key an identity of its own.
+- A clone carrying no `plan_id`. Exit 1, naming the upgrade form that gives a record which predates the key an identity of its own.
 - A clone whose uid is already in a slot. Exit 1, naming the slot that holds the plan and the location offered. The message says that one plan gets one slot. A copy meant to be a plan of its own needs an identity of its own, which no verb mints yet.
+
+```text
+two slots claim one project                                       exit 1
+  wipctl: two slots hold a plan declaring this project
+  wipctl:   payments      plan 9f2c41a08b7d4e63a15c8f02d7e4b619
+  wipctl:   payments-old  plan 4c81d0e7f39a4b25861d7c04e9a2f358
+  wipctl: one project has one plan; detach the copy, and keep the plan
+          whose plan_id the peers around you name
+```

@@ -39,11 +39,11 @@ The critical section is exactly four steps:
    ~/src/payments-oauth/      worktree, branch agent/oauth    ├─ all resolve
    ~/src/payments-review/     separate clone                  ┘  the same id
 
-        each carries .wipctl/project.toml:  project_id = "payments-acme"
+        each carries .wipctl/project.toml:  project_id = "a1b2...e8f90"
                              │
                              ▼
-   ~/.local/share/wipctl/projects/payments-acme/plan-repo/     the one live record
-   $XDG_RUNTIME_DIR/wipctl/payments-acme.lock                  the one writer lock
+   ~/.local/share/wipctl/projects/payments-acme/plan-repo/     slot name: payments-acme
+   $XDG_RUNTIME_DIR/wipctl/payments-acme.lock                  lock named by the slot
 ```
 
 One project, one plan, one lock, regardless of how many checkouts exist. The lock lives outside the record, so it is never committed, never cloned, and answers no question about the plan. Readers never take it. The preview, the board, the epic resolution, and validation all read the committed state and are never blocked.

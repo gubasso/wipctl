@@ -38,11 +38,11 @@ The closure is what the checker proves over. The flag selects from one table. A 
 
 ```text
 no --plan     walk upward to .wipctl/project.toml, read project_id,
-              and look it up in the attachment registry
+              and find the slot whose plan file declares it
 
 --plan <a>    resolve this project's plan as above, read its peers
-              section, resolve <a> to a uid, and find the slot whose
-              plan file declares that uid
+              section, resolve <a> to plan_id, and find the slot whose
+              plan file declares that identity
 ```
 
 The second path still starts with the first, because the table that binds the alias lives in this plan. A caller outside any project has no table to read, so the flag there is the ordinary no-configuration usage error.

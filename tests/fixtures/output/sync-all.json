@@ -2,24 +2,24 @@
   "schema_version": 1,
   "plans": [
     {
-      "project_id": "profile-acme",
-      "uid": "b7d0e94a15c8f0236a41e78c3d5b0f62",
+      "slot_name": "profile-acme",
+      "plan_id": "b7d0e94a15c8f0236a41e78c3d5b0f62",
       "outcome": "reconciled",
       "fetched": 2,
       "reconciled": 1,
       "pushed": true
     },
     {
-      "project_id": "payments-acme",
-      "uid": "9f2c41a08b7d4e63a15c8f02d7e4b619",
+      "slot_name": "payments-acme",
+      "plan_id": "9f2c41a08b7d4e63a15c8f02d7e4b619",
       "outcome": "up-to-date",
       "fetched": 0,
       "reconciled": 0,
       "pushed": false
     },
     {
-      "project_id": "platform-acme",
-      "uid": "4c81d0e7f39a4b25861d7c04e9a2f358",
+      "slot_name": "platform-acme",
+      "plan_id": "4c81d0e7f39a4b25861d7c04e9a2f358",
       "outcome": "locked",
       "fetched": 0,
       "reconciled": 0,

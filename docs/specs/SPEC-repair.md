@@ -3,7 +3,12 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
+- [The slot repair](#the-slot-repair)
 - [Requirements](#requirements)
+  - [`repair:a-slot-repair-moves-local-state-in-order` — A slot repair moves local state in order](#repaira-slot-repair-moves-local-state-in-order--a-slot-repair-moves-local-state-in-order)
+  - [`repair:a-slot-repair-locks-both-names` — A slot repair locks both names](#repaira-slot-repair-locks-both-names--a-slot-repair-locks-both-names)
+  - [`repair:an-explicit-slot-name-is-free` — An explicit slot name is free](#repairan-explicit-slot-name-is-free--an-explicit-slot-name-is-free)
+  - [`repair:a-slot-repair-is-machine-local` — A slot repair is machine-local](#repaira-slot-repair-is-machine-local--a-slot-repair-is-machine-local)
   - [`repair:the-repair-is-deterministic` — The repair is deterministic](#repairthe-repair-is-deterministic--the-repair-is-deterministic)
   - [`repair:the-repair-is-identity-preserving` — The repair is identity-preserving on legal input](#repairthe-repair-is-identity-preserving--the-repair-is-identity-preserving-on-legal-input)
   - [`repair:the-repair-is-idempotent` — The repair is idempotent](#repairthe-repair-is-idempotent--the-repair-is-idempotent)
@@ -25,7 +30,81 @@
 
 What every writer owes the bytes it touches, and what the rank repair guarantees on top of that. The boundary runs at the act. This domain covers the mechanics of writing. The transactions domain covers the lock and the commit that wrap it, and each verb's own domain covers what it writes.
 
+## The slot repair
+
+```text
+wipctl fix --registry [<name>]
+```
+
+Without a name, the repair derives the project slug and escalates it until free. With a name, it uses that name and refuses an occupied destination.
+
+The repair takes the locks for the current and new slot names in lexical order. It then moves three filesystem parts in order:
+
+```text
+1. move the slot
+2. move the state directory
+3. remove the old cache directory
+```
+
+Each boundary is resumable. A later run finds the moved slot, then completes any state move and cache removal left under the old name.
+
+The repair writes no project file because a peer slot has no host repository. It commits and replicates nothing. It accepts the project underfoot and refuses the plan targeting flag.
+
+```text
+wipctl: slot renamed: payments -> payments-ben
+wipctl: state moved:  <state dir>/projects/payments-ben
+wipctl: cache removed: <cache dir>/projects/payments
+```
+
 ## Requirements
+
+### `repair:a-slot-repair-moves-local-state-in-order` — A slot repair moves local state in order
+
+When a slot repair runs, the implementation MUST move the slot, move its state, and remove its old cache in order across resumable boundaries.
+
+#### Scenario: A run stops after moving the slot
+
+- GIVEN a slot under its new name and state under its old name
+- WHEN the operator runs the same repair again
+- THEN the repair moves the state and removes the old cache without merging either directory
+
+Verify: `cargo nextest run --test writer_guarantees`
+
+### `repair:a-slot-repair-locks-both-names` — A slot repair locks both names
+
+When a slot repair runs, the implementation MUST take both slot-name locks in lexical order and hold them through the filesystem changes.
+
+#### Scenario: Two repairs exchange names
+
+- GIVEN two concurrent repairs whose current and requested names cross
+- WHEN both take their locks
+- THEN lexical order prevents each repair from holding the lock that the other needs
+
+Verify: `cargo nextest run --test writer_guarantees`
+
+### `repair:an-explicit-slot-name-is-free` — An explicit slot name is free
+
+Where an operator supplies a slot name, the implementation MUST use it when free and refuse it when its destination exists.
+
+#### Scenario: The requested name is occupied
+
+- GIVEN a repair naming a slot that another plan already occupies
+- WHEN the repair checks the destination
+- THEN it refuses that one condition and leaves both slots unchanged
+
+Verify: `cargo nextest run --test verb_contracts`
+
+### `repair:a-slot-repair-is-machine-local` — A slot repair is machine-local
+
+When a slot repair runs, the implementation MUST change only this machine's registry, state, cache, and name locks.
+
+#### Scenario: A plan is attached only as a peer
+
+- GIVEN a slot whose plan has no host repository on this machine
+- WHEN its local repair runs from the project underfoot
+- THEN no committed file changes and no remote receives a write
+
+Verify: `cargo nextest run --test writer_guarantees`
 
 ### `repair:the-repair-is-deterministic` — The repair is deterministic
 
@@ -125,7 +204,7 @@ Verify: `cargo nextest run --test writer_guarantees`
 
 ### `repair:a-multi-item-operation-is-all-or-nothing` — A multi-item operation is all or nothing
 
-Where an operation covers many items, the implementation MUST complete all of them or none.
+Where one repository operation covers many record items, the implementation MUST complete all of them or none.
 
 #### Scenario: One fragment of a drain is incomplete
 

@@ -8,10 +8,12 @@
 - [Requirements](#requirements)
   - [`peer-attachment:the-command-surface-owns-the-table` — The command surface owns the table](#peer-attachmentthe-command-surface-owns-the-table--the-command-surface-owns-the-table)
   - [`peer-attachment:a-clone-is-verified-before-it-fills-a-slot` — A clone is verified before it fills a slot](#peer-attachmenta-clone-is-verified-before-it-fills-a-slot--a-clone-is-verified-before-it-fills-a-slot)
+  - [`peer-attachment:a-fresh-plan-id-is-provisional` — A fresh plan id is provisional](#peer-attachmenta-fresh-plan-id-is-provisional--a-fresh-plan-id-is-provisional)
+  - [`peer-attachment:a-row-identity-comes-from-the-clone` — A row identity comes from the clone](#peer-attachmenta-row-identity-comes-from-the-clone--a-row-identity-comes-from-the-clone)
   - [`peer-attachment:the-network-read-is-outside-the-lock` — The network read is outside the lock](#peer-attachmentthe-network-read-is-outside-the-lock--the-network-read-is-outside-the-lock)
   - [`peer-attachment:the-walk-fills-the-declared-set` — The walk fills the declared set](#peer-attachmentthe-walk-fills-the-declared-set--the-walk-fills-the-declared-set)
   - [`peer-attachment:the-walk-remembers-where-it-has-been` — The walk remembers where it went](#peer-attachmentthe-walk-remembers-where-it-has-been--the-walk-remembers-where-it-went)
-  - [`peer-attachment:a-peer-occupies-the-slot-its-own-id-names` — A peer occupies the slot its own id names](#peer-attachmenta-peer-occupies-the-slot-its-own-id-names--a-peer-occupies-the-slot-its-own-id-names)
+  - [`peer-attachment:a-peer-mints-a-local-slot-name` — A peer mints a local slot name](#peer-attachmenta-peer-mints-a-local-slot-name--a-peer-mints-a-local-slot-name)
   - [`peer-attachment:a-reference-follows-its-alias` — A reference follows its alias](#peer-attachmenta-reference-follows-its-alias--a-reference-follows-its-alias)
   - [`peer-attachment:a-row-in-use-is-not-removed` — A row in use is not removed](#peer-attachmenta-row-in-use-is-not-removed--a-row-in-use-is-not-removed)
   - [`peer-attachment:the-walk-writes-into-no-peer` — The walk writes into no peer](#peer-attachmentthe-walk-writes-into-no-peer--the-walk-writes-into-no-peer)
@@ -35,9 +37,9 @@ wipctl peer remove <alias>
 The first positional argument is the operation, exactly as `wipctl new <type> "<title>"` takes a type first. So `peer` is one dispatchable unit, the verb list stays derived from the build, and the surface gains no subcommands.
 
 ```text
-add        clone the plan at the url outside the lock, read its plan_uid
+add        clone the plan at the url outside the lock, read its plan_id
            and its project_id, then write the row. The alias is the peer's
-           project_id unless --as gives one.
+           derived project slug unless --as gives one.
 
 alias      change a row's alias to a name this project's readers prefer,
            and rewrite every prefixed id that used the old one, in the
@@ -65,11 +67,11 @@ wipctl attach --peers
 
 The verb resolves this project's plan first, as every verb does, then reads its table. No table is exit 0 with one line saying the plan names no peers.
 
-For each row whose uid sits in no slot on this machine, the verb clones from the first url that answers and verifies the clone. The sequence is five steps, because every one of them is a way to get this wrong.
+For each row absent from this machine, the verb clones from the first url that answers and verifies the plan identity. The sequence has five steps because each one prevents a distinct failure.
 
 ```text
 1. clone the url into a temporary directory outside every slot
-2. read the clone's .wipctl/plan.toml and verify the uid and the project_id
+2. read the clone's .wipctl/plan.toml and verify plan_id and project_id
 3. take this plan's writer lock, and re-read the peers section under it
 4. promote the temporary directory into the slot, create-only: a slot
    that appeared meanwhile is a lost race, and the loser removes its
@@ -100,13 +102,37 @@ Verify: `cargo nextest run --test verb_contracts`
 
 ### `peer-attachment:a-clone-is-verified-before-it-fills-a-slot` — A clone is verified before it fills a slot
 
-When a clone's configuration declares a uid other than the one its row states, the implementation MUST remove the clone and fail, naming both values.
+When a row matches neither `plan_id` nor `superseded_plan_ids`, the implementation MUST remove the clone and fail, naming the values.
 
 #### Scenario: A row's location is edited to another team's plan
 
-- GIVEN a row whose url now serves a different plan
+- GIVEN a row whose url serves a plan that claims neither its value nor a superseded match
 - WHEN the walk clones it
 - THEN the clone is removed and both uids are named, because a slot filled with the wrong plan is a trap for the next verb
+
+Verify: `cargo nextest run --test attachment`
+
+### `peer-attachment:a-fresh-plan-id-is-provisional` — A fresh plan id is provisional
+
+When a plan identity is freshly minted, the implementation MUST treat it as provisional until its commit reaches the published plan trunk.
+
+#### Scenario: Another replica publishes first
+
+- GIVEN two replicas that minted different plan identities
+- WHEN one push loses the fast-forward race
+- THEN its identity remains provisional and replication reports both values for settlement
+
+Verify: `cargo nextest run --test sync`
+
+### `peer-attachment:a-row-identity-comes-from-the-clone` — A row identity comes from the clone
+
+When `peer add` writes a row, the implementation MUST use the canonical `plan_id` read from its clone as identity proof.
+
+#### Scenario: A caller knows a plan identity
+
+- GIVEN a location and an identity supplied outside the clone
+- WHEN `peer add` prepares the row
+- THEN it ignores the supplied value and records the clone's canonical identity
 
 Verify: `cargo nextest run --test attachment`
 
@@ -136,7 +162,7 @@ Verify: `cargo nextest run --test attachment`
 
 ### `peer-attachment:the-walk-remembers-where-it-has-been` — The walk remembers where it went
 
-The walk MUST keep a set of the uids it visited and MUST visit each plan once.
+The walk MUST keep a set of the plan identities it visited and MUST visit each plan once.
 
 #### Scenario: Two plans name each other
 
@@ -146,15 +172,15 @@ The walk MUST keep a set of the uids it visited and MUST visit each plan once.
 
 Verify: `cargo nextest run --test attachment`
 
-### `peer-attachment:a-peer-occupies-the-slot-its-own-id-names` — A peer occupies the slot its own id names
+### `peer-attachment:a-peer-mints-a-local-slot-name` — A peer mints a local slot name
 
-An attached peer MUST occupy the slot its own `project_id` names, and a slot already holding another plan MUST be left as it was.
+When the walk attaches a peer, the walk MUST mint a local slot name from its first url by `slot-naming:a-taken-name-escalates`.
 
-#### Scenario: Two plans minted one slug on two machines
+#### Scenario: A peer name is already taken
 
-- GIVEN a peer whose project id matches a slot holding a different uid
+- GIVEN a peer whose first url gives the name of an occupied slot
 - WHEN the walk reaches it
-- THEN the refusal names both uids and the slot. One side needs a different project id, which the attachment domain names as a recorded operation and no verb performs yet
+- THEN the walk escalates to a free name by the same ladder used for every other slot
 
 Verify: `cargo nextest run --test attachment`
 
@@ -211,20 +237,13 @@ a row still in use                                                        exit 1
   wipctl: clear the references first, or rename the alias instead of
           removing the row
 
-the clone declares another uid                                            exit 1
+the clone declares another plan_id                                        exit 1
   wipctl: peer 'payments' cloned from
           https://git.example.org/acme/payments-plan.git
   wipctl:   the peers section expects 9f2c41a08b7d4e63a15c8f02d7e4b619
   wipctl:   plan.toml declares 4c81d0e7f39a4b25861d7c04e9a2f358
-  wipctl: the url serves a different plan; fix the url or the uid
-
-two plans minted one slug                                                 exit 1
-  wipctl: peer 'payments' cannot be attached: slot payments-acme is taken
-  wipctl:   in the slot   4c81d0e7f39a4b25861d7c04e9a2f358
-  wipctl:   the peer      9f2c41a08b7d4e63a15c8f02d7e4b619
-  wipctl: two plans chose the same project_id on two machines; one of
-          them needs a different one, which no verb changes yet, so the
-          slot stays as it is until that operation exists
+  wipctl: the url serves a different plan; fix the url or use an identity
+          that plan declares as canonical or superseded
 
 every url failed                                                          exit 1
   wipctl: could not clone peer 'payments' from any of 2 urls

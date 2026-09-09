@@ -7,13 +7,22 @@
   "properties": {
     "project_id": {
       "type": "string",
-      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-      "description": "The project this plan repository serves, in the slug grammar. Must equal the host repository's committed project_id; the two are checked against each other at every resolution, so an attach to the wrong repository surfaces as a disagreement between two committed facts."
+      "pattern": "^[0-9a-f]{32}$",
+      "description": "The project's identity: 128 random bits written as 32 lowercase hexadecimal characters. It is minted once, immutable, opaque, and equal to the host repository's committed project_id."
     },
-    "plan_uid": {
+    "plan_id": {
       "type": "string",
       "pattern": "^[0-9a-f]{32}$",
-      "description": "This plan's global identity: 128 bits of randomness, minted once when the plan is created, written as 32 lowercase hexadecimal characters. It answers which plan anywhere, while project_id answers which plan on this machine. Another plan repository writes this value down in its own peer table, so it is never renamed, never derived from anything, and never parsed: it carries no time, no machine, and no order."
+      "description": "This plan's identity: 128 random bits written as 32 lowercase hexadecimal characters. It is minted once, immutable, opaque, and written into other plans' peer rows."
+    },
+    "superseded_plan_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{32}$"
+      },
+      "description": "Plan identities discarded when two replicas minted different values for this plan. Each value remains resolvable, appears once, and differs from the canonical plan_id."
     },
     "window": {
       "type": "object",
@@ -65,17 +74,17 @@
     "alias": {
       "type": "string",
       "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
-      "description": "The local name for a peer, in the slug grammar. Unique within this section, and never equal to this plan's own project_id: without that rule a prefixed needs id has two candidate meanings. The alias is also the readable name, so a row carries no second label."
+      "description": "The local name for a peer, in the slug grammar. It is unique within this section and is also the readable name, so a row carries no second label."
     },
     "peer": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["uid", "urls"],
+      "required": ["plan_id", "urls"],
       "properties": {
-        "uid": {
+        "plan_id": {
           "type": "string",
           "pattern": "^[0-9a-f]{32}$",
-          "description": "The peer's plan_uid, as that plan declares it. This is the identity and everything else in the row is a hint. A uid appears in at most one row, and never equals this plan's own: both are cross-file facts the checker owns, because neither is visible to a schema reading one file."
+          "description": "The peer's plan_id, as that plan declares it. This is the identity and everything else in the row is a hint. One value appears in at most one row and differs from this plan's own value."
         },
         "urls": {
           "type": "array",

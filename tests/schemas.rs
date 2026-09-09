@@ -198,18 +198,44 @@ fn the_gate_accepts_the_shipped_tree() {
 }
 
 #[test]
-fn a_malformed_plan_uid_fails() {
+fn a_malformed_plan_id_fails() {
     // The identity's whole grammar is 32 lowercase hexadecimal characters, and
     // a value one character short is the defect a hand edit produces.
     let ok = accepts_fixture_with(
-        "plan-uid",
+        "plan-id",
         "alpha/.wipctl/plan.toml",
         "9f2c41a08b7d4e63a15c8f02d7e4b619",
         "9f2c41a08b7d4e63a15c8f02d7e4b61",
     )
     .expect("the gate should be runnable");
     let Some(ok) = ok else { return };
-    assert!(!ok, "a plan_uid outside its grammar must fail the gate");
+    assert!(!ok, "a plan_id outside its grammar must fail the gate");
+}
+
+#[test]
+fn a_malformed_superseded_plan_id_fails() {
+    let ok = accepts_fixture_with(
+        "superseded-plan-id",
+        "beta/.wipctl/plan.toml",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a superseded plan_id outside its grammar must fail");
+}
+
+#[test]
+fn a_repeated_superseded_plan_id_fails() {
+    let ok = accepts_fixture_with(
+        "superseded-plan-id-repeat",
+        "beta/.wipctl/plan.toml",
+        "[\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"]",
+        "[\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a repeated superseded plan_id must fail");
 }
 
 #[test]
@@ -257,18 +283,18 @@ fn a_repeated_dependency_fails() {
 }
 
 #[test]
-fn a_peer_row_without_a_uid_fails() {
-    // A peer is identified by the uid its own plan declares. A row naming only
+fn a_peer_row_without_a_plan_id_fails() {
+    // A peer is identified by the plan_id its own plan declares. A row naming only
     // a location names a place, not a plan.
     let ok = accepts_fixture_with(
-        "peer-no-uid",
+        "peer-no-plan-id",
         "alpha/.wipctl/plan.toml",
-        "uid = \"4c81d0e7f39a4b25861d7c04e9a2f358\"\n",
+        "plan_id = \"4c81d0e7f39a4b25861d7c04e9a2f358\"\n",
         "",
     )
     .expect("the gate should be runnable");
     let Some(ok) = ok else { return };
-    assert!(!ok, "a peer row with no uid must fail the gate");
+    assert!(!ok, "a peer row with no plan_id must fail the gate");
 }
 
 #[test]

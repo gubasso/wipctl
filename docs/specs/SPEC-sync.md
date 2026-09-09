@@ -52,7 +52,7 @@ With `--all` the run is not that contract repeated, and the reason comes before 
 
 ```text
 discover    resolve this plan, walk the declared set, and deduplicate by
-            plan_uid, so a plan two rows reach is visited once. The
+            plan_id, so a plan two rows reach is visited once. The
             output of this pass is the visit list, in a stated order:
             this plan first, then each plan in the order it was first
             declared.
@@ -159,19 +159,17 @@ The implementation MUST reconcile the local and remote histories semantically, a
 
 Verify: `cargo nextest run --test sync`
 
-### `sync:two-minted-identities-are-reported` — Two minted identities are reported, never merged
+### `sync:two-minted-identities-are-reported` — Two minted identities are reported and settled
 
-Where two replicas of one plan each minted a `plan_uid`, replication MUST report both values and MUST name the edit that resolves it.
+Where two replicas minted different `plan_id` values, replication MUST report both and record the discarded value when the operator chooses.
 
-#### Scenario: Two machines upgrade one record before either replicates
+#### Scenario: Two machines upgrade one plan before either replicates
 
-- GIVEN two replicas that each ran the upgrade form
-- WHEN the next replication reads both
-- THEN both values are named and neither is chosen. A uid carries no time and no order, and history is not a store this method reads, so nothing on disk orders the two mints
+- GIVEN two replicas with different plan identities
+- WHEN the operator keeps one identity
+- THEN the kept value becomes `plan_id` and the other is appended to `superseded_plan_ids`
 
-The resolution is an operator's edit of `.wipctl/plan.toml` on the losing side, committed by hand. No verb performs it, because no verb changes a uid.
-
-That settles the two replicas and nothing beyond them. A uid another plan already wrote into its own peer table stays written there, and no verb changes a row's uid. So this is cheap while the plan is young and expensive once other plans name it. The message says which case the operator is in.
+Rows carrying either value resolve to this plan. A new peer row records the canonical value.
 
 Verify: `cargo nextest run --test sync`
 
