@@ -16,6 +16,14 @@ A requirement's rule id is how code and gates cite what binds them. Cite the id,
 
 The specs stay language-agnostic. They never name a programming language, a library, a package manager, or a concrete third-party tool as a requirement. They state the contract a capability satisfies, and any tool meeting the contract serves. Implementation choices belong in the code and its decision records, never in a spec. The one tool the specs name is git. It is the plan repository's replication substrate, specified against git and no other version control, per ADR-git-is-the-replication-substrate.
 
+## Before 1.0, correctness beats compatibility
+
+The product is below version 1.0, so its contract is not frozen. Where the right design needs a breaking change, the change lands. A compatibility shim, a fallback reader, or a second accepted form is never a reason to keep a worse design.
+
+A breaking change owes three things in the change that lands it. The spec states the new contract alone and carries no trace of the old one. The changelog entry names what breaks and what an adopter does next. The commit carries the Conventional Commits breaking marker, so the release tooling computes the bump instead of an author asserting it.
+
+Migration is a verb the product offers, never a shape the product keeps.
+
 ## The repository is self-contained
 
 Everything needed to understand, build, or gate this project lives in it. An outbound link is a citation for further reading, never a prerequisite. It is never a dependency on an external, local, personalized, or mutating path. Substance borrowed from elsewhere is restated here in the zone that owns it. The binding statement of the rule, and the clone-on-a-bare-machine test that settles whether it holds, are in `docs/specs/SPEC-quality-gates.md`. Read it before citing anything outside this repository. ADR-the-repository-is-self-contained records why the project is built this way.
