@@ -4,6 +4,8 @@
 
 The zone file holding the questions that block named work. A question earns its place by blocking. The boundary runs at the edge: this domain owns the question's shape and its blocking claim, while the ranking domain owns what the eligibility predicate does with that claim.
 
+A question means the project does not know what to build, so work cannot start under it. A watch means the project knows what to build but waits for an outside action. Work can start before that outside wait appears, so a watch can block an entry already in flight.
+
 ## Section shape
 
 ```markdown
@@ -80,12 +82,12 @@ Verify: `cargo nextest run --test documents`
 
 ### `open-questions:blocking-is-derived-never-stored` — Blocking is derived, never stored
 
-The implementation MUST derive blocking from the question edges and the dependency edges, and MUST NOT store it as a lane or a field.
+The implementation MUST derive blocking from the dependency edges, the question edges, and the watch edges, and MUST NOT store it as a lane or a field.
 
 #### Scenario: A blocked flag is proposed
 
 - GIVEN a request to mark blocked entries in the lane files
-- WHEN the two edges already answer it
-- THEN the flag is refused, because a stored copy of a derived fact drifts on the first edit to either edge
+- WHEN the three edges already answer it
+- THEN the flag is refused, because a stored copy of a derived fact drifts on the first edit to any edge
 
 Verify: `cargo nextest run --test validation`
