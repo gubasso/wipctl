@@ -15,6 +15,9 @@
   - [`watches:a-watched-entry-is-not-eligible` — A watched entry is not eligible](#watchesa-watched-entry-is-not-eligible--a-watched-entry-is-not-eligible)
   - [`watches:a-blocked-id-exists` — A blocked id exists](#watchesa-blocked-id-exists--a-blocked-id-exists)
   - [`watches:a-stale-watch-is-reported` — A stale watch is reported](#watchesa-stale-watch-is-reported--a-stale-watch-is-reported)
+  - [`watches:a-reading-carries-its-date-and-its-observation` — A reading carries its date and its observation](#watchesa-reading-carries-its-date-and-its-observation--a-reading-carries-its-date-and-its-observation)
+  - [`watches:a-cadence-is-optional-at-both-levels` — A cadence is optional at both levels](#watchesa-cadence-is-optional-at-both-levels--a-cadence-is-optional-at-both-levels)
+  - [`watches:a-cold-reading-is-announced-and-never-gates` — A cold reading is announced and never gates](#watchesa-cold-reading-is-announced-and-never-gates--a-cold-reading-is-announced-and-never-gates)
 - [Unenforced rules](#unenforced-rules)
 - [Page budget](#page-budget)
 
@@ -46,13 +49,25 @@ Until: closed as completed, and the landed version carries the workflow.
 Blocks: hand-over-the-workflow — nothing exists to hand over until it ships.
 
 Read: 2026-09-09 — open, and the snippet list names no such workflow.
+
+Every: 30 days
 ```
 
-The heading carries the id and text. `Raised` dates the watch. `Watch` names who or what clears it. `Until` states the exit condition. `Blocks` names the affected entries. `Read` dates the latest observation. The parts appear in that order.
+The heading carries the id and text. `Raised` dates the watch. `Watch` names who or what clears it. `Until` states the exit condition. `Blocks` names the affected entries. `Read` dates the latest observation. The optional `Every` line sets this watch's reading cadence. The parts appear in that order.
 
-The `Read` line exists because the record can state when a person looked. Its date has the `YYYY-MM-DD` shape. Rules about the observation and its age belong to the same domain.
+The `Read` line carries the `YYYY-MM-DD` date when a person looked, an em dash, and one sentence describing what they saw. The sentence records a dated observation rather than a remote field. It can say that an item was open because the date keeps that statement true as an observation about that day.
+
+A reading is cold when its date is older than the watch's `Every` period or, without that line, the project's `stale_after.watch_days` period. Neither level has a default. A project that sets neither receives no cold-reading warning.
+
+The two project thresholds stay separate. `days` measures this project's own work going quiet, while `watch_days` measures an outside item going unread. A release cut monthly and a ticket triaged daily can also use different `Every` periods.
 
 The remote system remains the source of truth under `external-sources:a-source-ref-is-stated-and-never-verified`. No check reads a tracker. A person reads the item, tests the exit condition, and edits the record.
+
+A workflow verb announces a cold-reading count on stderr at exit 0 and names `wipctl stale` as the view that shows the watches. It folds both entry and watch counts against the one clock reading required by `metrics:the-clock-is-read-once`.
+
+The count includes a watch whose `Read` date is older than its threshold and whose blocked work remains open. It excludes a watch read inside the threshold. It also excludes a watch whose blocked entries have all closed, because `watches:a-stale-watch-is-reported` already reports that record error.
+
+Clearing a watch creates no separate event store. The section enters and leaves `watches.md` through ordinary commits, so `git log` on that file records when the block appeared and lifted, with its author and date. A future blocked-duration measure can fold from that history without storing or computing the measure here.
 
 ## Reference or phrase
 
@@ -174,6 +189,42 @@ At least one blocked id MUST still be open, and the implementation MUST report a
 - THEN the watch is reported as stale because nobody needs to keep reading its outside item
 
 Verify: `cargo nextest run --test validation`
+
+### `watches:a-reading-carries-its-date-and-its-observation` — A reading carries its date and its observation
+
+Every watch section MUST carry a `Read` line containing a `YYYY-MM-DD` date, an em dash, and a nonempty observation.
+
+#### Scenario: A reading names the observed state
+
+- GIVEN a `Read` line saying that the outside item was open on its stated date
+- WHEN the document check runs
+- THEN the line passes because it records what a person saw on that date rather than claiming a current remote state
+
+Verify: `cargo nextest run --test documents`
+
+### `watches:a-cadence-is-optional-at-both-levels` — A cadence is optional at both levels
+
+Where a cold-reading cadence is configured, the implementation MUST use the watch's optional `Every` period before the project's optional `stale_after.watch_days` period, and without either it MUST announce no cold reading.
+
+#### Scenario: A watch overrides the project cadence
+
+- GIVEN a project cadence of 14 days and a watch cadence of 30 days
+- WHEN the reading is 20 days old
+- THEN no cold reading is announced because the period belongs to the item being watched
+
+Verify: `cargo nextest run --test validation`
+
+### `watches:a-cold-reading-is-announced-and-never-gates` — A cold reading is announced and never gates
+
+When at least one open watch has a reading older than its resolved cadence, the implementation MUST announce the count once on stderr at exit 0 and name `wipctl stale` as the view that shows the watches.
+
+#### Scenario: Two watch readings are cold
+
+- GIVEN two watches past their resolved cadence and still blocking open entries
+- WHEN a workflow verb finishes
+- THEN one warning line reports both watches and the resolution while stdout and the exit code keep their ordinary result
+
+Verify: `cargo nextest run --test verb_contracts`
 
 ## Unenforced rules
 

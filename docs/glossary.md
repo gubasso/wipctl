@@ -9,6 +9,7 @@ Each term links to the page that owns its full definition. A term defined here i
 - capture: writing a story document plus a pending fragment, without touching a lane file. [explanation/replication.md](./explanation/replication.md)
 - chore: a work type whose outcome is upkeep. It needs no worked example. [explanation/stories-and-estimation.md](./explanation/stories-and-estimation.md)
 - closure: this record and every peer it reaches, transitively. It is the set the checker proves the dependency graph over. [explanation/plans-and-peers.md](./explanation/plans-and-peers.md)
+- cold reading: a watch observation whose `Read` date is older than its resolved cadence. [specs/SPEC-watches.md](./specs/SPEC-watches.md)
 - current story: the topmost entry of `doing.yml`, or of `todo.yml` when `doing` is empty. [specs/SPEC-reporting.md](./specs/SPEC-reporting.md)
 - cycle time: first entry into `doing` until close, read from the journal. [specs/SPEC-metrics.md](./specs/SPEC-metrics.md)
 - declared set: every row of this record's peer table, and of each of theirs, transitively. It is the set the attachment walk fills. [specs/SPEC-peers.md](./specs/SPEC-peers.md)

@@ -43,6 +43,10 @@ project_id = "a1b2c3d4e5f60718293a4b5c6d7e8f90"
 project_id = "a1b2c3d4e5f60718293a4b5c6d7e8f90"
 plan_id = "9f2c41a08b7d4e63a15c8f02d7e4b619"
 superseded_plan_ids = ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"]
+
+[stale_after]
+days = 21
+watch_days = 14
 ```
 
 Both identities are 128 random bits written as exactly 32 lowercase hexadecimal characters. Each is minted once, immutable, opaque, and parsed by nothing.
@@ -153,7 +157,7 @@ Verify: `cargo nextest run --test configuration`
 
 ### `configuration:the-stale-threshold-is-optional-and-undefaulted` — The stale threshold is optional and undefaulted
 
-Where the `stale_after` table is present, `days` MUST be an integer of at least 1, and its absence MUST leave every bar unmarked.
+Where the `stale_after` table is present, each of `days` and `watch_days` MAY be absent, each present key MUST be an integer of at least 1, and an absent key MUST leave its corresponding age unmarked.
 
 #### Scenario: A project never sets a threshold
 

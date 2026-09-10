@@ -189,6 +189,10 @@ The warning makes every workflow verb perform the age fold before it prints. A v
 
 The fold reads the transition journal and reads the clock once under the existing rules. A cached count would duplicate state that the record already holds.
 
+The same clock reading folds each watch's `Read` date against its resolved cold-reading threshold. A watch counts when that date is older than the threshold and at least one blocked entry remains open. A watch whose blocked entries have all closed is already reported under `watches:a-stale-watch-is-reported`, so the cold-reading count excludes it.
+
+The entry threshold measures this project's work going quiet. The watch threshold measures an outside item going unread, so each uses its own period.
+
 ### `metrics:a-suppression-is-local-and-never-replicates` — A suppression is local and never replicates
 
 When an operator hides or shows a stale row, the implementation MUST write only this machine's suppression file and leave the plan record, cache, and remote unchanged.
