@@ -7,10 +7,10 @@
 - [Open question](#open-question)
 - [Requirements](#requirements)
   - [`configuration:no-key-has-a-read-time-default` — No key has a read-time default](#configurationno-key-has-a-read-time-default--no-key-has-a-read-time-default)
+  - [`configuration:the-ranking-section-is-required` — The ranking section is required](#configurationthe-ranking-section-is-required--the-ranking-section-is-required)
   - [`configuration:the-project-file-carries-one-key` — The project file carries one key](#configurationthe-project-file-carries-one-key--the-project-file-carries-one-key)
   - [`configuration:the-project-file-marks-the-root` — The project file marks the project root](#configurationthe-project-file-marks-the-root--the-project-file-marks-the-project-root)
   - [`configuration:the-plan-declares-a-global-identity` — The plan declares a global identity](#configurationthe-plan-declares-a-global-identity--the-plan-declares-a-global-identity)
-  - [`configuration:the-two-identities-agree` — The two identities agree](#configurationthe-two-identities-agree--the-two-identities-agree)
   - [`configuration:an-unknown-key-is-rejected` — An unknown key is rejected](#configurationan-unknown-key-is-rejected--an-unknown-key-is-rejected)
   - [`configuration:an-optional-section-is-legally-absent` — An optional section is legally absent](#configurationan-optional-section-is-legally-absent--an-optional-section-is-legally-absent)
   - [`configuration:the-window-is-required` — The window is required](#configurationthe-window-is-required--the-window-is-required)
@@ -44,9 +44,8 @@ project_id = "a1b2c3d4e5f60718293a4b5c6d7e8f90"
 plan_id = "9f2c41a08b7d4e63a15c8f02d7e4b619"
 superseded_plan_ids = ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"]
 
-[stale_after]
-days = 21
-watch_days = 14
+[ranking]
+keys = ["eligibility", "needs", "class", "points-ascending", "id"]
 ```
 
 Both identities are 128 random bits written as exactly 32 lowercase hexadecimal characters. Each is minted once, immutable, opaque, and parsed by nothing.
@@ -68,6 +67,18 @@ When a verb finds a required key absent, the verb MUST fail the check rather tha
 - GIVEN a plan configuration without `window.length_days`
 - WHEN a velocity window is computed
 - THEN the verb fails naming the field, because a value guessed on a project's behalf is a value nobody wrote down
+
+Verify: `cargo nextest run --test configuration`
+
+### `configuration:the-ranking-section-is-required` — The ranking section is required
+
+The plan configuration MUST carry `[ranking].keys` as one ordered list of strings.
+
+#### Scenario: A plan has no ranking table
+
+- GIVEN a plan configuration without `[ranking]`
+- WHEN the record loads
+- THEN the cross-file checker fails and names the table to add, because no key chain has a read-time default
 
 Verify: `cargo nextest run --test configuration`
 
@@ -106,18 +117,6 @@ The plan configuration MUST carry `plan_id` as exactly 32 lowercase hexadecimal 
 - THEN the reference still resolves, because the identity is the value that repository committed and the location is a hint beside it
 
 Verify: `cargo nextest run --test schemas`
-
-### `configuration:the-two-identities-agree` — The two identities agree
-
-The plan configuration's `project_id` MUST equal the project file's value, checked at every resolution.
-
-#### Scenario: A slot holds another project's plan
-
-- GIVEN a host naming `payments-acme` and a plan repository naming `billing-acme`
-- WHEN any verb resolves
-- THEN the check fails naming both sides and the choice, because acting on the wrong record is worse than refusing
-
-Verify: `cargo nextest run --test attachment`
 
 ### `configuration:an-unknown-key-is-rejected` — An unknown key is rejected
 

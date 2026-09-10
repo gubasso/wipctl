@@ -6,6 +6,7 @@
 - [Where each identity enters resolution](#where-each-identity-enters-resolution)
 - [Requirements](#requirements)
   - [`attachment:resolution-is-two-steps` — Resolution is two steps](#attachmentresolution-is-two-steps--resolution-is-two-steps)
+  - [`attachment:the-two-identities-agree` — The two identities agree](#attachmentthe-two-identities-agree--the-two-identities-agree)
   - [`attachment:a-plan-uid-is-minted-only-at-creation` — A global identity is minted only at creation](#attachmenta-plan-uid-is-minted-only-at-creation--a-global-identity-is-minted-only-at-creation)
   - [`attachment:one-plan-occupies-one-slot` — One plan occupies one slot](#attachmentone-plan-occupies-one-slot--one-plan-occupies-one-slot)
   - [`attachment:duplicate-project-identities-are-ambiguous` — Duplicate project identities are ambiguous](#attachmentduplicate-project-identities-are-ambiguous--duplicate-project-identities-are-ambiguous)
@@ -54,6 +55,18 @@ When a verb touches a record, it MUST walk to the project id and find the one sl
 - GIVEN a working directory with no `.wipctl/project.toml` at or above it
 - WHEN the verb resolves
 - THEN it is a usage error, because the invocation named no project. An unattached id is a failed check instead, naming the attachment that fixes it
+
+Verify: `cargo nextest run --test attachment`
+
+### `attachment:the-two-identities-agree` — The two identities agree
+
+The plan configuration's `project_id` MUST equal the project file's value, checked at every resolution.
+
+#### Scenario: A slot holds another project's plan
+
+- GIVEN a host naming `payments-acme` and a plan repository naming `billing-acme`
+- WHEN any verb resolves
+- THEN the check fails naming both sides and the choice, because acting on the wrong record is worse than refusing
 
 Verify: `cargo nextest run --test attachment`
 

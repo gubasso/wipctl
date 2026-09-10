@@ -1,18 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Pending fragment",
-  "description": "One captured entry waiting to land: the lane it claims, the position it wants, the instant the capture stated, and the entry itself. A fragment states a delta, never a copy of anything a lane file holds. The entry mirrors the lane entry's field definitions so the fragment can be checked single-file; the lane file page owns the definitions, and keeping this mirror in agreement with the lane schema is a review responsibility. Closing fields are forbidden because a capture is never a close.",
+  "description": "One captured entry waiting to land: the lane it claims, the instant the capture stated, and the entry itself. A fragment states a new entry, never a copy of anything a lane file holds. The entry mirrors the lane entry's field definitions so the fragment can be checked single-file; the lane file page owns the definitions, and keeping this mirror in agreement with the lane schema is a review responsibility. Closing fields are forbidden because a capture is never a close.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["lane", "after", "captured", "entry"],
+  "required": ["lane", "captured", "entry"],
   "properties": {
     "lane": {
       "enum": ["backlog", "todo"],
       "description": "The planning lane the entry wants to land in. A work lane is excluded: landing there would be a transition, and a transition owes a journal event."
-    },
-    "after": {
-      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/id" }],
-      "description": "Land beneath the named entry, or at the bottom of the claimed lane when null. The target must be a landed entry; a fragment-only target is drift the drain reports."
     },
     "captured": {
       "type": "string",

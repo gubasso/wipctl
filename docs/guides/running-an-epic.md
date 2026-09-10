@@ -39,7 +39,7 @@ Inputs: `<EPIC_ID>` (§1).
    ```
 
 3. Ask again. Asking again is not optional, because a close changes eligibility and the answer is derived on every call. A session that needs the plan as a file points a consumer at `wipctl epic <EPIC_ID> --write`. That cache is never authoritative and never read back.
-4. Do not use the epic to sequence. Ordering lives in `needs`, and the repair never groups members. A prerequisite from outside the epic appears in the plan, marked by what it serves. It is part of the work and not an intrusion.
+4. Do not use the epic to sequence. The configured key chain starts with eligibility and same-lane dependencies and ends with the residual id. It applies class and points where the declaration names them. Epic membership contributes nothing. A prerequisite from outside the epic appears in the plan, marked by what it serves. It is part of the work and not an intrusion.
 
 Outputs: none.
 

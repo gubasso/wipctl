@@ -23,3 +23,5 @@ Chosen option: five lane files — state and order become facts of the filesyste
 ## Status
 
 Accepted
+
+Amended by [ADR-an-order-is-computed-and-never-stored.md](./ADR-an-order-is-computed-and-never-stored.md) — the file remains the lane, while a record-wide key chain computes order from entry facts.

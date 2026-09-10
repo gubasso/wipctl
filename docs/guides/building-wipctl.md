@@ -9,8 +9,9 @@ Build the data model first:
 - the configuration reader for both configuration files
 - the record library over the canonical subset, with the caller-supplied sink
 - the checker, with the identity, lane-parse, story, epic, initiative, graph, and open-questions rules
+- the record-wide order computation, with close date followed by the validated key chain from the plan configuration
 
-Then ship validation, with its census and its named schema half. Ship the preview verb as a head read that never gates. Ship the schemas with their metaschema gate. A hand-fabricated plan repository is the fixture, because no verb creates one yet.
+Then ship validation, with its census and its named schema half. Ship the preview verb as a head read that never gates, with its explain flag naming the key that reached the head. Ship the schemas with their metaschema gate. A hand-fabricated plan repository is the fixture, because no verb creates one yet.
 
 Acceptance: a hand-written zone validates. Every diagnostic in [the catalog](../specs/SPEC-validation.md) fires on a deliberate defect. The preview verb answers on a broken record, with warnings.
 
@@ -27,13 +28,13 @@ Build the project resolution: the upward walk, the attachment registry, and the 
 
 Acceptance: the journey test's first half passes. Scaffold from an installation, confirm the host gained exactly one file, fill the charter, add a story, and gate it. An attach of the created plan repository resolves the same record from a second checkout.
 
-## 3 — Ranking legality as a verb
+## 3 — Writers and transactions
 
-Build the repair: the repair verb and its slot report, under the four guarantees. Add the two ranking rules and the closed-order rule to the checker. Those rules ship in milestone 1 as report-only, and the writer needs this milestone.
+Build the supported repairs and the slot report under the writer guarantees. Lane order stays in the record reader built in milestone 1, and no writer stores or repairs it.
 
-This is also where the transaction layer lands whole: the lock, the preflight before the first byte, and the plan trunk commit. The repair is the simplest writer to prove it on.
+This is also where the transaction layer lands whole: the lock, the preflight before the first byte, and the plan trunk commit. A local-state repair is the simplest writer to prove it on.
 
-Acceptance: the guarantee suite passes for identity, idempotence, non-canonicality, and refusal on cycles. Every mutation is one commit in the trunk grammar.
+Acceptance: the guarantee suite passes for identity, determinism, idempotence, and refusal on cycles. Every mutation is one commit in the trunk grammar.
 
 ## 4 — Transitions
 
@@ -45,9 +46,9 @@ Acceptance: lane and journal agreement fails when hand-edited. A reopened entry 
 
 Build the mint's under-lock check against the live record and every tombstone. Then build the capture verb with its explicit-id flag. Add the pending schema and its rules to the checker and the census. Then build the id stream and the completion wiring.
 
-Then build the drain: its report mode and its writing mode, ordering by the stated instant with the full-id residual tie, the drift vocabulary, and all-or-nothing. Then build the rename verb, whose write set exercises everything above.
+Then build the drain: its report mode and its writing mode, writing lane-file bytes by the stated instant with the full-id residual tie, the dependency-drift report, and all-or-nothing. The record reader computes rank after landing. Then build the rename verb, whose write set exercises everything above.
 
-Acceptance: a repeat capture is refused naming the holder. The drain lands identically on two machines. Every drift class reports. An ordinary rename moves every reference, burns the old id, and is one commit. A rename resolving an id collision burns nothing.
+Acceptance: a repeat capture is refused naming the holder. The drain lands identically on two machines. Dependency drift reports. An ordinary rename moves every reference, burns the old id, and is one commit. A rename resolving an id collision burns nothing.
 
 ## 6 — Replication between machines
 

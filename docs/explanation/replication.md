@@ -4,9 +4,9 @@ One record and two machines, with no lock between them. What a capture writes so
 
 ## Capture, and why it is a fragment
 
-`wipctl new` writes a story document and a pending fragment, and touches no lane file. The fragment states a lane and a position, and nothing the lane files already hold. Two rules bound it: a fragment claims a planning lane only, and its position names a landed entry only. [../specs/SPEC-pending-fragment.md](../specs/SPEC-pending-fragment.md) holds both.
+`wipctl new` writes a story document and a pending fragment, and touches no lane file. The fragment states the new entry, its capture instant, and its planning lane. It claims no position because it belongs to no lane order until it lands. [../specs/SPEC-pending-fragment.md](../specs/SPEC-pending-fragment.md) holds the shape and the boundary.
 
-The drain later reconciles every fragment into the ranked record, in a derived order every machine agrees on. It reports every drift and repairs none. A drift is a need that closed, or a position target that moved. Rank is a claim, and only a person makes one.
+The drain later reconciles every fragment into the lane files, in a total byte order derived from capture instant and full id. Every machine writes the same bytes. A drift is a dependency that closed while the fragment waited, and the drain reports it without editing the dependency. Once an entry lands, the record's key chain computes its rank from the facts people stated.
 
 On one machine the lock already serialises captures, so the fragment is not needed for safety there. It is needed for the next section. A capture is a disjoint delta: one new file, named by an id nobody else was minting. Disjoint deltas are what make reconciliation between machines cheap. That choice was made so captures combine rather than conflict, and it pays exactly where no lock can reach.
 
@@ -35,7 +35,7 @@ desktop   ... abc1234 ── def5678 ── 77ff88e   move audit-headers to revi
        through resolve. Never by whichever line won a textual merge.
 ```
 
-The third case is rare and the first is overwhelmingly common. That is why capture writes a disjoint fragment instead of editing a shared ranked lane file. One case is new under the slug-only grammar. Two machines can mint the same slug, and that too surfaces at replication as a conflict naming both sides. The recovery is to rephrase one title, which a person usually wants to do anyway.
+The third case is rare and the first is overwhelmingly common. That is why capture writes a disjoint fragment instead of editing a shared lane file. One case is new under the slug-only grammar. Two machines can mint the same slug, and that too surfaces at replication as a conflict naming both sides. The recovery is to rephrase one title, which a person usually wants to do anyway.
 
 ## A peer at two revisions
 

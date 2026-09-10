@@ -33,7 +33,7 @@ What the scaffold lands and the contract each landed file carries. The scaffold 
 | Payload member      | Lands at                      | Notes                                                                                                                          |
 | ------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | host project file   | `<root>/.wipctl/project.toml` | generated, not copied: the minted `project_id` and nothing else. The scaffold creates the directory and the file together      |
-| plan configuration  | `<zone>/.wipctl/plan.toml`    | generated: both minted identities, the given or today's start date under `[window]`, and the one baked window length           |
+| plan configuration  | `<zone>/.wipctl/plan.toml`    | generated: both minted identities, the window values, and the `eligibility`, `needs`, `class`, `points-ascending`, `id` chain  |
 | zone `README.md`    | `<zone>/README.md`            | orientation: where to start, what bounds it, what stops it, what already happened                                              |
 | `AGENTS.md`         | `<zone>/AGENTS.md`            | the travelling method; gate placeholders substituted at emission                                                               |
 | `charter.md`        | `<zone>/charter.md`           | angle-bracketed placeholders for a person to fill                                                                              |

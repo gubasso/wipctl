@@ -25,7 +25,7 @@ The critical section is exactly four steps:
 │  LOCK                                                    │
 │    1. read the record at current HEAD                    │
 │    2. preflight — every check, before the first byte     │
-│    3. write, repair the ranking, validate                │
+│    3. write, validate                                    │
 │    4. commit                                             │
 │  UNLOCK                                                  │
 └─────────────────────────────────────────────────────────┘
@@ -67,7 +67,7 @@ time   agent A (pid 41291)                    agent B (pid 41337)
 0.009  │ eligible, preflight ok               │
 0.013  │ todo.yml -1, doing.yml +1            │
 0.015  │ journal/rate-limit-search.tsv +1     │
-0.017  │ rank repair, validate                │
+0.017  │ validate                             │
 0.021  │ commit def5678                       │
 0.022  └ LOCK RELEASED                        │
 0.023  rate-limit-search  2pt                 └ LOCK ACQUIRED

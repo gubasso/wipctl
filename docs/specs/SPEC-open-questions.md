@@ -9,13 +9,13 @@ A question means the project does not know what to build, so work cannot start u
 ## Section shape
 
 ```markdown
-## Q-may-a-position-name-a-fragment — May a position name a fragment?
+## Q-which-proof-closes-the-risk — Which proof closes the risk?
 
 Raised: 2026-08-14
 
-Blocks: land-the-capture-queue, drain-reports-drift — the drain's ordering rule depends on the answer.
+Blocks: choose-the-boundary, verify-the-contract — both entries depend on the answer.
 
-Exit: a decision record, measured against a worked two-session capture.
+Exit: a decision record, measured against a worked example of both choices.
 ```
 
 ## Requirements

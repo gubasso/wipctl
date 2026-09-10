@@ -83,9 +83,9 @@ Kept:
 - It now proves its graph acyclic across every plan it reaches, which no amount of prose in a note field does.
 - One plan is still one project. Nothing merges, and no programme is created.
 
-## The charter is not edited
+## The charter still holds
 
-Six phases of change land under this chapter, and the charter states the same pillars and no-gos it always did. That is a checked fact rather than an oversight, so each pillar a reader will suspect is named here with the reason it still holds.
+The peer design preserves the charter's pillars and no-gos. Each one a reader might suspect is named here with the reason it holds.
 
 ```text
 pillar 2, the host stays unassumed
@@ -100,11 +100,11 @@ no-go 1, no default for a value a project must declare
 no-go 2, no second store of what the record or filesystem holds
   reading a peer is a read, never a copy; no peer state is stored here
 
-no-go 4, no rank a machine computes
-  a prefixed id decides legality, never priority
+no-go 4, no priority a machine authors
+  a prefixed id affects derived eligibility and order as a fact a person wrote
 ```
 
-One property is new, and the charter does not state it. A record's validity now depends on the other records attached beside it. This page says so plainly rather than smuggling it in as an unstated consequence. [../specs/SPEC-validation.md](../specs/SPEC-validation.md) is where it is specified. If a later change decides the property belongs in the charter, that is a charter edit with its own reasoning.
+A record's validity depends on the other records attached beside it. This page says so plainly rather than hiding it as an unstated consequence. [../specs/SPEC-validation.md](../specs/SPEC-validation.md) is where it is specified.
 
 ## The half no linter holds
 

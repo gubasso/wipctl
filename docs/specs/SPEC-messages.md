@@ -7,6 +7,8 @@
 - [Requirements](#requirements)
   - [`messages:a-failure-names-its-resolution` — A failure names its resolution](#messagesa-failure-names-its-resolution--a-failure-names-its-resolution)
   - [`messages:a-warning-names-its-resolution` — A warning names its resolution](#messagesa-warning-names-its-resolution--a-warning-names-its-resolution)
+  - [`messages:an-excess-expedite-warning-names-the-count` — An excess expedite warning names the count](#messagesan-excess-expedite-warning-names-the-count--an-excess-expedite-warning-names-the-count)
+  - [`messages:the-preview-says-when-it-broke-a-tie` — The preview says when it broke a tie](#messagesthe-preview-says-when-it-broke-a-tie--the-preview-says-when-it-broke-a-tie)
   - [`messages:a-refusal-names-what-unblocks-it` — A refusal names what unblocks it](#messagesa-refusal-names-what-unblocks-it--a-refusal-names-what-unblocks-it)
   - [`messages:relayed-output-is-redacted-and-bounded` — Relayed output is redacted and bounded](#messagesrelayed-output-is-redacted-and-bounded--relayed-output-is-redacted-and-bounded)
   - [`messages:success-states-what-changed` — Success states what changed](#messagessuccess-states-what-changed--success-states-what-changed)
@@ -106,6 +108,43 @@ The warning is exactly:
 wipctl: warning: 4 entries are past the stale line
 wipctl: warning: 2 watches have not been read in 30 days
 wipctl: run `wipctl stale` to see them
+```
+
+Verify: `cargo nextest run --test verb_contracts`
+
+### `messages:an-excess-expedite-warning-names-the-count` — An excess expedite warning names the count
+
+When a workflow verb finds multiple open entries with class `expedite`, the implementation MUST warn once on stderr at exit 0, name the count, preserve its result, and leave resolution to a person.
+
+#### Scenario: Two open entries are expedited
+
+- GIVEN two open entries whose class is `expedite`
+- WHEN a workflow verb finishes
+- THEN stderr names the count once and says the person may leave or edit the classes, while stdout and the exit code keep their ordinary result
+
+The warning is exactly:
+
+```text
+wipctl: warning: 2 open entries have class expedite
+wipctl: leave them or edit their class
+```
+
+Verify: `cargo nextest run --test verb_contracts`
+
+### `messages:the-preview-says-when-it-broke-a-tie` — The preview says when it broke a tie
+
+Where the residual key reached the head, the preview under the explain flag MUST say so in one line and MUST name the entry it tied against.
+
+#### Scenario: The head was reached by the residual key
+
+- GIVEN two scheduled entries tied on every stated key
+- WHEN the preview runs under the explain flag
+- THEN it says the tie was broken by the id, because a reader taking the head deserves to know the tool chose where they did not
+
+The line is exactly:
+
+```text
+wipctl: the id broke a tie with profile-composition
 ```
 
 Verify: `cargo nextest run --test verb_contracts`
