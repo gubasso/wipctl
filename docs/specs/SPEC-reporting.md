@@ -26,6 +26,8 @@
 
 The read-only views: the lanes on one screen, what to start next, the composite screen, the dependency drawing, and the id stream. The boundary runs at the write. Every verb here is a pure function of the committed files. The rendering domain owns how a view looks, and each measure's own domain owns what it means.
 
+The board draws a watch badge from the record alone. Neither the board nor the checker reaches a network or knows whether the outside item remains open.
+
 ## Requirements
 
 ### `reporting:a-view-is-derived-and-never-written` — A view is derived and never written
@@ -80,13 +82,13 @@ Verify: `cargo nextest run --test reporting`
 
 ### `reporting:a-blocked-entry-is-shown-never-hidden` — A blocked entry is shown, never hidden
 
-The board MUST show blocked entries with distinct badges for a dependency block and a question block, distinguishable with escapes stripped.
+The board MUST show blocked entries with distinct badges for a dependency block, a question block, and a watch block, distinguishable with escapes stripped. The watch badge MUST remain on an in-flight row.
 
 #### Scenario: The board is piped into a log
 
-- GIVEN two entries blocked for different reasons
+- GIVEN entries blocked by a dependency, a question, and a watch
 - WHEN the escapes are stripped
-- THEN the glyphs still tell them apart, because the distinction is carried by the glyph and not by colour
+- THEN the glyphs still tell them apart, because they mark record work, a decision this project owes, and an outside item this project does not own
 
 Verify: `cargo nextest run --test reporting`
 

@@ -5,7 +5,7 @@
 - [Purpose](#purpose)
 - [A node, and how it is written for a reader](#a-node-and-how-it-is-written-for-a-reader)
 - [Requirements](#requirements)
-  - [`ranking:eligibility-is-derived-from-two-edges` — Eligibility is derived from two edges](#rankingeligibility-is-derived-from-two-edges--eligibility-is-derived-from-two-edges)
+  - [`ranking:eligibility-is-derived-from-three-edges` — Eligibility is derived from three edges](#rankingeligibility-is-derived-from-three-edges--eligibility-is-derived-from-three-edges)
   - [`ranking:an-eligible-entry-sits-above-an-ineligible-one` — An eligible entry sits above an ineligible one](#rankingan-eligible-entry-sits-above-an-ineligible-one--an-eligible-entry-sits-above-an-ineligible-one)
   - [`ranking:an-entry-sits-below-what-it-needs` — An entry sits below what it needs](#rankingan-entry-sits-below-what-it-needs--an-entry-sits-below-what-it-needs)
   - [`ranking:the-dependency-graph-is-acyclic` — The dependency graph is acyclic](#rankingthe-dependency-graph-is-acyclic--the-dependency-graph-is-acyclic)
@@ -18,7 +18,7 @@
 
 ## Purpose
 
-What makes an entry eligible, and what a legal lane order is. Eligibility is derived from two edges and never stored. The boundary runs at the order: this domain says which orders are legal, while the repair domain says how an illegal one is restored.
+What makes an entry eligible, and what a legal lane order is. Eligibility is derived from three edges and never stored. The boundary runs at the order: this domain says which orders are legal, while the repair domain says how an illegal one is restored.
 
 ## A node, and how it is written for a reader
 
@@ -47,11 +47,13 @@ The third form uses a separator no dependency accepts, so it cannot be read as a
 
 This is also why a cycle report is stable when the same cycle is found from either side. The nodes are the same pairs, and only the rendering changes.
 
+A watch is legal on work already in flight. A question means the project does not know what to build, so the entry leaves the work lane. A watch means the project knows what to build and the outside world moved after work started. Sending that entry back to the scheduled lane would falsely say it never started and its clock never ran. The watch keeps that blocked row visible where it carries the most signal.
+
 ## Requirements
 
-### `ranking:eligibility-is-derived-from-two-edges` — Eligibility is derived from two edges
+### `ranking:eligibility-is-derived-from-three-edges` — Eligibility is derived from three edges
 
-The implementation MUST derive eligibility from an entry's dependencies and its blocking questions, and MUST NOT store it.
+The implementation MUST derive eligibility from an entry's dependencies, blocking questions, and blocking watches, and MUST NOT store it.
 
 #### Scenario: A blocked flag is proposed
 
@@ -135,8 +137,8 @@ Verify: `cargo nextest run --test ranking`
 
 ## Unenforced rules
 
-| Rule                                            | Why no command decides it                                                              |
-| ----------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `ranking:eligibility-is-derived-from-two-edges` | Whether a proposed field restates a derived fact is a reading of what the field means. |
+| Rule                                              | Why no command decides it                                                              |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `ranking:eligibility-is-derived-from-three-edges` | Whether a proposed field restates a derived fact is a reading of what the field means. |
 
 A landed record's ranking is settled by a person. The repair restores legality and never chooses between two legal orders.

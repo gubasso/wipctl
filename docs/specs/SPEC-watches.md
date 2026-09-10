@@ -12,6 +12,9 @@
   - [`watches:a-watch-carries-a-section-per-part` — A watch carries a section per part](#watchesa-watch-carries-a-section-per-part--a-watch-carries-a-section-per-part)
   - [`watches:a-watch-is-never-a-dependency` — A watch is never a dependency](#watchesa-watch-is-never-a-dependency--a-watch-is-never-a-dependency)
   - [`watches:a-cleared-watch-leaves-the-file` — A cleared watch leaves the file](#watchesa-cleared-watch-leaves-the-file--a-cleared-watch-leaves-the-file)
+  - [`watches:a-watched-entry-is-not-eligible` — A watched entry is not eligible](#watchesa-watched-entry-is-not-eligible--a-watched-entry-is-not-eligible)
+  - [`watches:a-blocked-id-exists` — A blocked id exists](#watchesa-blocked-id-exists--a-blocked-id-exists)
+  - [`watches:a-stale-watch-is-reported` — A stale watch is reported](#watchesa-stale-watch-is-reported--a-stale-watch-is-reported)
 - [Unenforced rules](#unenforced-rules)
 - [Page budget](#page-budget)
 
@@ -22,6 +25,10 @@
 The earned `watches.md` file at the plan zone root holds items this project waits on and does not own. A watch blocks named entries until a person confirms its exit condition. A project that waits on nothing carries no file, and an absent file fails no check.
 
 A question ends when this project decides. A watch ends when somebody else acts. The watch domain owns the file, each section, and its blocking claim. The ranking domain owns what eligibility does with that claim.
+
+A watch is local to the record that declares it. The attached closure does not read a peer's watches because this record cannot check or clear them. A peer's watch-blocked entry remains open in its own lane, and a prefixed dependency on that entry blocks here.
+
+Validation includes the watch count in its census and reports zero when `watches.md` is absent. The count describes the record and does not add a default file.
 
 `Q-` names a question section and `W-` names a watch section. A watch id is unique within `watches.md`, so a reader can cite it. Section ids do not enter the entry id namespace or consume tombstones.
 
@@ -62,7 +69,7 @@ The reference form reuses the source reference whole. Its url template turns the
 
 ### `watches:a-watch-blocks-something` — A watch blocks something
 
-Every watch section MUST carry a `Blocks` line naming at least one entry id that exists in some lane.
+Every watch section MUST carry a `Blocks` line naming at least one entry id.
 
 #### Scenario: A watch blocks nothing
 
@@ -131,6 +138,42 @@ When a watch meets its exit condition, the record MUST delete its section and MU
 - THEN the section leaves the file because an earned file holds unmet watches alone
 
 Verify: reviewer confirms a cleared watch is deleted instead of marked
+
+### `watches:a-watched-entry-is-not-eligible` — A watched entry is not eligible
+
+While an open watch names an entry on its `Blocks` line, the implementation MUST treat that entry as ineligible.
+
+#### Scenario: The scheduled head waits on an outside item
+
+- GIVEN a scheduled entry blocked by an open watch
+- WHEN ranking derives eligibility
+- THEN the entry is ineligible because work this record cannot order must happen first
+
+Verify: `cargo nextest run --test ranking`
+
+### `watches:a-blocked-id-exists` — A blocked id exists
+
+Every id named on a watch's `Blocks` line MUST exist in some lane.
+
+#### Scenario: A blocked entry is deleted
+
+- GIVEN a watch naming an id that no longer exists
+- WHEN validation runs
+- THEN it fails because the watch blocks no record entry
+
+Verify: `cargo nextest run --test validation`
+
+### `watches:a-stale-watch-is-reported` — A stale watch is reported
+
+At least one blocked id MUST still be open, and the implementation MUST report a watch whose blocked entries have all closed.
+
+#### Scenario: The last blocked entry closes
+
+- GIVEN a watch whose every blocked entry is finished
+- WHEN validation runs
+- THEN the watch is reported as stale because nobody needs to keep reading its outside item
+
+Verify: `cargo nextest run --test validation`
 
 ## Unenforced rules
 
