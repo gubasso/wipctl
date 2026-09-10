@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.5.0](https://github.com/gubasso/wipctl/compare/v0.4.1...v0.5.0) - 2026-09-10
+
+### Added
+
+- breaking, `ranking`: Derive a lane's order from a declared key chain ([#46](https://github.com/gubasso/wipctl/pull/46)). derive a lane's order from a declared key chain ([#46](https://github.com/gubasso/wipctl/pull/46))
+
 ## [0.4.1](https://github.com/gubasso/wipctl/compare/v0.4.0...v0.4.1) - 2026-09-09
 
 ### Other
