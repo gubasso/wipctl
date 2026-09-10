@@ -14,7 +14,7 @@ An id that carries an alias prefix is read in the peer that alias names. It gate
 
 ## The key chain
 
-The record uses one order computation. Close date sorts first, ascending, where an entry carries one. The remaining comparisons run in this order:
+The record uses one order computation. Close date sorts first, ascending, where an entry carries one. The plan configuration's required `[ranking]` table declares the remaining comparisons as one ordered list. The scaffold writes this chain:
 
 1. eligible before ineligible
 2. topological over same-lane dependencies
@@ -22,7 +22,11 @@ The record uses one order computation. Close date sorts first, ascending, where 
 4. points ascending
 5. full id, compared lexically as one opaque string
 
-The first two comparisons apply the graph constraints by construction. Class follows, with an absent class at the `standard` position. It states whether the cost of delay is immediate, ordinary, or late. Smaller work follows, which shortens the average wait, and the three-point cap bounds what larger work can wait behind. The full id resolves only otherwise indistinguishable entries and makes the order total. The closed lane uses the same procedure, with close date equal everywhere else, so the record needs no separate chain per lane.
+Every valid chain starts with eligibility and same-lane dependencies because they are constraints rather than preferences. A chain that put class first could put blocked work at its head. The project chooses which stated keys follow and their order, and the full id always ends the list. The residual id resolves only otherwise indistinguishable entries and makes the order total. The closed lane uses the same procedure, with close date equal everywhere else, so the record needs no separate chain per lane.
+
+The declaration lives in `.wipctl/plan.toml` because a commit and `sync` replicate it to every worker. The host repository would make it per checkout, the state directory would make it per machine, and the cache is disposable. An order that differs per machine is not an order.
+
+An operator changes the chain by editing the plan configuration and committing it. The plan repository's hooks validate the change before it lands. No verb writes the chain because a configuration verb would need a grammar for every key, and no warning duplicates the hook's refusal.
 
 Class affects ordering alone. It creates no dependency, changes no eligibility result, and enters no measure. More than one open expedite entry is legal and produces a warning at exit 0, because the person who stated the classes decides whether to change them.
 

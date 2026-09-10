@@ -9,7 +9,7 @@ Build the data model first:
 - the configuration reader for both configuration files
 - the record library over the canonical subset, with the caller-supplied sink
 - the checker, with the identity, lane-parse, story, epic, initiative, graph, and open-questions rules
-- the record-wide order computation, with close date followed by eligibility, same-lane dependencies, class of service, points, and the full-id residual key
+- the record-wide order computation, with close date followed by the validated key chain from the plan configuration
 
 Then ship validation, with its census and its named schema half. Ship the preview verb as a head read that never gates. Ship the schemas with their metaschema gate. A hand-fabricated plan repository is the fixture, because no verb creates one yet.
 

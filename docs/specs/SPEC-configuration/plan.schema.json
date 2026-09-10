@@ -41,6 +41,20 @@
         }
       }
     },
+    "ranking": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The plan's ordered ranking key names. The cross-file checker owns the presence of this table and its keys. This schema owns the table, list, and string types.",
+      "properties": {
+        "keys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The key chain in comparison order. The ranking checker owns the accepted names, uniqueness, fixed derived prefix, and residual suffix."
+        }
+      }
+    },
     "stale_after": {
       "type": "object",
       "additionalProperties": false,

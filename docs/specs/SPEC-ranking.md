@@ -9,6 +9,9 @@
   - [`ranking:eligibility-is-derived-from-three-edges` — Eligibility is derived from three edges](#rankingeligibility-is-derived-from-three-edges--eligibility-is-derived-from-three-edges)
   - [`ranking:an-order-is-computed-and-never-stored` — An order is computed and never stored](#rankingan-order-is-computed-and-never-stored--an-order-is-computed-and-never-stored)
   - [`ranking:a-class-orders-below-eligibility-and-above-size` — A class orders below eligibility and above size](#rankinga-class-orders-below-eligibility-and-above-size--a-class-orders-below-eligibility-and-above-size)
+  - [`ranking:a-key-name-is-known-and-appears-once` — A key name is known and appears once](#rankinga-key-name-is-known-and-appears-once--a-key-name-is-known-and-appears-once)
+  - [`ranking:the-chain-ends-in-the-residual-key` — The chain ends in the residual key](#rankingthe-chain-ends-in-the-residual-key--the-chain-ends-in-the-residual-key)
+  - [`ranking:the-derived-keys-lead-and-are-not-reordered` — The derived keys lead and are not reordered](#rankingthe-derived-keys-lead-and-are-not-reordered--the-derived-keys-lead-and-are-not-reordered)
   - [`ranking:the-key-chain-is-total` — The key chain is total](#rankingthe-key-chain-is-total--the-key-chain-is-total)
   - [`ranking:a-key-reads-the-record-alone` — A key reads the record alone](#rankinga-key-reads-the-record-alone--a-key-reads-the-record-alone)
   - [`ranking:the-residual-key-is-the-full-id` — The residual key is the full id](#rankingthe-residual-key-is-the-full-id--the-residual-key-is-the-full-id)
@@ -55,23 +58,28 @@ A watch is legal on work already in flight. A question means the project does no
 
 ## The key chain
 
-The record uses one ordering procedure. It compares close date first, ascending, for entries that carry one. Entries without a close date compare equal on that key. The remaining chain reads top to bottom:
+The record uses one ordering procedure. It compares close date first, ascending, for entries that carry one. Entries without a close date compare equal on that key. The plan configuration declares the remaining chain as one ordered list that the reader applies top to bottom.
 
-```text
-1. eligible before ineligible        derived from dependencies, blocking questions, and blocking watches
-2. topological over same-lane needs  derived; the hard constraint
-3. class of service                  stated; expedite, standard, intangible
-4. points ascending                  stated; smaller work first
-5. full id, lexical                  residual; makes the chain total
+```toml
+[ranking]
+keys = ["eligibility", "needs", "class", "points-ascending", "id"]
 ```
 
-The first two keys express graph constraints by construction. Eligibility sorts first, and a same-lane dependency sorts before the entry that needs it.
+The scaffold writes that chain. Five names are valid: `eligibility` sorts eligible entries first, `needs` orders same-lane dependencies topologically, `class` applies class of service, `points-ascending` puts smaller work first, and `id` compares the full id lexically.
+
+The first two keys express graph constraints by construction. Every chain begins with `eligibility` and then `needs`, so a same-lane dependency sorts before the entry that needs it. The project chooses which stated keys follow and their order. Every chain ends with `id` so the order stays total.
 
 Class is the only field a person states for ordering alone. It creates no dependency edge, changes no eligibility result, and enters no measure because it is not an event.
 
 Smaller work first shortens the average wait. The three-point cap bounds what a larger entry can wait behind because larger work splits along its judgments.
 
 One record-wide procedure avoids four more chains to configure. The closed lane is the only lane with a distinct key, and the close-date comparison is equal everywhere else.
+
+The ranking domain owns the cross-file check for the section's presence because an absent section leaves the order undefined. The configuration schema owns the table, list, and string types, and `configuration:the-schema-owns-types-and-the-checker-owns-agreement` keeps presence with the checker.
+
+The declaration lives in `.wipctl/plan.toml` because the file is committed and `sync` replicates it. Every worker then derives one order from one declaration. The host repository is per project checkout, the state directory is machine-local, and the cache is disposable, so none can carry a plan's order.
+
+An operator changes the chain by editing the plan configuration and committing it. No verb writes the chain because a configuration verb would need a grammar for every key. The plan hooks validate the commit under `transactions:the-plan-hooks-are-never-bypassed`, so no warning about an uncommitted edit is needed.
 
 ## Requirements
 
@@ -89,7 +97,7 @@ Verify: `cargo nextest run --test ranking`
 
 ### `ranking:an-order-is-computed-and-never-stored` — An order is computed and never stored
 
-The implementation MUST compute every lane's order on each read and treat lane-file sequence as membership alone.
+The implementation MUST compute every lane's order from the configured key chain on each read and treat lane-file sequence as membership alone.
 
 #### Scenario: A stored order is requested
 
@@ -101,15 +109,51 @@ Verify: `cargo nextest run --test ranking`
 
 ### `ranking:a-class-orders-below-eligibility-and-above-size` — A class orders below eligibility and above size
 
-The order computation MUST compare class after eligibility and same-lane needs and before points.
+The scaffolded ranking chain MUST compare class after eligibility and same-lane needs and before points.
 
-#### Scenario: An expedited entry is blocked
+#### Scenario: A scaffolded plan has a blocked expedite entry
 
-- GIVEN an expedite entry with an open dependency and an eligible intangible entry in the same lane
-- WHEN the chain compares them
+- GIVEN the default chain, an expedite entry with an open dependency, and an eligible intangible entry in the same lane
+- WHEN the chain compares the entries
 - THEN the eligible intangible entry sorts first, because expedite does not make blocked work startable
 
 Verify: `cargo nextest run --test ranking`
+
+### `ranking:a-key-name-is-known-and-appears-once` — A key name is known and appears once
+
+When a ranking chain loads, the implementation MUST accept only `eligibility`, `needs`, `class`, `points-ascending`, and `id`, and each name MUST appear at most once.
+
+#### Scenario: A chain repeats one unknown name
+
+- GIVEN a chain containing `priority` twice
+- WHEN the configuration loads
+- THEN it fails naming the valid set and the repetition, because the unknown comparison has no meaning and the second occurrence is unreachable
+
+Verify: `cargo nextest run --test configuration`
+
+### `ranking:the-chain-ends-in-the-residual-key` — The chain ends in the residual key
+
+The configured key chain MUST end with `id`.
+
+#### Scenario: Points is the last key
+
+- GIVEN a chain whose last key is `points-ascending`
+- WHEN the configuration loads
+- THEN it fails before a lane is read, because two entries can tie on points and leave the head undefined
+
+Verify: `cargo nextest run --test configuration`
+
+### `ranking:the-derived-keys-lead-and-are-not-reordered` — The derived keys lead and are not reordered
+
+The configured key chain MUST start with `eligibility` followed by `needs`.
+
+#### Scenario: A stated preference leads the chain
+
+- GIVEN a chain that places `class` before either derived key
+- WHEN the configuration loads
+- THEN it fails because eligibility and dependency order are constraints, not preferences, and a chain that puts blocked work at the head contradicts `ranking:a-work-lane-entry-is-unblocked`
+
+Verify: `cargo nextest run --test configuration`
 
 ### `ranking:the-key-chain-is-total` — The key chain is total
 
@@ -125,11 +169,11 @@ Verify: `cargo nextest run --test ranking`
 
 ### `ranking:a-key-reads-the-record-alone` — A key reads the record alone
 
-Every ordering key MUST read the current record's entries alone.
+Every ordering key MUST read the current record's entries and plan configuration alone.
 
 #### Scenario: Two clones read one commit
 
-- GIVEN two clones at one commit with the same record
+- GIVEN two clones at one commit with the same record and configuration
 - WHEN each computes a lane's order
 - THEN both produce one order, because no key reads a clock, history, a directory listing, or machine-local state
 
@@ -185,7 +229,7 @@ Verify: `cargo nextest run --test ranking`
 
 ### `ranking:the-closed-lane-orders-by-date` — The closed lane orders by close date
 
-The order computation MUST compare closed entries by close date ascending before the five-key chain and treat an absent close date as equal.
+The order computation MUST compare closed entries by close date ascending before the configured chain and treat an absent close date as equal.
 
 #### Scenario: An entry reopens and closes again
 
