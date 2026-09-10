@@ -92,18 +92,19 @@ Verify: `cargo nextest run --test verb_contracts`
 
 ### `messages:a-warning-names-its-resolution` — A warning names its resolution
 
-When a stale warning is emitted, the message MUST state the number of entries past the stale line and name `wipctl stale` as the resolution.
+When a stale or cold-reading warning is emitted, the message MUST state each applicable count and name `wipctl stale` as the resolution.
 
-#### Scenario: Four entries are stale
+#### Scenario: Four entries are stale and two watch readings are cold
 
-- GIVEN four rows that the ordinary stale view shows
+- GIVEN four rows that the ordinary stale view shows and two watches unread for 30 days
 - WHEN a workflow verb finishes
-- THEN the warning states the count and the command that shows the rows, because a warning without a resolution leaves the reader stuck
+- THEN the warning states both counts and the command that shows them, because a warning without a resolution leaves the reader stuck
 
 The warning is exactly:
 
 ```text
 wipctl: warning: 4 entries are past the stale line
+wipctl: warning: 2 watches have not been read in 30 days
 wipctl: run `wipctl stale` to see them
 ```
 
