@@ -155,9 +155,9 @@ When a drain reports drift, the reader MUST act on each reported item.
 
 #### Scenario: A landing reports two drift lines
 
-- GIVEN fragments landed at the bottom of their lanes
+- GIVEN fragments that landed naming a dependency which closed while they waited
 - WHEN the report is read
-- THEN each item is acted on, because a landed record whose ranking nobody settled is a plan nobody agreed to
+- THEN each item is acted on, because a landed record carrying a fact the record outgrew is a plan nobody agreed to
 
 Verify: reviewer confirms each drift line in the landing report was acted on
 

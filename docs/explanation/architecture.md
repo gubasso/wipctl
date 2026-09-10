@@ -20,7 +20,7 @@ It owns the third path too. Where an invocation names a peer, the component reso
 
 ## The record library
 
-The single reader of the record. It scans the configuration, the five lanes, the presence of the story, epic, and initiative documents, the open questions, the fragments, and the journals. It scans the peer table too. It reads an attached peer through itself, at the tree of that peer's current commit. A peer is a plan, and there is no second reader for one. It answers the derived questions every consumer shares: eligibility, the blocking edges of both kinds, story paths, positions, topological order, the startable set, pending claims, and membership at both tiers.
+The single reader of the record. It scans the configuration, the five lanes, the presence of the story, epic, and initiative documents, the open questions, the fragments, and the journals. It scans the peer table too. It reads an attached peer through itself, at the tree of that peer's current commit. A peer is a plan, and there is no second reader for one. It answers the derived questions every consumer shares: eligibility, the three kinds of blocking edge, story paths, computed lane order, topological order, the startable set, pending claims, and membership at both tiers.
 
 Two properties are load-bearing:
 
@@ -35,7 +35,7 @@ The cross-file rule catalog, implemented against the record library, emitting lo
 
 ## The writers and the transaction layer
 
-The ten writing verbs share one write-discipline layer. That layer holds the transaction lock, the preflight before the first byte, and block relocation without re-serialisation. It also holds temporary-file-and-rename placement, the four guarantees, and the closing plan trunk commit in the fixed grammar. The rank repair is one implementation, called by the repair verb and by the transition verbs.
+The ten writing verbs share one write-discipline layer. That layer holds the transaction lock, the preflight before the first byte, and block relocation without re-serialisation. It also holds temporary-file-and-rename placement, the four guarantees, and the closing plan trunk commit in the fixed grammar. Lane order remains a record-library read and is never a writer concern.
 
 ## The plan repository manager
 

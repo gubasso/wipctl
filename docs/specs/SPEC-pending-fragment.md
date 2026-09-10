@@ -6,7 +6,6 @@
 - [File shape](#file-shape)
 - [Requirements](#requirements)
   - [`pending-fragment:a-fragment-claims-a-planning-lane` — A fragment claims a planning lane](#pending-fragmenta-fragment-claims-a-planning-lane--a-fragment-claims-a-planning-lane)
-  - [`pending-fragment:a-position-names-a-landed-entry` — A position names a landed entry](#pending-fragmenta-position-names-a-landed-entry--a-position-names-a-landed-entry)
   - [`pending-fragment:the-capture-instant-orders-the-drain` — The capture instant orders the drain](#pending-fragmentthe-capture-instant-orders-the-drain--the-capture-instant-orders-the-drain)
   - [`pending-fragment:a-fragment-requires-only-id-and-type` — A fragment requires only an id and a type](#pending-fragmenta-fragment-requires-only-id-and-type--a-fragment-requires-only-an-id-and-a-type)
   - [`pending-fragment:a-closing-field-never-appears` — A closing field never appears](#pending-fragmenta-closing-field-never-appears--a-closing-field-never-appears)
@@ -21,13 +20,12 @@
 
 ## Purpose
 
-One file per captured entry, written by capture and consumed by the drain. A fragment states a delta, meaning where a new entry wants to land, and never a copy of anything a lane file holds. The boundary runs at landing. This domain owns the fragment and what the drain refuses. The lane file domain owns the entry once it lands, and it owns the two forms a dependency takes.
+One file per captured entry, written by capture and consumed by the drain. A fragment states a new entry and its planning lane, and never copies anything a lane file holds. The boundary runs at landing. This domain owns the fragment and what the drain refuses. The lane file domain owns the entry once it lands, and it owns the two forms a dependency takes.
 
 ## File shape
 
 ```yaml
 lane: backlog
-after: null
 captured: "2026-08-14T09:41:07Z"
 entry:
   id: rate-limit-the-search-endpoint
@@ -53,18 +51,6 @@ A fragment MUST claim a planning lane and MUST NOT claim a work lane.
 - THEN it fails, because landing into a work lane is a transition, and a transition owes a journal event
 
 Verify: `cargo nextest run --test schemas`
-
-### `pending-fragment:a-position-names-a-landed-entry` — A position names a landed entry
-
-A fragment's position claim MUST be empty or name a landed entry, and MUST NOT name an id that exists only as another fragment.
-
-#### Scenario: Two captures reference each other
-
-- GIVEN a fragment positioned beneath another fragment
-- WHEN validation runs
-- THEN it fails, because a position between two things that have not landed states no order
-
-Verify: `cargo nextest run --test validation`
 
 ### `pending-fragment:the-capture-instant-orders-the-drain` — The capture instant orders the drain
 
@@ -116,13 +102,13 @@ Verify: `cargo nextest run --test schemas`
 
 ### `pending-fragment:a-pending-entry-has-no-rank` — A pending entry has no rank
 
-A pending entry MUST be part of the record for validation alone: never eligible, without rank, invisible to the next-work verb and the epic verbs, and outside epic arithmetic.
+A pending entry MUST remain outside every lane's key chain and take part in validation alone. It is ineligible, invisible to the next-work verb and the epic verbs, and outside epic arithmetic.
 
 #### Scenario: An epic is summarised while a capture is pending
 
 - GIVEN a fragment naming an epic
 - WHEN the epic's points are totalled
-- THEN the fragment's points are not counted, because an unlanded entry has no agreed position in the plan
+- THEN the fragment's points are not counted, because an unlanded entry belongs to no lane
 
 Verify: `cargo nextest run --test validation`
 
@@ -154,11 +140,11 @@ Verify: `cargo nextest run --test validation`
 
 When the drain finds drift, it MUST report the drift and MUST NOT repair it.
 
-#### Scenario: A position target closed while the capture waited
+#### Scenario: A dependency closed while the capture waited
 
-- GIVEN a fragment positioned beneath an entry that has since closed
+- GIVEN a fragment whose dependency was open when captured and has since closed
 - WHEN the drain runs
-- THEN the fragment lands at the bottom of its claimed lane and the report says so. A landing whose order nobody chose is worse than one that reports
+- THEN the fragment lands and the report names the closed dependency without changing the dependency list
 
 Verify: `cargo nextest run --test verb_contracts`
 
@@ -168,4 +154,4 @@ Verify: `cargo nextest run --test verb_contracts`
 | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `pending-fragment:a-fragment-requires-only-id-and-type` | Keeping the fragment schema's restatement of the entry fields in agreement with the lane schema is a review responsibility. |
 
-Drift is a fact a fragment states that the record then outgrew. It is a dependency that closed, or a position target that is now another fragment, in another lane, closed, or gone. Rank is a claim, and only a person makes one.
+Drift is a dependency fact a fragment states that the record then outgrows. A dependency can close while the fragment waits, and the drain reports that change without editing it.

@@ -32,4 +32,4 @@ An epic states an end state, not a design. The approach that reaches it covers t
 
 ## Executing one
 
-The epic verb resolves the epic into eligible and blocked groups in graph order, with outside prerequisites included and marked. The loop is simple: take one entry from the eligible group, work it, close it, and ask again. Asking again is not optional, because a close changes eligibility and can change the ranking. One entry serves one end state. A story that seems to serve two was split along the wrong seam.
+The epic verb resolves the epic into eligible and blocked groups in dependency order, breaking ties with the record's key chain, with outside prerequisites included and marked. The loop is simple: take one entry from the eligible group, work it, close it, and ask again. Asking again is not optional, because a close changes eligibility and can change the computed order. One entry serves one end state. A story that seems to serve two was split along the wrong seam.

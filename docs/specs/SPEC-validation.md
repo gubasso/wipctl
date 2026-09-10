@@ -33,13 +33,10 @@ Is the record coherent, and which half answers. The split is architectural: it d
 
 ## The three diagnostic classes
 
-| Class           | Meaning                                                                | Exit     |
-| --------------- | ---------------------------------------------------------------------- | -------- |
-| failure         | the record states something incorrectly and no tool may decide the fix | non-zero |
-| ranking failure | an order contradicting the dependency graph                            | non-zero |
-| warning         | a fact the reader decides about                                        | zero     |
-
-The ranking class is separate because it is the one class the repair can resolve.
+| Class   | Meaning                                                                | Exit     |
+| ------- | ---------------------------------------------------------------------- | -------- |
+| failure | the record states something incorrectly and no tool may decide the fix | non-zero |
+| warning | a fact the reader decides about                                        | zero     |
 
 ## The closure the checker reads
 
@@ -167,11 +164,11 @@ Verify: `cargo nextest run --test validation`
 
 A warning MUST reach the reader and MUST NOT reach the exit code.
 
-#### Scenario: A close date is out of sequence
+#### Scenario: Two journal instants are out of sequence
 
-- GIVEN a record whose only fault is an out-of-order close
+- GIVEN a record whose only fault is a journal pair whose instants decrease
 - WHEN validation runs
-- THEN it succeeds and reports the warning, because the reader decides whether to run the repair
+- THEN it succeeds and reports the warning, because clocks can drift while the event order remains readable
 
 Verify: `cargo nextest run --test validation`
 

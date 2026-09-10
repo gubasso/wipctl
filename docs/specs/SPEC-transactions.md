@@ -33,7 +33,6 @@ plan: move <id> from <from> to <to>
 plan: close <id> as <outcome>
 plan: land <n> fragments
 plan: rename <old> to <new>
-plan: fix ranking
 plan: delete <id>
 plan: reconcile <n> changes
 plan: resolve <id> keeping <side>

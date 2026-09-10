@@ -8,11 +8,11 @@
 - [A dependency that crosses plans](#a-dependency-that-crosses-plans)
 - [Lane semantics](#lane-semantics)
 - [Requirements](#requirements)
-  - [`lane-file:the-file-is-the-lane` — The file is the lane and the position is the rank](#lane-filethe-file-is-the-lane--the-file-is-the-lane-and-the-position-is-the-rank)
+  - [`lane-file:the-file-is-the-lane` — The file is the lane](#lane-filethe-file-is-the-lane--the-file-is-the-lane)
   - [`lane-file:an-id-is-unique-across-the-record` — An id is unique across the record](#lane-filean-id-is-unique-across-the-record--an-id-is-unique-across-the-record)
   - [`lane-file:the-points-scale-counts-judgments` — The points scale counts judgments](#lane-filethe-points-scale-counts-judgments--the-points-scale-counts-judgments)
   - [`lane-file:a-summary-is-one-bounded-line` — A summary is one bounded line](#lane-filea-summary-is-one-bounded-line--a-summary-is-one-bounded-line)
-  - [`lane-file:needs-is-the-only-sequencing-fact` — Dependencies are the only sequencing fact](#lane-fileneeds-is-the-only-sequencing-fact--dependencies-are-the-only-sequencing-fact)
+  - [`lane-file:needs-is-the-only-sequencing-fact` — Dependencies are the only stored sequencing constraint](#lane-fileneeds-is-the-only-sequencing-fact--dependencies-are-the-only-stored-sequencing-constraint)
   - [`lane-file:a-prefixed-dependency-is-quoted` — A prefixed dependency is quoted](#lane-filea-prefixed-dependency-is-quoted--a-prefixed-dependency-is-quoted)
   - [`lane-file:an-entry-names-its-epic-and-nothing-higher` — An entry names its epic and nothing higher](#lane-filean-entry-names-its-epic-and-nothing-higher--an-entry-names-its-epic-and-nothing-higher)
   - [`lane-file:a-code-reference-is-stated-never-verified` — A code reference is stated, never verified](#lane-filea-code-reference-is-stated-never-verified--a-code-reference-is-stated-never-verified)
@@ -26,7 +26,7 @@
 
 ## Purpose
 
-One file per lane, and the fields an entry carries. The file is the lane, so there is no status field, and the sequence position is the ranking, so there is no priority field. The boundary runs at the file: the shape schema owns each file's own structure, and the cross-file checker owns everything spanning two files.
+One file per lane, and the fields an entry carries. The file is the lane, so there is no status field. The ranking domain computes order from the record. The boundary runs at the file: the shape schema owns each file's own structure, and the cross-file checker owns everything spanning two files.
 
 ## File shape
 
@@ -59,7 +59,7 @@ stories:
 | `succeeded_by` | required when reshaped | one id                                                                                                  |
 | `note`         | optional               | free prose about handling; nothing parses it                                                            |
 
-Points read as follows. `1` is confirmation only: named tests settle acceptance, and at most one unchanged contract is involved. `2` is one judgment: an interface, name, message, or existing contract needs human reasoning. `3` is two judgments, or one that is hard to reverse, such as a schema or a security control.
+Points read as follows. `1` is confirmation only: named tests settle acceptance, and at most one unchanged contract is involved. `2` is one judgment: an interface, name, message, or existing contract needs human reasoning. `3` is two judgments, or one that is hard to reverse, such as a schema or a security control. The cap also bounds what a larger entry waits behind when points sort ascending.
 
 ## A dependency that crosses plans
 
@@ -90,25 +90,25 @@ The separator is `#`. A comment marker in this format must be separated from wha
 
 ## Lane semantics
 
-| Lane      | Meaning                                                               |
-| --------- | --------------------------------------------------------------------- |
-| `backlog` | agreed, not scheduled                                                 |
-| `todo`    | scheduled; the topmost entry is what to start                         |
-| `doing`   | in flight; every dependency closed and no blocking question           |
-| `review`  | waiting on a reader; the same entry gate as in flight                 |
-| `closed`  | finished, append-ordered by close date ascending, stable within a day |
+| Lane      | Meaning                                                     |
+| --------- | ----------------------------------------------------------- |
+| `backlog` | agreed, not scheduled                                       |
+| `todo`    | scheduled; the computed head is what to start               |
+| `doing`   | in flight; every dependency closed and no blocking question |
+| `review`  | waiting on a reader; the same entry gate as in flight       |
+| `closed`  | finished, ordered by close date ascending                   |
 
 ## Requirements
 
-### `lane-file:the-file-is-the-lane` — The file is the lane and the position is the rank
+### `lane-file:the-file-is-the-lane` — The file is the lane
 
-A lane file MUST name the lane matching its basename, MUST order its entries highest priority first, and MUST declare an empty lane explicitly.
+A lane file MUST name the lane matching its basename and MUST declare an empty lane explicitly.
 
 #### Scenario: A status field is proposed
 
 - GIVEN a request for a status or priority field
-- WHEN the file already answers both
-- THEN the field is refused, because two places holding one fact disagree on the first edit
+- WHEN the file answers lane membership and the key chain answers rank
+- THEN each field is refused, because it would store a fact that already has one source
 
 Verify: `cargo nextest run --test schemas`
 
@@ -132,7 +132,7 @@ An entry MUST carry a point value of `1`, `2`, or `3`, and larger work MUST spli
 
 - GIVEN work carrying three judgments and a hard-to-reverse choice
 - WHEN the author reaches for a fourth point
-- THEN there is no such value, and the acceptance criteria already name the split
+- THEN there is no such value, and the acceptance criteria already name the split that bounds its wait
 
 Verify: `cargo nextest run --test schemas`
 
@@ -148,15 +148,15 @@ An entry's summary MUST be one double-quoted line of 60 to 400 characters with n
 
 Verify: `cargo nextest run --test schemas`
 
-### `lane-file:needs-is-the-only-sequencing-fact` — Dependencies are the only sequencing fact
+### `lane-file:needs-is-the-only-sequencing-fact` — Dependencies are the only stored sequencing constraint
 
-The record MUST store sequencing only as an entry's dependency list.
+The record MUST store hard sequencing constraints only as an entry's dependency list.
 
 #### Scenario: A second ordering field is proposed
 
-- GIVEN a request for a phase or a milestone order
+- GIVEN a request for a phase or milestone constraint
 - WHEN the dependency list already expresses it
-- THEN the field is refused, because two orderings disagree the moment either moves
+- THEN the field is refused, because two constraint stores disagree on the first edit
 
 Verify: `cargo nextest run --test validation`
 
@@ -224,10 +224,10 @@ Verify: `cargo nextest run --test validation`
 
 The implementation MUST accept only flat mappings, one level of entry nesting, and one-line flow sequences, and MUST reject every other YAML construct.
 
-#### Scenario: The repair relocates an entry block
+#### Scenario: The move verb relocates an entry block
 
 - GIVEN a lane file with comments and blank lines
-- WHEN the repair moves an entry
+- WHEN the move verb moves an entry
 - THEN the block moves byte for byte and the comments survive, because nothing is ever re-serialised
 
 Verify: `cargo nextest run --test schemas`
@@ -240,7 +240,7 @@ An entry MAY leave the closed lane, and a gap left by a departure MUST NOT be tr
 
 - GIVEN a closed entry that turns out to be unfinished
 - WHEN it moves back
-- THEN the move is legal and recorded, and a close date out of sequence is a warning the repair resolves
+- THEN the move is legal and recorded, and a later close places the entry by its new close date
 
 Verify: `cargo nextest run --test validation`
 

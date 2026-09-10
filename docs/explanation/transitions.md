@@ -2,7 +2,7 @@
 
 ## Why a lane change is recorded
 
-Lane files say where an entry is. Every flow question is a question about when it arrived somewhere: how old is this work, how long did review hold it, and how many times did it come back. So a lane change is an event the record itself states. The move verb relocates the entry, appends the event, and repairs the ranking, in one transaction. An edit records no when, which is why the gate fails a lane that disagrees with its journal.
+Lane files say where an entry is. Every flow question is a question about when it arrived somewhere: how old is this work, how long did review hold it, and how many times did it come back. So a lane change is an event the record itself states. The move verb relocates the entry, appends the event, validates, and commits in one transaction. The next read computes the order from the landed facts. An edit records no when, which is why the gate fails a lane that disagrees with its journal.
 
 ## Why git is a witness, not a source
 

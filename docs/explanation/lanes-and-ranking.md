@@ -2,23 +2,29 @@
 
 ## The record's shape
 
-The lane files are the record. The file is the lane, so there is no `status` field. The position is the ranking, so there is no `priority` field. This is what makes a lane move a reviewable diff and a rank change a one-line relocation.
+The lane files are the record. The file is the lane, so there is no `status` field. File sequence records membership alone, and the key chain computes rank from record facts on every read. A lane move is a reviewable membership diff, while a change to dependencies, points, or close date changes the computed order without relocating an entry by hand.
 
 The lane entry carries what a scanner needs: type, points, summary, dependencies, epic, labels, and outcome. The story document carries what a session needs: goal, example, scope, references, acceptance, and tasks. The zone holds intent, so it is allowed to become false as work moves. That is why it must hold no durable fact. Durable facts live in the host project's documents, as [host-integration.md](./host-integration.md) states.
 
 ## Eligibility
 
-An entry is eligible when every id in its `needs` is closed and no open question blocks it. Blocked is always derived from those two edge kinds, never a lane and never a field. As a result, a view and a gate can never disagree about it.
+An entry is eligible when every id in its `needs` is closed and no open question or blocking watch blocks it. Blocked is always derived from those three edge kinds, never a lane and never a field. As a result, a view and a gate can never disagree about it.
 
 An id that carries an alias prefix is read in the peer that alias names. It gates this entry exactly as a local id does. [plans-and-peers.md](./plans-and-peers.md) says why the two forms are one edge.
 
-## The two ranking rules
+## The key chain
 
-- R1. In `todo.yml`, no ineligible entry sits above an eligible one. Whenever the lane holds a startable entry, the head is one, so the preview verb is a head read and not a search.
-- R2. In `backlog.yml` and `todo.yml`, no entry sits above an entry it needs. Only same-lane edges count.
+The record uses one order computation. Close date sorts first, ascending, where an entry carries one. The remaining comparisons run in this order:
 
-The two work lanes need no ranking rules. Their entry gate already requires closed dependencies and no blocking question. The closed lane is ordered by close date ascending, stable within a day. An out-of-order date is a warning the repair resolves, and a gap left by a reopening is not a defect.
+1. eligible before ineligible
+2. topological over same-lane dependencies
+3. points ascending
+4. full id, compared lexically as one opaque string
 
-## Machine legality, human priority
+The first two comparisons apply the graph constraints by construction. Smaller work follows, which shortens the average wait, and the three-point cap bounds what larger work can wait behind. The full id resolves only otherwise indistinguishable entries and makes the order total. The closed lane uses the same procedure, with close date equal everywhere else, so the record needs no separate chain per lane.
 
-The checker decides whether an order is legal. It never decides which legal order is right. The repair restores legality with the smallest disturbance and treats every legal permutation as a fixed point. That split is why the repair is non-canonical and why no hook invokes it. It is also why the slot report names the legal candidates per position instead of choosing one.
+The two work lanes admit only entries whose dependencies are closed and whose questions are answered. The chain still computes their order, and a gap left by a reopening is not a defect because file sequence carries no rank.
+
+## Computed order, human priority
+
+The tool computes rank; it does not author priority. Every comparison above the residual id reads a fact a person wrote or a condition derived from those facts. The residual id chooses only when those facts express no preference. There is no stored order to validate, repair, or offer as a set of legal positions.

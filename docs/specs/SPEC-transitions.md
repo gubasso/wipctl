@@ -87,13 +87,13 @@ Verify: `cargo nextest run --test verb_contracts`
 
 ### `transitions:arrival-makes-no-rank-claim` — Arrival makes no rank claim
 
-A moved entry's original lines MUST be appended at the bottom of the destination lane, and MUST NOT be inserted anywhere else.
+A moved entry's original lines MUST enter the destination lane unchanged.
 
-#### Scenario: An entry arrives in a ranked lane
+#### Scenario: An entry arrives in a lane
 
-- GIVEN a destination whose order a person arranged
-- WHEN the entry lands at the bottom
-- THEN the repair restores legality and any finer rank stays a person's act, and appending keeps the closed lane in ascending date order
+- GIVEN a destination whose order the key chain computes
+- WHEN the entry lands anywhere in the file sequence
+- THEN its record facts determine its rank, so the arrival makes no separate rank claim
 
 Verify: `cargo nextest run --test writer_guarantees`
 
@@ -161,7 +161,7 @@ Verify: `cargo nextest run --test verb_contracts`
 
 ### `transitions:taking-work-is-atomic` — Taking work is atomic
 
-The take verb MUST read the head, preflight, write, repair, and commit inside one lock holding, choosing the id inside that lock.
+The take verb MUST read the head, preflight, write, validate, and commit inside one lock holding, choosing the id inside that lock.
 
 #### Scenario: Two agents take work at the same instant
 

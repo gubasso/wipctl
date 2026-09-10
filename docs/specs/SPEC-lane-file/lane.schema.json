@@ -11,7 +11,7 @@
       "enum": ["backlog", "todo", "doing", "review", "closed"]
     },
     "stories": {
-      "description": "Ordered highest-priority first. Position is the ranking; there is no priority field.",
+      "description": "The entries that belong to this lane. The ranking domain computes their order on every read.",
       "type": "array",
       "items": { "$ref": "#/$defs/story" }
     }

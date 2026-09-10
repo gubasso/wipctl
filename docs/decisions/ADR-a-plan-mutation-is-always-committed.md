@@ -24,3 +24,5 @@ Chosen option: always committed. One semantic mutation is one transaction and on
 Accepted
 
 Supersedes ADR-a-transition-commit-is-generated-and-opt-in.
+
+Amended by [ADR-an-order-is-computed-and-never-stored.md](./ADR-an-order-is-computed-and-never-stored.md) — `plan: fix ranking` leaves the grammar because no stored ranking exists to repair.

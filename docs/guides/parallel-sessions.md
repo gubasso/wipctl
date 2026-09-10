@@ -60,22 +60,22 @@ Inputs: `<PENDING_FRAGMENTS>` (§2).
 
    ```text
    $ wipctl land --report
-   backlog  rate-limit-the-admin-endpoint-too  bottom
+   backlog  rate-limit-the-admin-endpoint-too
    1 pending, 0 drifts
    $ wipctl land
    ...
    1 landed, 1 fragment removed
    ```
 
-   The order is the captures' own stated instants, with a residual tie on the full id. It is identical on every machine. Any drift is reported, such as a need that closed meanwhile or a moved position target. A fragment with an unresolvable position lands at the bottom of its claimed lane, and the report says so.
+   The drain writes fragments by their stated capture instants, with a residual tie on the full id, so the resulting bytes are identical on every machine. A dependency that closed meanwhile is reported as drift. After landing, the lane's key chain computes each entry's rank from the record facts.
 
-2. Rank as a person's act:
+2. Validate the landed record:
 
    ```text
-   $ wipctl fix --slots
+   $ wipctl validate
    ```
 
-   shows the legal positions. An edit or `wipctl fix` settles them, and `wipctl validate` closes the loop.
+   The check succeeds with no ranking repair because file sequence stores membership alone. The next preview or board read applies the total key chain.
 
 Outputs: none. The fragments are consumed, and the lane files hold the entries.
 

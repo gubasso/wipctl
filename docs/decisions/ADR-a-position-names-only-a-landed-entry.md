@@ -22,3 +22,5 @@ Chosen option: a position names only a landed entry — the drain stays one-phas
 ## Status
 
 Accepted
+
+Superseded by [ADR-an-order-is-computed-and-never-stored.md](./ADR-an-order-is-computed-and-never-stored.md) — pending fragments state no position, and lane-file sequence stores no rank.
