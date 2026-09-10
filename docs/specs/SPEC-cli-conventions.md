@@ -63,9 +63,9 @@ wipctl sync [--all] [--json]
 wipctl resolve <id> --keep <here|remote>
 wipctl validate
 wipctl doctor
-wipctl next
+wipctl next [--why]
 wipctl ids
-wipctl board
+wipctl board [--why]
 wipctl dashboard
 wipctl graph [--unblocks <id>]
 wipctl flow [--lane <lane>]

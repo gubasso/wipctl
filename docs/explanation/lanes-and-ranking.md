@@ -32,6 +32,16 @@ Class affects ordering alone. It creates no dependency, changes no eligibility r
 
 The two work lanes admit only entries whose dependencies are closed and whose questions are answered. The chain still computes their order, and a gap left by a reopening is not a defect because file sequence carries no rank.
 
+## Reading the order back
+
+A computed order a reader cannot explain is an order they cannot argue with. `wipctl board` renders each lane in chain order and marks each row's class with a glyph: `^` for expedite, nothing for standard, and `.` for intangible. Two ASCII characters survive a pipe and a colour-free terminal, which is why they are the mark rather than a colour.
+
+`wipctl board --why` and `wipctl next --why` add one column naming the key that decided each row against the row above it. One key, never the whole chain and never a score, because the reader wants to know why this row sits here rather than one line up.
+
+Where the residual id decided a row, the board says so with no flag given. That mark is not optional, because a mark only a flag reveals is a mark nobody sees, and this is the one place the tool chose where a person did not.
+
+The loop is read, edit the record, read again. Neither flag writes a byte, takes a lock, or exits non-zero.
+
 ## Computed order, human priority
 
 The tool computes rank; it does not author priority. Class is the one field a person writes for ordering alone. Every comparison above the residual id reads a fact a person wrote or a condition derived from those facts. The residual id chooses only when those facts express no preference. There is no stored order to validate, repair, or offer as a set of legal positions.

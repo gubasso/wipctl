@@ -11,6 +11,8 @@
   - [`reporting:a-blocked-entry-is-shown-never-hidden` — A blocked entry is shown, never hidden](#reportinga-blocked-entry-is-shown-never-hidden--a-blocked-entry-is-shown-never-hidden)
   - [`reporting:a-dependency-across-plans-is-visible` — A dependency across plans is visible](#reportinga-dependency-across-plans-is-visible--a-dependency-across-plans-is-visible)
   - [`reporting:the-board-offers-no-interaction` — The board offers no interaction](#reportingthe-board-offers-no-interaction--the-board-offers-no-interaction)
+  - [`reporting:a-row-names-the-key-that-placed-it` — A row names the key that placed it](#reportinga-row-names-the-key-that-placed-it--a-row-names-the-key-that-placed-it)
+  - [`reporting:a-residual-tie-is-marked-without-a-flag` — A residual tie is marked without a flag](#reportinga-residual-tie-is-marked-without-a-flag--a-residual-tie-is-marked-without-a-flag)
   - [`reporting:the-preview-is-a-head-read` — The preview is a head read](#reportingthe-preview-is-a-head-read--the-preview-is-a-head-read)
   - [`reporting:a-defect-warns-and-the-line-prints` — A defect warns and the line prints](#reportinga-defect-warns-and-the-line-prints--a-defect-warns-and-the-line-prints)
   - [`reporting:pending-work-is-invisible-to-the-preview` — Pending work is invisible to the preview](#reportingpending-work-is-invisible-to-the-preview--pending-work-is-invisible-to-the-preview)
@@ -27,6 +29,8 @@
 The read-only views: the lanes on one screen, what to start next, the composite screen, the dependency drawing, and the id stream. The boundary runs at the write. Every verb here is a pure function of the committed files. The rendering domain owns how a view looks, and each measure's own domain owns what it means.
 
 The board draws a watch badge from the record alone. Neither the board nor the checker reaches a network or knows whether the outside item remains open.
+
+A view that explains an order looks like a view that could fix one, so this page says it once. The explain flag adds a column. It takes no lock, writes no byte, and exits 0. A reader who wants a different order edits the record and reads again.
 
 ## Requirements
 
@@ -116,6 +120,44 @@ The board MUST offer no interaction.
 
 Verify: `cargo nextest run --test reporting`
 
+### `reporting:a-row-names-the-key-that-placed-it` — A row names the key that placed it
+
+Under the explain flag, the board and the preview MUST name one key per row, which is the key that decided that row against the row above it, and MUST print no score.
+
+#### Scenario: A reader asks why a row sits where it does
+
+- GIVEN a lane rendered in chain order under the explain flag
+- WHEN the reader reads one row
+- THEN one key is named and the rest of the chain is not, because the reader wants to know why this row is here rather than one line up
+
+The board renders each lane in chain order, and the explain flag adds a column and never a write.
+
+```text
+$ wipctl board --why
+
+TODO
+  ^  rate-limit-the-search-endpoint     class: expedite
+     secure-session-storage             points: 1
+     profile-composition                points: 2
+     audit-the-token-store              id (tied)
+```
+
+Verify: `cargo nextest run --test reporting`
+
+### `reporting:a-residual-tie-is-marked-without-a-flag` — A residual tie is marked without a flag
+
+Where the residual key decides a row, the board MUST mark that row whether or not the explain flag is given.
+
+#### Scenario: The ordinary board renders two tied entries
+
+- GIVEN two entries tied on every stated key, rendered with no flag
+- WHEN the board draws
+- THEN the lower row carries the tie mark, because a mark only a flag reveals is a mark nobody sees and the tool must not look like it decided a priority
+
+`ranking:the-residual-key-is-the-full-id` makes the chain total, and a total chain hides the difference between a decided order and an accidental one. This mark puts the difference back.
+
+Verify: `cargo nextest run --test reporting`
+
 ### `reporting:the-preview-is-a-head-read` — The preview is a head read
 
 The preview verb MUST print the head of the in-flight lane, or of the scheduled lane when that is empty, and MUST walk neither.
@@ -124,7 +166,7 @@ The preview verb MUST print the head of the in-flight lane, or of the scheduled 
 
 - GIVEN a scheduled lane whose head is blocked
 - WHEN the preview runs
-- THEN it warns and prints the line anyway, because the ranking rule already sorts eligible entries above ineligible ones
+- THEN it warns and prints the line anyway, because the chain's first key already sorts eligible entries above ineligible ones
 
 Verify: `cargo nextest run --test reporting`
 
@@ -148,7 +190,7 @@ The preview MUST NOT offer an unlanded entry as work to start.
 
 - GIVEN a fragment claiming the scheduled lane
 - WHEN the preview runs
-- THEN it is invisible, because an unlanded entry has no agreed position in the plan
+- THEN it is invisible, because an entry outside every lane is outside the chain
 
 Verify: `cargo nextest run --test reporting`
 
