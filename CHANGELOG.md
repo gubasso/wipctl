@@ -10,7 +10,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- breaking, `ranking`: Derive a lane's order from a declared key chain ([#46](https://github.com/gubasso/wipctl/pull/46)). derive a lane's order from a declared key chain ([#46](https://github.com/gubasso/wipctl/pull/46))
+- breaking, `ranking`: Derive a lane's order from a declared key chain ([#46](https://github.com/gubasso/wipctl/pull/46)). A lane file's sequence no longer carries rank, and an existing lane file needs no migration because its order is recomputed on the next read. A pending fragment no longer accepts the `after` key, so an adopter removes that key from every fragment before validating or draining. The plan configuration now requires a ranking section, so an adopter adds `[ranking]` with `keys = ["eligibility", "needs", "class", "points-ascending", "id"]` to `.wipctl/plan.toml`.
+- breaking, `validation`: Derive eligibility from three edges ([#43](https://github.com/gubasso/wipctl/pull/43)). Eligibility now derives from dependencies, blocking questions, and blocking watches. An entry blocked by a watch is ineligible where it was eligible before, and the rule id becomes `ranking:eligibility-is-derived-from-three-edges`.
+- breaking, `record`: Hold an external wait as a watch that blocks named entries ([#42](https://github.com/gubasso/wipctl/pull/42)). `external-sources:a-source-ref-never-sequences-and-never-counts` now applies to references in `Sources` sections. An adopter moves an outside wait from an entry note into a watch section.
+- `record`: Mark a watch whose item left the source's open list ([#45](https://github.com/gubasso/wipctl/pull/45))
+- `record`: Give every watch the date it was last read ([#44](https://github.com/gubasso/wipctl/pull/44))
+- `metrics`: Announce stale rows, silence one, and route an agent ([#41](https://github.com/gubasso/wipctl/pull/41))
 
 ## [0.4.1](https://github.com/gubasso/wipctl/compare/v0.4.0...v0.4.1) - 2026-09-09
 
