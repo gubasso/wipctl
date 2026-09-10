@@ -18,6 +18,7 @@
   - [`watches:a-reading-carries-its-date-and-its-observation` — A reading carries its date and its observation](#watchesa-reading-carries-its-date-and-its-observation--a-reading-carries-its-date-and-its-observation)
   - [`watches:a-cadence-is-optional-at-both-levels` — A cadence is optional at both levels](#watchesa-cadence-is-optional-at-both-levels--a-cadence-is-optional-at-both-levels)
   - [`watches:a-cold-reading-is-announced-and-never-gates` — A cold reading is announced and never gates](#watchesa-cold-reading-is-announced-and-never-gates--a-cold-reading-is-announced-and-never-gates)
+  - [`watches:the-view-reports-a-watch-and-decides-nothing` — The view reports a watch and decides nothing](#watchesthe-view-reports-a-watch-and-decides-nothing--the-view-reports-a-watch-and-decides-nothing)
 - [Unenforced rules](#unenforced-rules)
 - [Page budget](#page-budget)
 
@@ -68,6 +69,10 @@ A workflow verb announces a cold-reading count on stderr at exit 0 and names `wi
 The count includes a watch whose `Read` date is older than its threshold and whose blocked work remains open. It excludes a watch read inside the threshold. It also excludes a watch whose blocked entries have all closed, because `watches:a-stale-watch-is-reported` already reports that record error.
 
 Clearing a watch creates no separate event store. The section enters and leaves `watches.md` through ordinary commits, so `git log` on that file records when the block appeared and lifted, with its author and date. A future blocked-duration measure can fold from that history without storing or computing the measure here.
+
+The source view marks a reference-form watch as `still listed`, `no longer listed`, or `unjudged`. The words `no longer listed` mean only that the item left the command's open list. A person compares that fact with the `Until` condition. The view reports a phrase-form watch as `skipped` because it has no alias or key to compare.
+
+The mark is not a check, and it changes no exit code. It is not a clear, so the watch stays until a person edits the record. It is not eligibility, which derives from `watches.md` rather than the view. It is not a store under `external-sources:the-view-cache-is-authoritative-for-nothing`, because every run derives the report again.
 
 ## Reference or phrase
 
@@ -223,6 +228,18 @@ When at least one open watch has a reading older than its resolved cadence, the 
 - GIVEN two watches past their resolved cadence and still blocking open entries
 - WHEN a workflow verb finishes
 - THEN one warning line reports both watches and the resolution while stdout and the exit code keep their ordinary result
+
+Verify: `cargo nextest run --test verb_contracts`
+
+### `watches:the-view-reports-a-watch-and-decides-nothing` — The view reports a watch and decides nothing
+
+When the source view renders, it MUST report each reference-form watch as `still listed`, `no longer listed`, or `unjudged`, report each phrase-form watch as `skipped`, and MUST leave every check, exit code, and eligibility answer unchanged.
+
+#### Scenario: The view reads some watches and cannot read others
+
+- GIVEN one listed watch, one absent watch, one watch whose source did not answer, and one phrase-form watch
+- WHEN the source view renders
+- THEN it reports all four as `still listed`, `no longer listed`, `unjudged`, and `skipped`, while the record keeps deciding from its files alone
 
 Verify: `cargo nextest run --test verb_contracts`
 
