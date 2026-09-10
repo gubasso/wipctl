@@ -18,7 +18,7 @@ A planning method a project can adopt without adopting a documentation methodolo
 - No default for a path or a value a project must declare. A value guessed on a project's behalf is a value nobody wrote down.
 - No second store of anything the record or the filesystem already holds. Repository history is explicitly excluded from the stores the method leans on. A rebase rewrites it, a squash deletes it, and a shallow clone never carries it. The plan trunk's own history is a replication log and not a store. No verb reads it back to answer a question the files answer.
 - No promise past the build. The spec zone is the complete specification the product is built against, and conformance grows into it. A capability proposed after the product ships enters the plan record as a story before it enters a spec. Either way, a capability a given build lacks is named absent, in the usage output, in the payload, and everywhere else. It is never implied present.
-- No priority a machine authors. The tool computes rank by applying the key chain to record facts a person wrote. The residual id comparison acts only when those facts express no preference.
+- No priority a machine authors. The tool computes rank by applying the key chain to dependencies, class of service, and points a person wrote. The residual id comparison acts only when those facts express no preference.
 
 ## Iteration
 

@@ -5,12 +5,15 @@
 - [Purpose](#purpose)
 - [File shape](#file-shape)
 - [Entry fields](#entry-fields)
+- [Class of service](#class-of-service)
 - [A dependency that crosses plans](#a-dependency-that-crosses-plans)
 - [Lane semantics](#lane-semantics)
 - [Requirements](#requirements)
   - [`lane-file:the-file-is-the-lane` — The file is the lane](#lane-filethe-file-is-the-lane--the-file-is-the-lane)
   - [`lane-file:an-id-is-unique-across-the-record` — An id is unique across the record](#lane-filean-id-is-unique-across-the-record--an-id-is-unique-across-the-record)
   - [`lane-file:the-points-scale-counts-judgments` — The points scale counts judgments](#lane-filethe-points-scale-counts-judgments--the-points-scale-counts-judgments)
+  - [`lane-file:a-class-of-service-is-optional-and-ordered` — A class of service is optional and ordered](#lane-filea-class-of-service-is-optional-and-ordered--a-class-of-service-is-optional-and-ordered)
+  - [`lane-file:an-absent-class-sorts-as-standard` — An absent class sorts as standard](#lane-filean-absent-class-sorts-as-standard--an-absent-class-sorts-as-standard)
   - [`lane-file:a-summary-is-one-bounded-line` — A summary is one bounded line](#lane-filea-summary-is-one-bounded-line--a-summary-is-one-bounded-line)
   - [`lane-file:needs-is-the-only-sequencing-fact` — Dependencies are the only stored sequencing constraint](#lane-fileneeds-is-the-only-sequencing-fact--dependencies-are-the-only-stored-sequencing-constraint)
   - [`lane-file:a-prefixed-dependency-is-quoted` — A prefixed dependency is quoted](#lane-filea-prefixed-dependency-is-quoted--a-prefixed-dependency-is-quoted)
@@ -36,6 +39,7 @@ stories:
   - id: rate-limit-the-search-endpoint
     type: story
     points: 2
+    class: expedite
     summary: "Callers of the search endpoint are limited per token, and the limit is announced in the response headers rather than discovered by being cut off."
     needs: [secure-session-storage]
     epic: session-hardening
@@ -48,6 +52,7 @@ stories:
 | `id`           | required               | the title's slug; the story document's filename stem                                                    |
 | `type`         | required               | `story`, `spike`, or `chore`                                                                            |
 | `points`       | required               | `1`, `2`, or `3`, counting judgments                                                                    |
+| `class`        | optional               | `expedite`, `standard`, or `intangible`, ordered as written                                             |
 | `summary`      | required               | one double-quoted line, 60 to 400 characters, no surrounding whitespace                                 |
 | `needs`        | optional               | one-line flow sequence of unique ids this entry depends on, each naming this record or an attached peer |
 | `epic`         | optional               | one id naming an existing epic document                                                                 |
@@ -60,6 +65,19 @@ stories:
 | `note`         | optional               | free prose about handling; nothing parses it                                                            |
 
 Points read as follows. `1` is confirmation only: named tests settle acceptance, and at most one unchanged contract is involved. `2` is one judgment: an interface, name, message, or existing contract needs human reasoning. `3` is two judgments, or one that is hard to reverse, such as a schema or a security control. The cap also bounds what a larger entry waits behind when points sort ascending.
+
+## Class of service
+
+A class states the shape of an entry's cost of delay. `expedite` means the cost is immediate. `standard` is the ordinary shape of work. `intangible` means the cost arrives late or never, as with technical debt, automation, or cleanup.
+
+An absent class occupies the `standard` sort position. The reader adds no value to the entry. A comparison position for an absent value is not a read-time default.
+
+The class vocabulary carries one ordering fact and none of its associated planning practices:
+
+- Fixed date is absent because it needs a date on an open entry, which would be a second stored ordering input.
+- Capacity allocation is absent because it is a planning practice, while the record states intent rather than policing it.
+- No rule limits expedite entries. Multiple expedite entries remain legal, and a workflow verb warns at exit 0 and changes nothing.
+- A class marks a row. It creates no swimlane or sixth lane.
 
 ## A dependency that crosses plans
 
@@ -135,6 +153,30 @@ An entry MUST carry a point value of `1`, `2`, or `3`, and larger work MUST spli
 - THEN there is no such value, and the acceptance criteria already name the split that bounds its wait
 
 Verify: `cargo nextest run --test schemas`
+
+### `lane-file:a-class-of-service-is-optional-and-ordered` — A class of service is optional and ordered
+
+An entry MAY carry a class of service as `expedite`, `standard`, or `intangible`, ordered from first to last.
+
+#### Scenario: An entry carries a local class name
+
+- GIVEN an entry whose class is `critical`
+- WHEN the lane schema reads it
+- THEN validation fails, because the shared vocabulary gives the value no ordering meaning
+
+Verify: `cargo nextest run --test schemas`
+
+### `lane-file:an-absent-class-sorts-as-standard` — An absent class sorts as standard
+
+When an entry carries no class, the order computation MUST compare it at the `standard` position without adding a value to the entry.
+
+#### Scenario: An absent class meets an explicit standard class
+
+- GIVEN two entries that differ only because one omits class and one states `standard`
+- WHEN the class key compares them
+- THEN they compare equal on that key and both lane entries remain unchanged
+
+Verify: `cargo nextest run --test ranking`
 
 ### `lane-file:a-summary-is-one-bounded-line` — A summary is one bounded line
 

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Lane file",
-  "description": "One lane of a project's plan record. The filename is the lane and sequence order is the human ranking within it.",
+  "description": "One lane of a project's plan record. The filename is the lane and the ranking domain computes order from entry facts.",
   "type": "object",
   "additionalProperties": false,
   "required": ["lane", "stories"],
@@ -72,6 +72,10 @@
         "points": {
           "enum": [1, 2, 3],
           "description": "Units of irreducible human judgment. Work above 3 must split."
+        },
+        "class": {
+          "enum": ["expedite", "standard", "intangible"],
+          "description": "Optional class of service. Values sort in enum order, and absence sorts at the standard position without adding a value."
         },
         "needs": {
           "type": "array",

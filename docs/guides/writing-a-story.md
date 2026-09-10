@@ -19,7 +19,7 @@ One phase, from an itch to a gated entry. [specs/SPEC-documents.md](../specs/SPE
 6. Make acceptance falsifiable. Every assertion names the test that proves it. The point value counts the judgments in that section a test cannot settle.
 7. Pre-authorise escapes in `Rabbit holes`. Every known trap gets a written way out. An escape written after hitting the trap is a revision.
 8. Write the difference and nothing else. Delete the sentence. If a durable fact disappeared, it was in the wrong file, because durable facts live in the documents `Amends` names.
-9. Complete the fragment. Fill the entry's `points` and `summary`, and any field the capture left absent. Then land it, or add the lane entry by hand. The drain refuses an incomplete fragment.
+9. Complete the fragment. Fill the entry's `points` and `summary`, and any field the capture left absent. Set the optional `class` when the cost of delay is immediate (`expedite`) or late (`intangible`). An absent class sorts as `standard`. Then land it, or add the lane entry by hand. The drain refuses an incomplete fragment.
 
    ```text
    $ wipctl validate

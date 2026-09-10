@@ -8,6 +8,7 @@
 - [Requirements](#requirements)
   - [`ranking:eligibility-is-derived-from-three-edges` — Eligibility is derived from three edges](#rankingeligibility-is-derived-from-three-edges--eligibility-is-derived-from-three-edges)
   - [`ranking:an-order-is-computed-and-never-stored` — An order is computed and never stored](#rankingan-order-is-computed-and-never-stored--an-order-is-computed-and-never-stored)
+  - [`ranking:a-class-orders-below-eligibility-and-above-size` — A class orders below eligibility and above size](#rankinga-class-orders-below-eligibility-and-above-size--a-class-orders-below-eligibility-and-above-size)
   - [`ranking:the-key-chain-is-total` — The key chain is total](#rankingthe-key-chain-is-total--the-key-chain-is-total)
   - [`ranking:a-key-reads-the-record-alone` — A key reads the record alone](#rankinga-key-reads-the-record-alone--a-key-reads-the-record-alone)
   - [`ranking:the-residual-key-is-the-full-id` — The residual key is the full id](#rankingthe-residual-key-is-the-full-id--the-residual-key-is-the-full-id)
@@ -59,11 +60,14 @@ The record uses one ordering procedure. It compares close date first, ascending,
 ```text
 1. eligible before ineligible        derived from dependencies, blocking questions, and blocking watches
 2. topological over same-lane needs  derived; the hard constraint
-3. points ascending                  stated; smaller work first
-4. full id, lexical                  residual; makes the chain total
+3. class of service                  stated; expedite, standard, intangible
+4. points ascending                  stated; smaller work first
+5. full id, lexical                  residual; makes the chain total
 ```
 
-The first two keys express the former order constraints by construction. Eligibility sorts first, and a same-lane dependency sorts before the entry that needs it.
+The first two keys express graph constraints by construction. Eligibility sorts first, and a same-lane dependency sorts before the entry that needs it.
+
+Class is the only field a person states for ordering alone. It creates no dependency edge, changes no eligibility result, and enters no measure because it is not an event.
 
 Smaller work first shortens the average wait. The three-point cap bounds what a larger entry can wait behind because larger work splits along its judgments.
 
@@ -95,13 +99,25 @@ The implementation MUST compute every lane's order on each read and treat lane-f
 
 Verify: `cargo nextest run --test ranking`
 
+### `ranking:a-class-orders-below-eligibility-and-above-size` — A class orders below eligibility and above size
+
+The order computation MUST compare class after eligibility and same-lane needs and before points.
+
+#### Scenario: An expedited entry is blocked
+
+- GIVEN an expedite entry with an open dependency and an eligible intangible entry in the same lane
+- WHEN the chain compares them
+- THEN the eligible intangible entry sorts first, because expedite does not make blocked work startable
+
+Verify: `cargo nextest run --test ranking`
+
 ### `ranking:the-key-chain-is-total` — The key chain is total
 
 The key chain MUST order every pair of entries in one lane so that no two entries compare equal.
 
 #### Scenario: Every stated key ties
 
-- GIVEN two entries with the same eligibility, same-lane needs relation, close date, and points
+- GIVEN two entries with the same eligibility, same-lane needs relation, close date, class, and points
 - WHEN the chain reaches its residual key
 - THEN one id sorts first, so the preview and take verbs read one defined head
 
@@ -169,7 +185,7 @@ Verify: `cargo nextest run --test ranking`
 
 ### `ranking:the-closed-lane-orders-by-date` — The closed lane orders by close date
 
-The order computation MUST compare closed entries by close date ascending before the four-key chain and treat an absent close date as equal.
+The order computation MUST compare closed entries by close date ascending before the five-key chain and treat an absent close date as equal.
 
 #### Scenario: An entry reopens and closes again
 

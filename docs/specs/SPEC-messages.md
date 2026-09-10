@@ -7,6 +7,7 @@
 - [Requirements](#requirements)
   - [`messages:a-failure-names-its-resolution` — A failure names its resolution](#messagesa-failure-names-its-resolution--a-failure-names-its-resolution)
   - [`messages:a-warning-names-its-resolution` — A warning names its resolution](#messagesa-warning-names-its-resolution--a-warning-names-its-resolution)
+  - [`messages:an-excess-expedite-warning-names-the-count` — An excess expedite warning names the count](#messagesan-excess-expedite-warning-names-the-count--an-excess-expedite-warning-names-the-count)
   - [`messages:a-refusal-names-what-unblocks-it` — A refusal names what unblocks it](#messagesa-refusal-names-what-unblocks-it--a-refusal-names-what-unblocks-it)
   - [`messages:relayed-output-is-redacted-and-bounded` — Relayed output is redacted and bounded](#messagesrelayed-output-is-redacted-and-bounded--relayed-output-is-redacted-and-bounded)
   - [`messages:success-states-what-changed` — Success states what changed](#messagessuccess-states-what-changed--success-states-what-changed)
@@ -106,6 +107,25 @@ The warning is exactly:
 wipctl: warning: 4 entries are past the stale line
 wipctl: warning: 2 watches have not been read in 30 days
 wipctl: run `wipctl stale` to see them
+```
+
+Verify: `cargo nextest run --test verb_contracts`
+
+### `messages:an-excess-expedite-warning-names-the-count` — An excess expedite warning names the count
+
+When a workflow verb finds multiple open entries with class `expedite`, the implementation MUST warn once on stderr at exit 0, name the count, preserve its result, and leave resolution to a person.
+
+#### Scenario: Two open entries are expedited
+
+- GIVEN two open entries whose class is `expedite`
+- WHEN a workflow verb finishes
+- THEN stderr names the count once and says the person may leave or edit the classes, while stdout and the exit code keep their ordinary result
+
+The warning is exactly:
+
+```text
+wipctl: warning: 2 open entries have class expedite
+wipctl: leave them or edit their class
 ```
 
 Verify: `cargo nextest run --test verb_contracts`

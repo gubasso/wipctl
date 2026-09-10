@@ -8,6 +8,7 @@ Each term links to the page that owns its full definition. A term defined here i
 - canonical YAML subset: the narrow YAML the record accepts. It allows flat mappings, one nesting level, and one-line flow sequences for lists. [specs/SPEC-lane-file.md](./specs/SPEC-lane-file.md)
 - capture: writing a story document plus a pending fragment, without touching a lane file. [explanation/replication.md](./explanation/replication.md)
 - chore: a work type whose outcome is upkeep. It needs no worked example. [explanation/stories-and-estimation.md](./explanation/stories-and-estimation.md)
+- class of service: an optional lane-entry value stating whether the cost of delay is immediate, ordinary, or late. [specs/SPEC-lane-file.md](./specs/SPEC-lane-file.md)
 - closure: this record and every peer it reaches, transitively. It is the set the checker proves the dependency graph over. [explanation/plans-and-peers.md](./explanation/plans-and-peers.md)
 - cold reading: a watch observation whose `Read` date is older than its resolved cadence. [specs/SPEC-watches.md](./specs/SPEC-watches.md)
 - current story: the head of the computed order for `doing.yml`, or for `todo.yml` when `doing` is empty. [specs/SPEC-reporting.md](./specs/SPEC-reporting.md)
