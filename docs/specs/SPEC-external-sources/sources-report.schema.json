@@ -1,10 +1,10 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "External sources report",
-  "description": "One run of the external sources view, as `wipctl sources --json` emits it: every declared source, the open items each one listed, and which of those items an artifact of this record references. A source whose command did not answer appears with its degradation named rather than omitted, so a consumer can tell an empty source from an unread one.",
+  "description": "One run of the external sources view, as `wipctl sources --json` emits it: every declared source, the open items each one listed, which artifacts reference them, and how reference-form watches compare with the open list. A source whose command did not answer appears with its degradation named rather than omitted, so a consumer can tell an empty source from an unread one.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["sources"],
+  "required": ["sources", "skipped_watches"],
   "properties": {
     "sources": {
       "type": "array",
@@ -12,7 +12,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["alias", "answered", "items"],
+        "required": ["alias", "answered", "items", "watches"],
         "properties": {
           "alias": {
             "type": "string",
@@ -54,6 +54,56 @@
                 }
               }
             }
+          },
+          "watches": {
+            "type": "array",
+            "description": "The reference-form watches using this alias. An empty array from an answered source means no watch of this alias is missing. A source that did not answer marks every watch unjudged.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "key", "url", "mark"],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The watch id from its section heading."
+                },
+                "key": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The opaque item key from the watch's source reference."
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The address the alias's url template renders for this key."
+                },
+                "mark": {
+                  "type": "string",
+                  "enum": ["still listed", "no longer listed", "unjudged"],
+                  "description": "The comparison with the open list. No longer listed claims no remote state or satisfied exit condition."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "skipped_watches": {
+      "type": "array",
+      "description": "The phrase-form watches that have no alias or key to compare and must remain visible as skipped.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "mark"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The watch id from its section heading."
+          },
+          "mark": {
+            "const": "skipped",
+            "description": "The view skipped comparison because the watch names an actor rather than a source reference."
           }
         }
       }

@@ -182,6 +182,12 @@ The view MUST mark each listed item as referenced by an artifact of this record 
 
 Verify: `cargo nextest run --test verb_contracts`
 
+The view also compares each reference-form watch against its alias's open list. It marks the watch `still listed` when the key appears and `no longer listed` when the key is absent. The second mark says only that the item left the open list. It does not claim that the item closed, was fixed, or met the watch's `Until` condition.
+
+Each alias object carries its watch judgments beside its `answered` field. An answered source with no missing watch carries an empty result. A source that did not answer marks its watches `unjudged`, because an unread list can support no absence claim.
+
+A phrase-form watch has no alias or key to compare. The report includes it in `skipped_watches` with the `skipped` mark instead of omitting it.
+
 ### `external-sources:a-missing-source-command-degrades-loudly` — A missing source command degrades loudly
 
 Where a declared command does not answer, the view MUST name the degradation on the error stream and MUST report every source that did.
