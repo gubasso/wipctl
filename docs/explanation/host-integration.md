@@ -26,6 +26,14 @@ The shape holds the same doctrine as the branch and the commit. The record store
 
 Two rules keep the tier ladder intact. A reference never sequences and never counts, so `needs` stays the one sequencing fact. A reference also carries no hierarchy, so a story's reference is never checked against its epic's. Membership runs one way through the local ladder, and a remote tree read as membership becomes a second store of it. The cost is stated rather than hidden. Nothing tells a reader that a story and its epic point at unrelated outside trees, and that stays a review question.
 
+Sharing is legal in both directions, and it needs no machinery. A story names every item it answers. An epic names the item that states its end state, and its member stories name that same item where they answer it too. Each claim lives in the document that makes it, and the record keeps no index of the reverse. The reverse is a search over the plan zone:
+
+```bash
+rg -l 'issues#412' <the plan zone root>
+```
+
+That answer costs nothing to keep true, because there is nothing to keep. It needs no network, no declared list command, and no cache. It also finds an artifact whose item the remote system has already closed, which a view built from an open list cannot.
+
 ## A story is a diff, a durable document is a state
 
 This is the doctrine the whole integration rests on. A story describes a change, and the host's documents describe what is true. When a story closes, its acceptance assertions are rewritten in the present tense into the amended documents, together with the behavior. The story then freezes as history. The durable document carries the truth forward and keeps no inverse list of the stories that shaped it.

@@ -60,6 +60,10 @@ A source reference is one token, `<alias>#<key>`. The alias names a table in the
 
 The section carries paths for no reason and resolves against no root, so it is not a path reference. Its item shape follows the same rule the other reference sections carry: the leading inline-code token is the datum, and everything after it is prose.
 
+The relation is many to many, and neither direction is capped. One artifact names as many items as it answers. One item is named by as many artifacts as answer it, at any tier, so an epic and its member stories can each reference it. Nothing is derived from that overlap, because membership still runs one way through the local ladder.
+
+The reverse question, which artifacts name one item, needs no stored index and no command. One fixed-string search for the token over the plan zone answers it. That search runs offline, and it still finds an item the remote system has closed, which the view cannot.
+
 ## Requirements
 
 ### `external-sources:the-remote-system-stays-the-source-of-truth` — The remote system stays the source of truth
