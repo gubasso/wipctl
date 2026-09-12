@@ -5,7 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
-    # The project's own `rk`, pinned at a release tag. `rk devshell sync` moves
+    # The project's own `rk`, pinned at a release tag. `rk self-depend sync` moves
     # the tag and the lock together, and `.envrc` runs it on directory entry.
     release-kit = {
       url = "github:gubasso/release-kit/v0.3.27";
