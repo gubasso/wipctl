@@ -18,13 +18,14 @@ One phase, from an itch to a gated entry. [specs/SPEC-documents.md](../specs/SPE
 5. Wire the references. `Reads` names the individual documents a session must load. State each as a claim linked to a stable anchor, never to a line number. `Amends` names the documents the work must leave changed, or the literal `None`. Mark a document the work will create with `new:`. Where the work changes a rule the host identifies by id, type the clause. Write `ADDED`, `MODIFIED`, or `REMOVED`, then the rule id in inline code. `Sources` names the outside items the work answers, one `<alias>#<key>` token per line, or the literal `None`. [wiring-host-docs.md](./wiring-host-docs.md) is the full sequence.
 6. Make acceptance falsifiable. Every assertion names the test that proves it. The point value counts the judgments in that section a test cannot settle.
 7. Pre-authorise escapes in `Rabbit holes`. Every known trap gets a written way out. An escape written after hitting the trap is a revision.
-8. Write the difference and nothing else. Delete the sentence. If a durable fact disappeared, it was in the wrong file, because durable facts live in the documents `Amends` names.
-9. Complete the fragment. Fill the entry's `points` and `summary`, and any field the capture left absent. Set `delay_cost: immediate` when waiting causes material harm now. Set `delay_cost: deferred` when that harm appears later, remains uncertain, or is negligible now. Omit the field for ordinary work. Then land it, or add the lane entry by hand. The drain refuses an incomplete fragment.
+8. Record the approach that lost. `Refused option` names one other way to reach the same goal, and the reason you did not take it, or the literal `None`. An outcome you leave out is negotiable scope, and a choice that is significant and hard to reverse is a decision record.
+9. Write the difference and nothing else. Delete the sentence. If a durable fact disappeared, it was in the wrong file, because durable facts live in the documents `Amends` names.
+10. Complete the fragment. Fill the entry's `points` and `summary`, and any field the capture left absent. Set `delay_cost: immediate` when waiting causes material harm now. Set `delay_cost: deferred` when that harm appears later, remains uncertain, or is negligible now. Omit the field for ordinary work. Then land it, or add the lane entry by hand. The drain refuses an incomplete fragment.
 
-   ```text
-   $ wipctl validate
-   ```
+```text
+$ wipctl validate
+```
 
-10. Keep the agreement visible. Any later change to the agreement is one dated line under `Revisions`.
+1. Keep the agreement visible. Any later change to the agreement is one dated line under `Revisions`.
 
 No gate catches whether the point value names real judgments, whether the example is concrete, or whether the prose is lean. Those are the reviewer's, by design. [specs/SPEC-review.md](../specs/SPEC-review.md) holds the list.

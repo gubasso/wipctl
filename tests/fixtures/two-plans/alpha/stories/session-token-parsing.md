@@ -49,6 +49,10 @@ None
 
 - A malformed token tempts a repair. The escape is to return nothing and let the caller redirect.
 
+## Refused option
+
+Parse the token at every call site, refused because two parsers drift apart.
+
 ## Revisions
 
 None

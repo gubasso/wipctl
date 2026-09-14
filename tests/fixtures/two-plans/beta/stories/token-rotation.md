@@ -49,6 +49,10 @@ None
 
 - A dropped token tempts a grace period. The escape is to drop it at once and record the choice.
 
+## Refused option
+
+Rotate on a timer, refused because the timer rotates tokens nobody uses.
+
 ## Revisions
 
 None
