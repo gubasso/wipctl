@@ -372,6 +372,35 @@ repos:
         pass_filenames: true
         # upstream: https://github.com/crate-ci/committed (v1.1.11)
 
+  # --- A breaking change carries its adopter guidance (commit-msg stage) ---
+  #
+  # The third property of a commit message this repository judges, and the one
+  # neither hook above reaches. `conventional-pre-commit` reads the subject's
+  # shape and `committed` reads its width, so the body goes unjudged; the
+  # release-kit block's own body check guards attribution and internal paths
+  # and nothing else.
+  #
+  # AGENTS.md says a breaking change owes a changelog entry naming what breaks
+  # and what an adopter does next. That entry is generated: `release-plz.toml`
+  # renders `commit.breaking_description`, which is this message's
+  # `BREAKING CHANGE:` footer. Guidance written anywhere else never reaches the
+  # release, and the field then falls back to the subject, so the entry repeats
+  # itself. The rule was stated in prose and gated by nothing, and two breaking
+  # changes in a row missed it. This hook is the gate it was missing.
+  #
+  # `language: system`; bash comes from the devShell like every other system
+  # hook. The script is repository tooling and is excluded from the published
+  # package, which is why the case suite skips when it is absent.
+  - repo: local
+    hooks:
+      - id: breaking-change-carries-a-footer
+        name: a breaking change carries its adopter guidance
+        entry: scripts/check-breaking-footer
+        language: system
+        stages: [commit-msg]
+        always_run: true
+        pass_filenames: true
+
   # --- Secret scanning (both stages) ---
   #
   # `ripsecrets-system` is upstream's own sanctioned system variant: same

@@ -43,6 +43,13 @@ semver_check = false
 # the commit and one physical line here, so the template replaces each newline
 # with a space before writing it. Without that replacement the footer's second
 # line leaves the list item and becomes a paragraph.
+#
+# The footer comparison is the guard on a message that carries the breaking
+# marker and no footer: `breaking_description` then falls back to the subject,
+# and the entry reads "Subject. subject". The `breaking-change-carries-a-footer`
+# hook is what prevents that message, so this clause only ever fires where the
+# hook was bypassed. It is kept because a template that repeats itself in a
+# published entry is worse than one that says less.
 [changelog]
 header = """# Changelog
 
@@ -57,6 +64,6 @@ body = """
 {%- for group, commits in commits | group_by(attribute="group") %}
 ### {{ group | upper_first }}
 
-{% for commit in commits %}- {% if commit.breaking %}breaking, {% endif %}{% if commit.scope %}`{{ commit.scope }}`: {% endif %}{{ commit.message | upper_first }}{% if commit.breaking and commit.breaking_description %}. {{ commit.breaking_description | replace(from="\n", to=" ") | trim }}{% endif %}
+{% for commit in commits %}- {% if commit.breaking %}breaking, {% endif %}{% if commit.scope %}`{{ commit.scope }}`: {% endif %}{{ commit.message | upper_first }}{% if commit.breaking and commit.breaking_description and commit.breaking_description != commit.message %}. {{ commit.breaking_description | replace(from="\n", to=" ") | trim }}{% endif %}
 {% endfor %}{% endfor %}"""
 trim = true

@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# A breaking change carries its adopter guidance as a footer.
+#
+# AGENTS.md states what a breaking change owes: a changelog entry naming what
+# breaks and what an adopter does next. That entry is generated rather than
+# written. `release-plz.toml` renders `commit.breaking_description` after the
+# subject, and that field is the `BREAKING CHANGE:` footer of this message. A
+# breaking commit with no footer therefore produces an entry with no guidance,
+# and the field falls back to the subject, so the entry repeats itself.
+#
+# Two authors in a row wrote the guidance somewhere the generator cannot read
+# it: once as a `## Breaking change` markdown heading in the body, once as a
+# hand-written block under `## [Unreleased]` in the changelog. Neither reaches
+# the released entry, and neither failed anything. This gate is what fails.
+#
+# Usage:
+#   scripts/check-breaking-footer <commit message file>
+#
+# The gate reads the message alone. It takes the file pre-commit hands a
+# commit-msg hook, and it judges no other input.
+set -euo pipefail
+
+if (($# != 1)); then
+  printf 'check-breaking-footer: takes one commit message file\n' >&2
+  exit 2
+fi
+
+message=$1
+
+if [[ ! -f $message ]]; then
+  printf 'check-breaking-footer: %s is not a file\n' "$message" >&2
+  exit 2
+fi
+
+# Git strips comment lines before it writes the commit, so they are not body.
+body=$(grep -v '^#' -- "$message" || true)
+subject=$(printf '%s\n' "$body" | head -1)
+
+# The marker is the `!` before the colon, which is what the release tooling
+# reads to compute the bump. A message without it is not a breaking change and
+# owes no footer.
+if ! printf '%s' "$subject" | grep -Eq '^[a-z]+(\([a-z0-9._/-]+\))?!: '; then
+  exit 0
+fi
+
+# Conventional Commits accepts both spellings of the footer token, and
+# git-cliff reads both into `breaking_description`.
+if printf '%s\n' "$body" | grep -Eq '^BREAKING[ -]CHANGE: .'; then
+  exit 0
+fi
+
+cat >&2 <<'MESSAGE'
+check-breaking-footer: this subject carries the breaking marker and the body
+check-breaking-footer: carries no BREAKING CHANGE footer, so the generated
+check-breaking-footer: changelog entry would name what breaks and not what an
+check-breaking-footer: adopter does next.
+check-breaking-footer:
+check-breaking-footer: Add a footer to the body, at the start of its own line:
+check-breaking-footer:
+check-breaking-footer:   BREAKING CHANGE: <what breaks, and the step an adopter takes>
+check-breaking-footer:
+check-breaking-footer: The changelog is generated from this message. Do not write
+check-breaking-footer: the guidance into CHANGELOG.md by hand: an entry added under
+check-breaking-footer: [Unreleased] collides with the generated section and stops
+check-breaking-footer: the release on a duplicate heading.
+MESSAGE
+exit 1
