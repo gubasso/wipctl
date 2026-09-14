@@ -1,7 +1,7 @@
 {
-  "schema_version": 5,
-  "rk_version": "0.3.0",
-  "payload_sha256": "9f84d604207ffc6895899a1ebe170d41b566f8a9f8c02dc98a86efc69cdd38bc",
+  "schema_version": 6,
+  "rk_version": "0.4.0",
+  "payload_sha256": "4dc1d547fffaa3db30e26c89825df5b3d14e16311d2eea7a83391d8f60b01d43",
   "origin": "adopt",
   "tech": "rust",
   "forge": "github",
@@ -10,32 +10,48 @@
     "repo": "gubasso/wipctl",
     "workflow": "worktree",
     "style": "trunk",
-    "nix": true
+    "nix": true,
+    "trunk": "master",
+    "line_prefix": "release/",
+    "security_contact": "",
+    "security_response": "best-effort"
   },
   "files": [
     {
       "destination": ".github/workflows/pr-title.yml",
       "kind": "rendered",
-      "sha256": "9a10a4d7f9ada97c0e7b871a9d7c351574ff3cb13081504cd7f453cf7a012ee4",
-      "baseline_sha256": "95565551a263edecb52c98cf91f40e0f6c9412560243481f816ba525049854c1"
+      "sha256": "972336ac17d76fa11d785a8dfb381b3bdc7dc8af318ae9225a4855c08bc1b13c",
+      "baseline_sha256": "0205b9f369179ae855a5feb84d034860632c3187818dd4ae8a23b1fe0aa79bda"
     },
     {
       "destination": ".github/workflows/release-plz.yml",
       "kind": "rendered",
-      "sha256": "c6caff0323bb4489ea637178c99ac836c3c55c40ac4b4437e1345da12be272b7",
-      "baseline_sha256": "f67151adc5f1c8a215e2320edef81151435c71a837e175e7f4aeed5cf8d77ff1"
+      "sha256": "dae0bfc1282b30535df0a13562b0b3ea5b4ff59af63009301f5ee86a9406c968",
+      "baseline_sha256": "2815a2dd91138807ad760fa5e43cde3220beb2980846417ad2b7c5d2f0ba4905"
     },
     {
       "destination": ".pre-commit-config.yaml",
       "kind": "rendered",
       "sha256": "78149baea10341037a25dd728b31ae014c9d391a1c75375076d494663783e6f1",
-      "baseline_sha256": "78149baea10341037a25dd728b31ae014c9d391a1c75375076d494663783e6f1"
+      "baseline_sha256": "96ddd38956586d8ea9a74bcc30b00c90199d6a9b8ecdee8df80da8da3676f1bd"
     },
     {
       "destination": "AGENTS.md",
       "kind": "rendered",
-      "sha256": "06981a4a2f55f76f32dfb6d59e2643ed65bb01df173452ef8c00d4f0811ce91c",
-      "baseline_sha256": "06981a4a2f55f76f32dfb6d59e2643ed65bb01df173452ef8c00d4f0811ce91c"
+      "sha256": "f5b0cdda452317a7735a4d0a5c5a65003d62eaf8766e0db1971fefcfe3b4989f",
+      "baseline_sha256": "2a44e1d476c77305b54c652934306d72f0ae7e6bd9a07a295ba9dc91e94e3ecc"
+    },
+    {
+      "destination": "GLOSSARY.md",
+      "kind": "rendered",
+      "sha256": "f87056fd6911ed36f7d0ed920cb23b737652bfe06c0239f19fce8a3952b7b0c4",
+      "baseline_sha256": "f87056fd6911ed36f7d0ed920cb23b737652bfe06c0239f19fce8a3952b7b0c4"
+    },
+    {
+      "destination": "SECURITY.md",
+      "kind": "rendered",
+      "sha256": "c6a0b788174917afea0ff6171d99c61b6642ee082cfb27f4a170f165246395bf",
+      "baseline_sha256": "c7effad58bca6f1325f7c7123ccf48fe61420b83da7234b74f37215ec0a2b16e"
     },
     {
       "destination": "dist-workspace.toml",
@@ -52,7 +68,7 @@
     {
       "destination": "release-plz.toml",
       "kind": "seeded",
-      "sha256": "f32e33e8637a1e426ee203306f8255e72ed097a49b6c065d447c688e6f0d14f4",
+      "sha256": "a95f367005cc2de98757b77a52aa03e581578c4906b8acbaf7620638a4d04869",
       "baseline_sha256": "0983ed155c83959d08f4446b91fb9dfcfebc80284babe49969bed4eaa0e55f1d"
     }
   ],
@@ -66,6 +82,7 @@
     "dist-download-artifact": "8",
     "dist-upload-artifact": "7",
     "magic-nix-cache-action": "13",
+    "nix-image": "2.35.2",
     "nix-installer-action": "19",
     "pre-commit-hooks": "6.0.0",
     "release-plz": "0.3.160",
