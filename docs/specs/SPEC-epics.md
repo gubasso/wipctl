@@ -6,6 +6,7 @@
 - [The point arithmetic](#the-point-arithmetic)
 - [Requirements](#requirements)
   - [`epics:the-arithmetic-has-one-implementation` — The arithmetic has one implementation](#epicsthe-arithmetic-has-one-implementation--the-arithmetic-has-one-implementation)
+  - [`epics:a-rollup-is-folded-from-the-members` — A rollup is folded from the members](#epicsa-rollup-is-folded-from-the-members--a-rollup-is-folded-from-the-members)
   - [`epics:membership-is-searched-from-the-entries` — Membership is searched from the entries](#epicsmembership-is-searched-from-the-entries--membership-is-searched-from-the-entries)
   - [`epics:the-plan-is-the-transitive-closure` — The plan is the transitive closure](#epicsthe-plan-is-the-transitive-closure--the-plan-is-the-transitive-closure)
   - [`epics:an-outside-prerequisite-is-marked-never-hidden` — An outside prerequisite is marked, never hidden](#epicsan-outside-prerequisite-is-marked-never-hidden--an-outside-prerequisite-is-marked-never-hidden)
@@ -44,6 +45,20 @@ One implementation MUST compute the point arithmetic for every tier.
 - GIVEN a single epic shown in the resolution and in the rollup
 - WHEN both render
 - THEN the numbers agree, because two implementations of one sum disagree on the first edge case
+
+Verify: `cargo nextest run --test epics`
+
+### `epics:a-rollup-is-folded-from-the-members` — A rollup is folded from the members
+
+The implementation MUST fold the session rows and the path-to-entry map from the epic's open direct members on every call, derive each session row's capabilities from the referenced adapter, derive the path union and the overlap set from that map, and store none of them.
+
+#### Scenario: Two members carry claims and one adapter cannot be inspected
+
+- GIVEN one member whose adapter declares inspection and one whose adapter declares resume alone
+- WHEN the detail renders
+- THEN the first row carries a dated reading and the second carries a null one, and neither is a verdict about the epic, because `epics:no-verb-reports-a-staleness-verdict` refuses one at every tier
+
+A union is breadth and never complexity, so it sits beside the point total rather than instead of it. An overlap is evidence for a person and never an edge: `lane-file:needs-is-the-only-sequencing-fact` owns sequencing, and the charter refuses a priority a machine authors. The single-detail view owns this payload, and the rollup stays one row per epic.
 
 Verify: `cargo nextest run --test epics`
 

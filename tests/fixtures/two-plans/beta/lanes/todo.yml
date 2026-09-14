@@ -4,4 +4,5 @@ stories:
     type: story
     points: 3
     needs: ["alpha#profile-composition"]
+    touches: [src/session/store.rs, src/session/mod.rs, docs/specs/SPEC-session.md]
     summary: "Hold a session identity in a store that survives a restart, so that a reader stays signed in and no identity is readable by another process."

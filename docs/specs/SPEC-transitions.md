@@ -15,6 +15,7 @@
   - [`transitions:an-emptied-lane-redeclares-itself` — An emptied lane redeclares itself](#transitionsan-emptied-lane-redeclares-itself--an-emptied-lane-redeclares-itself)
   - [`transitions:reopening-strips-and-records` — Reopening strips and records](#transitionsreopening-strips-and-records--reopening-strips-and-records)
   - [`transitions:a-dry-run-takes-no-lock` — A dry run takes no lock](#transitionsa-dry-run-takes-no-lock--a-dry-run-takes-no-lock)
+  - [`transitions:a-session-claim-changes-with-the-move` — A session claim changes with the move](#transitionsa-session-claim-changes-with-the-move--a-session-claim-changes-with-the-move)
   - [`transitions:taking-work-is-atomic` — Taking work is atomic](#transitionstaking-work-is-atomic--taking-work-is-atomic)
   - [`transitions:taking-prints-what-the-preview-would` — Taking prints what the preview would](#transitionstaking-prints-what-the-preview-would--taking-prints-what-the-preview-would)
   - [`transitions:nothing-startable-terminates-the-loop` — Nothing startable terminates the loop](#transitionsnothing-startable-terminates-the-loop--nothing-startable-terminates-the-loop)
@@ -34,6 +35,7 @@ The lane change as a recorded event, and the verb that takes the next entry atom
 4. The entry is not already in the destination.
 5. The closing flags are consistent. An outcome is required by and only by a move to the closed lane. A successor is required by and only by a reshaped outcome.
 6. An entry entering a work lane has every dependency closed and no blocking question. A dependency that names a peer is read in that peer's record, and step 6 needed no widening to reach it: a peer's entry is an entry and its lane is a lane.
+7. A supplied session reference names a work lane as its destination. A move to a planning or closed lane carries none, which holds a session claim to the discipline step 5 holds a closing flag to.
 
 ## Requirements
 
@@ -156,6 +158,20 @@ A dry run MUST run the whole preflight, print the same report, warn that nothing
 - GIVEN a dry run of a closing move
 - WHEN it completes
 - THEN no lock was taken, because a run that writes nothing is a read
+
+Verify: `cargo nextest run --test verb_contracts`
+
+### `transitions:a-session-claim-changes-with-the-move` — A session claim changes with the move
+
+Where an invocation supplies a session reference, the transition MUST write it inside the same locked transaction as the lane change, preserve an existing claim on a move between work lanes that supplies none, and strip the claim on a move out of the work lanes.
+
+#### Scenario: An in-flight entry is closed
+
+- GIVEN an entry in review carrying a session claim
+- WHEN it moves to the closed lane
+- THEN the claim is gone in the same transaction that changed the lane, because a locator on a closed entry points at a session nobody will resume
+
+A claim is a locator and never a lock. `transitions:taking-work-is-atomic` already owns the lock holding, and the claim rides inside it rather than extending it. The case worth stating is a session that ends without handing the work on: the claim stays, the entry stays in its work lane, and the record honestly says that somebody claimed this and nobody resolved it. `agent-sessions:a-reading-never-gates` is what refuses an automatic repair for that.
 
 Verify: `cargo nextest run --test verb_contracts`
 

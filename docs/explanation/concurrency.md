@@ -8,6 +8,8 @@ A lock protects a transaction, never a session.
 
 An agent that is implementing a story is not editing the plan. It touched the plan for a few milliseconds when it took the work. It will touch the plan again for a few milliseconds when it hands the work to review. In between, the plan is free.
 
+An entry in flight may name the session acting on it, and that claim is a locator and never a lock. It blocks nobody and expires against nothing. The transition writes or strips it inside the same millisecond-scale transaction as the lane change, so the plan is still completely free while the session works.
+
 ```text
 the picture that needs a queue          the picture that does not
 
@@ -182,6 +184,7 @@ What is promised instead is four things. A waiting writer says who holds the loc
 read freely                 next, board, epic, validate — no lock, never blocked
 take atomically             start — one transaction, id chosen inside the lock
 hold nothing while working  the plan is free during implementation
+claim without holding       session names who is acting: a locator, never a lock
 re-check at the write       every precondition is checked against current HEAD
 accept a refusal            exit 2 means somebody got there first: ask again
 sync when leaving a machine fetch, reconcile, push; never force

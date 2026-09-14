@@ -16,6 +16,8 @@ A host whose documentation method excludes a class of document from that load se
 
 `Amends` is the outbound direction. It names the documents the work must leave changed, and it is gated. Each path is relative, carries no dot segment, and resolves against the project root. An assertion opening with `new:` is the exception. It promises a document the work will create, and it exempts existence for the life of the entry. Both directions point anywhere in the project, not only at its documentation.
 
+The outbound direction is an obligation, and it is a subset. The other files the work changes are the ones two agents collide over, and nothing in the record named them. So every entry also predicts the paths its work probably changes, and every path an assertion names appears in that prediction, per [../specs/SPEC-touch-prediction.md](../specs/SPEC-touch-prediction.md). Containment rather than independence is what keeps this one fact instead of two: the prediction is the wider list, the assertions are the promised part of it, and the cross-file check holds them in step.
+
 A host that keeps requirement-level specifications identifies each rule by an id of the shape `<domain>:<rule-slug>`. An `Amends` assertion can then carry a typed delta: `ADDED`, `MODIFIED`, or `REMOVED`, plus the rule id in inline code. Rule-to-story traceability is then one fixed-string search over the plan zone. The gate checks a declared clause's shape and never its presence, for the same reason the inbound direction is unchecked. Which host documents keep rule ids is a fact about the host.
 
 ## A reference out of the project

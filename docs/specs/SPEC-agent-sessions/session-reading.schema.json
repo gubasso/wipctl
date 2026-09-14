@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Session reading",
+  "description": "One normalized observation of one coding session, as a declared inspect adapter writes it on standard output and as every verb that reports a claim restates it. The reading is resolved on use and stored nowhere: the plan record holds the <alias>#<key> locator alone, and whether the session runs, where it listens, and what it is working on stay owned by the session system. A reading is evidence for a person or an agent and never a gate — it changes no record validity, sequences no work, and moves, closes, contacts, or resumes nothing by itself.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["state", "observed_at"],
+  "properties": {
+    "state": {
+      "enum": ["active", "ended", "unknown"],
+      "description": "Three values and no fourth. `active` means the adapter holds present evidence that the session can continue, which is not a claim that it is executing at this instant. `ended` means the adapter holds present evidence that it cannot continue. `unknown` means the adapter could not decide: the command failed, timed out, emitted an invalid object, or supplied no evidence. An inability to look is never proof that a session ended. A provider distinction such as idle, executing, streaming, or compacting belongs in `activity`, because adding `idle` here would overlap the meaning `active` already carries."
+    },
+    "observed_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+      "description": "The instant the reading was taken, in the transition journal's textual form: RFC 3339 UTC with Z, second precision. Required on every reading, an unknown one included, because an undated liveness claim is a claim about now that no reader can check. A failed inspection stamps when the failure was observed."
+    },
+    "location": {
+      "type": "string",
+      "description": "Opaque: where the session is working, as the adapter reports it. No consumer parses it, and no check resolves it against a filesystem."
+    },
+    "activity": {
+      "type": "string",
+      "description": "Opaque: what the session is doing, as the adapter reports it. This is where a provider's own liveness vocabulary lives, so that the three-valued state stays portable across session systems."
+    },
+    "address": {
+      "type": "string",
+      "description": "Opaque: where the adapter found the live session, resolved freshly on this call. It is never stored in the record or the configuration, and it never carries a credential: a reading is printed, piped, logged, and pasted into a report, so an adapter resolves every secret it needs from protected per-user runtime state instead."
+    }
+  }
+}

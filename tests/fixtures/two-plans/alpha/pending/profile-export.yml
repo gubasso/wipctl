@@ -6,3 +6,4 @@ entry:
   points: 2
   summary: "Export a reader's profile as one file they can download, so that leaving the service does not mean leaving the data behind."
   needs: ["beta#token-rotation"]
+  touches: [src/profile/export.rs]

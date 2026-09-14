@@ -33,10 +33,13 @@ entry:
   points: 2
   summary: "Callers of the search endpoint are limited per token, and the limit is announced in the response headers rather than discovered by being cut off."
   needs: ["payments#secure-session-storage"]
+  touches: [src/http/limit.rs]
   epic: session-hardening
 ```
 
 A fragment's `needs` accepts the same two forms a lane entry's does, and the double-quoting rule applies here too.
+
+A fragment's `touches` mirrors the lane entry's field and carries the same bound, and it is optional here for the reason points and summary are. Capture writes what it knows, and the fragment is committed as captured. The drain refuses every field a lane entry requires, so a fragment reaching the drain without its prediction is refused by name, and `pending-fragment:a-fragment-requires-only-id-and-type` is unchanged. A fragment carries no session claim, because a claim belongs to a work lane and a fragment claims a planning one.
 
 ## Requirements
 

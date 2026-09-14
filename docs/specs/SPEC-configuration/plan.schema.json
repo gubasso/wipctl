@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Plan configuration file",
-  "description": "The plan repository's whole configuration: .wipctl/plan.toml at the zone root. It restates the project's identity and carries every fact about the plan itself — the plan owns its own home, so its cadence, its thresholds, the plans it names, and the outside systems it references all live with it, not with the host. The host repository's .wipctl/project.toml carries project_id alone and has no schema: one required key is below a schema's floor, and the cross-file checker owns its presence, grammar, and agreement with this file. Each .wipctl directory holds one file and no second one. The peers and sources sections are optional, and an absent one means what its own domain says it means; a present one is complete, because no key has a read-time default and a value guessed on a project's behalf is a value nobody wrote down.",
+  "description": "The plan repository's whole configuration: .wipctl/plan.toml at the zone root. It restates the project's identity and carries every fact about the plan itself — the plan owns its own home, so its cadence, its thresholds, the plans it names, and the outside systems it references all live with it, not with the host. The host repository's .wipctl/project.toml carries project_id alone and has no schema: one required key is below a schema's floor, and the cross-file checker owns its presence, grammar, and agreement with this file. Each .wipctl directory holds one file and no second one. The peers, sources, and session_adapters sections are optional, and an absent one means what its own domain says it means; a present one is complete, because no key has a read-time default and a value guessed on a project's behalf is a value nobody wrote down.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -82,6 +82,15 @@
       "patternProperties": {
         "^[a-z0-9]+(-[a-z0-9]+)*$": { "$ref": "#/$defs/source" }
       }
+    },
+    "session_adapters": {
+      "type": "object",
+      "description": "The coding-session systems a work-lane entry's session reference can name, one table per alias, and the alias is local to the plan that declares it. An alias names an integration profile rather than an agent. The section states how a session of that kind is inspected, contacted, or resumed; it stores no session, no address, and no credential. Its absence is legal and means the project reaches no discoverable coding session, so the section is earned rather than scaffolded.",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "patternProperties": {
+        "^[a-z0-9]+(-[a-z0-9]+)*$": { "$ref": "#/$defs/session_adapter" }
+      }
     }
   },
   "$defs": {
@@ -134,6 +143,40 @@
           "description": "The command that lists the source's open items, as an argument vector rather than one string, so no shell parses it. Any command meeting the report's contract serves; the specification names none."
         }
       }
+    },
+    "session_adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "description": "One declared session adapter. The three operations are its only keys, every one is optional, and at least one is present: a declared command is the capability, so nothing here can disagree with a second list a reader would have to reconcile. The table is closed on purpose — a misspelled operation must fail rather than read as unsupported, which is the same reasoning that rejects an unknown key anywhere else in this file. A later operation changes this object and the contract together.",
+      "properties": {
+        "inspect": {
+          "$ref": "#/$defs/adapter_command",
+          "description": "Reads one session and writes one session-reading.schema.json object on standard output. Its absence means inspection is unsupported for this alias, which a reader reports as a null reading and never as an unknown one."
+        },
+        "contact": {
+          "$ref": "#/$defs/adapter_command",
+          "description": "Delivers one message to one session. The message travels as UTF-8 on standard input through end of file and never in the argument vector, so no other process on the machine reads it from the process table. Exit zero means the native system accepted or queued it, and nothing more."
+        },
+        "resume": {
+          "$ref": "#/$defs/adapter_command",
+          "description": "Asks the native system to make one session available for continuation. It runs only when a caller invokes it explicitly: no reading, age, or touch overlap triggers it."
+        }
+      }
+    },
+    "adapter_command": {
+      "type": "array",
+      "minItems": 2,
+      "prefixItems": [{ "not": { "const": "{key}" } }],
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^(\\{key\\}|[^{}]*)$"
+      },
+      "contains": { "const": "{key}" },
+      "minContains": 1,
+      "maxContains": 1,
+      "description": "One declared operation, as an argument vector rather than one string, so no shell parses it and no key the record never validated reaches a shell. The first item is the executable. Exactly one later item is the placeholder {key}, which the caller replaces with the reference's opaque key. No item carries another placeholder: in particular contact admits no message placeholder, because a message in argv is readable by every process on the machine."
     }
   }
 }

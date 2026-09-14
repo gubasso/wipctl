@@ -1,0 +1,64 @@
+{
+  "id": "session-hardening",
+  "closed_points": 1,
+  "total_points": 4,
+  "open": 2,
+  "eligible": [
+    {
+      "id": "audit-the-token-store",
+      "type": "story",
+      "points": 1,
+      "lane": "doing",
+      "path": "/data/wipctl/projects/alpha-acme/plan-repo/stories/audit-the-token-store.md",
+      "needs": [],
+      "serves": "session-hardening"
+    }
+  ],
+  "blocked": [
+    {
+      "id": "secure-session-storage",
+      "type": "story",
+      "points": 3,
+      "lane": "review",
+      "path": "/data/wipctl/projects/alpha-acme/plan-repo/stories/secure-session-storage.md",
+      "needs": ["audit-the-token-store"],
+      "serves": "session-hardening"
+    }
+  ],
+  "sessions": [
+    {
+      "entry": "audit-the-token-store",
+      "lane": "doing",
+      "session": "sessions#4f19a2",
+      "capabilities": ["inspect", "contact", "resume"],
+      "reading": {
+        "state": "active",
+        "observed_at": "2026-09-12T14:07:33Z",
+        "location": "the alpha checkout at the token-store worktree",
+        "activity": "running the permissive store case"
+      }
+    },
+    {
+      "entry": "secure-session-storage",
+      "lane": "review",
+      "session": "detached#c81b07",
+      "capabilities": ["resume"],
+      "reading": null
+    }
+  ],
+  "path_union": [
+    "docs/specs/SPEC-session.md",
+    "src/session/mod.rs",
+    "src/session/store.rs"
+  ],
+  "overlaps": [
+    {
+      "path": "docs/specs/SPEC-session.md",
+      "entries": ["audit-the-token-store", "secure-session-storage"]
+    },
+    {
+      "path": "src/session/store.rs",
+      "entries": ["audit-the-token-store", "secure-session-storage"]
+    }
+  ]
+}
