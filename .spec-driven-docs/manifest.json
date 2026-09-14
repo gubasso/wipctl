@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "canon_version": "0.6.0",
+  "canon_version": "0.10.0",
   "canon_source": "https://github.com/gubasso/spec-driven-docs",
   "profile": "codebase",
   "docs_root": "docs",
@@ -23,73 +23,56 @@
       "source": ".markdownlint/relative-links.markdownlint-cli2.jsonc",
       "destination": ".spec-driven-docs/markdownlint/relative-links.markdownlint-cli2.jsonc",
       "sha256": "c489edba99309dcb809edab714d6ed4db44f85a8cd306a594b2f36efe2e6486e"
-    },
-    {
-      "source": "third-party/simpleenglish/LICENSE",
-      "destination": ".spec-driven-docs/upstreams/simpleenglish/LICENSE",
-      "sha256": "10b2f9435643bae609e4c1a7690131b2aeb6941e9d867e934bc80619935a6f8f"
-    },
-    {
-      "source": "third-party/simpleenglish/prompts/system-prompt.md",
-      "destination": ".spec-driven-docs/upstreams/simpleenglish/prompts/system-prompt.md",
-      "sha256": "73dacf384adf2f158646c03fba3eb2899880c906631e4206e4e9d96ecbcd0b9d"
-    },
-    {
-      "source": "third-party/simpleenglish/skills/simple-english/SKILL.md",
-      "destination": ".spec-driven-docs/upstreams/simpleenglish/skills/simple-english/SKILL.md",
-      "sha256": "22f0e2cadcdb906177bb88352544e64dfda190ef994713049962559ef6693766"
-    },
-    {
-      "source": "third-party/simpleenglish/skills/simple-english/references/checklist.md",
-      "destination": ".spec-driven-docs/upstreams/simpleenglish/skills/simple-english/references/checklist.md",
-      "sha256": "56c8296bd382a20912c4f789b2dd259d42f194c6a6686a25ea028f51aa0e130b"
-    },
-    {
-      "source": "third-party/simpleenglish/skills/simple-english/references/strict-vocabulary.md",
-      "destination": ".spec-driven-docs/upstreams/simpleenglish/skills/simple-english/references/strict-vocabulary.md",
-      "sha256": "3f34ef3a878d9dc83de68191b5ddd6220fdb4e3c99eafc89425adfabd46258a7"
-    },
-    {
-      "source": "third-party/simpleenglish/skills/simple-english/references/use-cases.md",
-      "destination": ".spec-driven-docs/upstreams/simpleenglish/skills/simple-english/references/use-cases.md",
-      "sha256": "6c5b342f706d346255466b86400d11d558c4db677a2f7ca5ec4dedb978df8a7c"
-    },
-    {
-      "source": "third-party/simpleenglish/skills/simple-english/references/word-swaps.md",
-      "destination": ".spec-driven-docs/upstreams/simpleenglish/skills/simple-english/references/word-swaps.md",
-      "sha256": "e6cbc5677e3a910190eedf3d87fce49540b42863a6f2166cd1211dcce2074378"
     }
   ],
   "adopted_files": [
     {
+      "source": "instance/seeds/config.yaml",
+      "destination": ".spec-driven-docs/config.yaml",
+      "sha256": "e3c7b6a3da71a246d42957658ded8838d76a9b477749e61b4bf856a1538f987e",
+      "baseline_sha256": "e3c7b6a3da71a246d42957658ded8838d76a9b477749e61b4bf856a1538f987e"
+    },
+    {
+      "source": "_docs/specs/SPEC-budget-debt.md",
+      "destination": "docs/specs/SPEC-budget-debt.md",
+      "sha256": "1b652c9984683d4732b748ad363d56232095dd5fe9c2d048fd4dab59a468d684",
+      "baseline_sha256": "1b652c9984683d4732b748ad363d56232095dd5fe9c2d048fd4dab59a468d684"
+    },
+    {
+      "source": "_docs/specs/SPEC-writing-policy.md",
+      "destination": "docs/specs/SPEC-writing-policy.md",
+      "sha256": "e48af91d103a6a680191f30c6e0e43c7d3610edb4d4ba4ee6a783509670865bf",
+      "baseline_sha256": "e48af91d103a6a680191f30c6e0e43c7d3610edb4d4ba4ee6a783509670865bf"
+    },
+    {
       "source": "_docs/specs/SPEC-decision-records.md",
       "destination": "docs/specs/SPEC-decision-records.md",
       "sha256": "833cae2f3a75f01c3f9d278354e70c06275f0f3e8aa428ebfb98b22197659638",
-      "baseline_sha256": "c39e7d7f3559493ae5293c24b52f49364c657f7840c4d5002012254932aef8f3"
+      "baseline_sha256": "78153cfd7ce576a44496c8682cfcf53541a61626af80dfa9fee18958becd46f6"
     },
     {
       "source": "_docs/specs/SPEC-instance.md",
       "destination": "docs/specs/SPEC-instance.md",
-      "sha256": "e4e1ab18d0a8db5ba6ca959249595069d21e4fd3808615a1dca0617555444a09",
-      "baseline_sha256": "56e554ed23228d66ea0d8b629b65e3436bfbeb3b6a90fa15972da48e48e9f9d5"
+      "sha256": "56e554ed23228d66ea0d8b629b65e3436bfbeb3b6a90fa15972da48e48e9f9d5",
+      "baseline_sha256": "f86aa3d3d48dc2028b5baf18bb45f1a7bf5ce0300bbfef39b4d0431919b6aeb9"
     },
     {
       "source": "_docs/specs/SPEC-docs-format.md",
       "destination": "docs/specs/SPEC-docs-format.md",
       "sha256": "6a0462ba74e75e10ce4a2bcc4416d5e6caad8359be408b7f478550dbd68c2fb3",
-      "baseline_sha256": "bc2440a0053beefc8211684e31d76d16b8f2f936111e21971829c0caeee85a9a"
+      "baseline_sha256": "d90c7751f1f6e75fa44bbb78a1ae6a85827a7e7513928dcd06141ac1dafc9ebe"
     },
     {
       "source": "_docs/specs/SPEC-docs-foundations.md",
       "destination": "docs/specs/SPEC-docs-foundations.md",
       "sha256": "3e6abb5726d76f929bbbd08ef53e44a1d79568e944bb9f75ad18aa6f705337db",
-      "baseline_sha256": "3e6abb5726d76f929bbbd08ef53e44a1d79568e944bb9f75ad18aa6f705337db"
+      "baseline_sha256": "632106cc4e4c2a3e6b728407738fa609859f66ae47da175c39e3f7a59761f874"
     },
     {
       "source": "_docs/specs/SPEC-docs-specs.md",
       "destination": "docs/specs/SPEC-docs-specs.md",
       "sha256": "be494b762ec0ce2d8da1425ee131e6031b0025c3d5cc6c38283f89bc85a47987",
-      "baseline_sha256": "c62e033081d5427e6aa2eb0a33fb0d8e9821d620fa91782ff3a1df1de05f92bb"
+      "baseline_sha256": "69185324c489c2f9230b06520417ef6786fbdb1abaf35a2da2ddfb5efae11413"
     },
     {
       "source": "_docs/specs/SPEC-comparison-docs.md",
@@ -100,14 +83,14 @@
     {
       "source": "_docs/specs/SPEC-known-issues.md",
       "destination": "docs/specs/SPEC-known-issues.md",
-      "sha256": "33a9d4b02c975e2db5eff8e1df69ddabc2686ff8df0b7c22c07666ac6bbeba63",
+      "sha256": "00f3396494b816eba4904f90567db12729e99aa8e71e21d3018f40728c07336f",
       "baseline_sha256": "00f3396494b816eba4904f90567db12729e99aa8e71e21d3018f40728c07336f"
     },
     {
       "source": "_docs/specs/SPEC-spec-to-code.md",
       "destination": "docs/specs/SPEC-spec-to-code.md",
-      "sha256": "128eaf3664452bbe50b1def1579585460512d76c349a7c9dc41ab316d3fac29d",
-      "baseline_sha256": "cabe0437a2d7e7cb27af71fc02b22c1c202876c8f6a7139c09d06c2bf6ff7495"
+      "sha256": "2551942d24e9b0be1001f8b7be8a6d201ebdd98db4d435d9c8a8de0ad2a2ae89",
+      "baseline_sha256": "9c5c30de7f7ecd78e4d5acd089d1a8bc5e0d5db8fc8215414a0a4a093a1a8928"
     },
     {
       "source": "_docs/specs/SPEC-guides.md",
@@ -119,7 +102,7 @@
       "source": "_docs/specs/SPEC-writing-style.md",
       "destination": "docs/specs/SPEC-writing-style.md",
       "sha256": "72f36ffb29d6df4d798e73f075d54e4ca9ef9f950b77fbc4a74691f3d25564d8",
-      "baseline_sha256": "72f36ffb29d6df4d798e73f075d54e4ca9ef9f950b77fbc4a74691f3d25564d8"
+      "baseline_sha256": "1d5555c5ba405294e2e7bac79f7b5796520e11a63a25ef15975abe14faa4e4a1"
     },
     {
       "source": "_docs/specs/SPEC-tracking.md",
@@ -166,18 +149,18 @@
     {
       "source": "templates/TEMPLATE-known-issue.md",
       "destination": "docs/reference/TEMPLATE-known-issue.md",
-      "sha256": "a88508f87a54a1a3b7cfc63ce1411cbaa1c6def6c9fd41cbf0eed05b7a5e03ff",
+      "sha256": "17175f356d71bf0b8b17fdf52403b4344dca37193811e2cb28975b95fbb6ceb3",
       "baseline_sha256": "17175f356d71bf0b8b17fdf52403b4344dca37193811e2cb28975b95fbb6ceb3"
     }
   ],
   "integration_blocks": [
     {
       "path": ".pre-commit-config.yaml",
-      "marker_hash": "8e0bad671efc98c6008560ea5ae2e6a05763d1539f13706e5b2abaf17458d4f8"
+      "marker_hash": "6364d9d70ff020a8da70399cd8a236023018b9df82f0ab6f023aafb6a5ff73d2"
     },
     {
       "path": "AGENTS.md",
-      "marker_hash": "5a77e0c7c2c33de434b6b47dd374fe4baab859e107c008b348e80e88dad4d7ba"
+      "marker_hash": "7af86896aa9e4094293d110e9b9bc44326a95ba8e42fc306e43f3c49c5355415"
     }
   ]
 }

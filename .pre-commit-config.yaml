@@ -799,7 +799,7 @@ repos:
         name: 'decision record filename shape'
         entry: sdd gate adr-filename-shape
         language: system
-        files: '^docs/decisions/.*\.md$'
+        files: '^docs/decisions/[^/]*\.md$'
       - id: adr-word-cap
         name: 'decision record word cap'
         entry: sdd gate adr-word-cap
@@ -822,27 +822,27 @@ repos:
         name: 'comparison tables are dated'
         entry: sdd gate comparison-dated-tables
         language: system
-        files: '(^|/)COMPARISON-[a-z0-9-]+\.md$'
+        files: '^(?:.*/)?COMPARISON-[^/]*\.md$'
       - id: comparison-escaped-pipes
         name: 'comparison table pipes are escaped'
         entry: sdd gate comparison-escaped-pipes
         language: system
-        files: '(^|/)COMPARISON-[a-z0-9-]+\.md$'
+        files: '^(?:.*/)?COMPARISON-[^/]*\.md$'
       - id: comparison-legend
         name: 'comparison legend'
         entry: sdd gate comparison-legend
         language: system
-        files: '(^|/)COMPARISON-[a-z0-9-]+\.md$'
+        files: '^(?:.*/)?COMPARISON-[^/]*\.md$'
       - id: comparison-one-reference-per-cell
         name: 'one reference per comparison cell'
         entry: sdd gate comparison-one-reference-per-cell
         language: system
-        files: '(^|/)COMPARISON-[a-z0-9-]+\.md$'
+        files: '^(?:.*/)?COMPARISON-[^/]*\.md$'
       - id: comparison-verdict-word
         name: 'comparison verdict word'
         entry: sdd gate comparison-verdict-word
         language: system
-        files: '(^|/)COMPARISON-[a-z0-9-]+\.md$'
+        files: '^(?:.*/)?COMPARISON-[^/]*\.md$'
       - id: gate-message-cites-a-rule
         name: 'gate messages cite a rule'
         entry: sdd gate gate-message-cites-a-rule
@@ -871,7 +871,7 @@ repos:
         name: 'known issue filename shape'
         entry: sdd gate ki-filename-shape
         language: system
-        files: '^docs/reference/known-issues/.*\.md$'
+        files: '^docs/reference/known-issues/[^/]*\.md$'
       - id: ki-filing
         name: 'known issue filing state'
         entry: sdd gate ki-filing
@@ -911,14 +911,16 @@ repos:
         name: 'documents state the present'
         entry: sdd gate no-self-narration
         language: system
+        files: '^docs/(?:.*/)?[^/]*\.md$'
         types: [markdown]
-        exclude: '^docs/decisions/'
+        exclude: '^docs/decisions/.*$'
       - id: prose-stays-unwrapped
         name: 'prose lines stay unwrapped'
         entry: sdd gate prose-stays-unwrapped
         language: system
+        files: '^docs/(?:.*/)?[^/]*\.md$'
         types: [markdown]
-        exclude: '(?:^|/)CHANGELOG\.md$'
+        exclude: '^(?:.*/)?CHANGELOG\.md$'
       - id: spec-change-is-typed
         name: 'spec changes are typed'
         entry: sdd gate spec-change-is-typed
@@ -929,7 +931,7 @@ repos:
         name: 'spec requirement parts'
         entry: sdd gate spec-requirement-parts
         language: system
-        files: '^docs/specs/SPEC-.*\.md$'
+        files: '^docs/specs/SPEC-[^/]*\.md$'
       - id: spec-rule-id-unique
         name: 'spec rule IDs are unique'
         entry: sdd gate spec-rule-id-unique
