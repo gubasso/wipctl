@@ -49,6 +49,10 @@ None
 
 - A slow store tempts a cache. The escape is to measure first and stop.
 
+## Refused option
+
+Keep the session in the process, refused because a restart signs every reader out.
+
 ## Revisions
 
 None

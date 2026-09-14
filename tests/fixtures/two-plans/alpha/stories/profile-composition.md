@@ -49,6 +49,10 @@ None
 
 - A missing timezone tempts a guess. The escape is to render the literal `unset` and stop.
 
+## Refused option
+
+None
+
 ## Revisions
 
 None

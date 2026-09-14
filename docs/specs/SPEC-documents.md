@@ -12,6 +12,7 @@
   - [`documents:never-cut-work-is-not-negotiable-scope` — Never-cut work is not negotiable scope](#documentsnever-cut-work-is-not-negotiable-scope--never-cut-work-is-not-negotiable-scope)
   - [`documents:an-assertion-names-its-test` — An assertion names its test](#documentsan-assertion-names-its-test--an-assertion-names-its-test)
   - [`documents:an-escape-precedes-the-trap` — An escape precedes the trap](#documentsan-escape-precedes-the-trap--an-escape-precedes-the-trap)
+  - [`documents:a-refused-option-names-the-reason-it-lost` — A refused option names the reason it lost](#documentsa-refused-option-names-the-reason-it-lost--a-refused-option-names-the-reason-it-lost)
   - [`documents:a-changed-agreement-is-a-revision` — A changed agreement is a revision](#documentsa-changed-agreement-is-a-revision--a-changed-agreement-is-a-revision)
   - [`documents:done-when-is-not-every-member-closed` — Done when is not every member closed](#documentsdone-when-is-not-every-member-closed--done-when-is-not-every-member-closed)
   - [`documents:the-initiative-section-carries-one-token` — The initiative section carries one token](#documentsthe-initiative-section-carries-one-token--the-initiative-section-carries-one-token)
@@ -31,24 +32,27 @@ One document per story, epic, and initiative, and the shape each one carries. Th
 
 ## The three heading sequences
 
-| Story          | Epic           | Initiative     |
-| -------------- | -------------- | -------------- |
-| —              | `Initiative`   | —              |
-| `Goal`         | `Goal`         | `Goal`         |
-| `Example`      | `Example`      | `Example`      |
-| `Core`         | `Core`         | `Core`         |
-| `In scope`     | —              | —              |
-| `Out of scope` | `Out of scope` | `Out of scope` |
-| `Reads`        | `Reads`        | `Reads`        |
-| `Amends`       | `Amends`       | `Amends`       |
-| `Sources`      | `Sources`      | `Sources`      |
-| `Acceptance`   | —              | —              |
-| —              | `Done when`    | `Done when`    |
-| `Tasks`        | —              | —              |
-| `Rabbit holes` | —              | —              |
-| `Revisions`    | `Revisions`    | `Revisions`    |
+| Story            | Epic           | Initiative     |
+| ---------------- | -------------- | -------------- |
+| —                | `Initiative`   | —              |
+| `Goal`           | `Goal`         | `Goal`         |
+| `Example`        | `Example`      | `Example`      |
+| `Core`           | `Core`         | `Core`         |
+| `In scope`       | —              | —              |
+| `Out of scope`   | `Out of scope` | `Out of scope` |
+| `Reads`          | `Reads`        | `Reads`        |
+| `Amends`         | `Amends`       | `Amends`       |
+| `Sources`        | `Sources`      | `Sources`      |
+| `Acceptance`     | —              | —              |
+| —                | `Done when`    | `Done when`    |
+| `Tasks`          | —              | —              |
+| `Rabbit holes`   | —              | —              |
+| `Refused option` | —              | —              |
+| `Revisions`      | `Revisions`    | `Revisions`    |
 
-Four story headings are deliberately absent above the story. Negotiable scope needs a point budget no epic has. Acceptance, tasks, and traps are obligations on a work session, and no session implements an epic or an initiative. The closing condition runs the other way: a story closes on its acceptance, and the tiers above it state an observable end state instead.
+Five story headings are deliberately absent above the story. Negotiable scope needs a point budget no epic has. Acceptance, tasks, traps, and a refused option bind the one work session a story owns, and no session implements an epic or an initiative. The closing condition runs the other way: a story closes on its acceptance, and the tiers above it state an observable end state instead.
+
+Three story sections read as near neighbours and are not. Negotiable scope is an outcome the story can cut. A rabbit hole is a trap inside the chosen approach. A refused option is a second approach to the same goal, with the reason it lost. A refusal that is significant and hard to reverse is a decision record instead.
 
 ## Requirements
 
@@ -135,6 +139,18 @@ Each known trap MUST carry a pre-authorised escape.
 - THEN it is a revision, because an escape decided under pressure is a new agreement and not the old one
 
 Verify: `cargo nextest run --test documents`
+
+### `documents:a-refused-option-names-the-reason-it-lost` — A refused option names the reason it lost
+
+A story's refused option section MUST state one alternative approach to the goal, and the reason that approach lost.
+
+#### Scenario: A story names an outcome it will not deliver
+
+- GIVEN a refused option section holding work the story leaves out
+- WHEN the section is read
+- THEN it is negotiable scope in the wrong section, because a refused option is a way to reach the same goal
+
+Verify: reviewer confirms the section states one approach and the reason it lost
 
 ### `documents:a-changed-agreement-is-a-revision` — A changed agreement is a revision
 
@@ -246,9 +262,10 @@ Verify: `cargo nextest run --test validation`
 
 ## Unenforced rules
 
-| Rule                                               | Why no command decides it                                                       |
-| -------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `documents:never-cut-work-is-not-negotiable-scope` | Whether a listed item is never-cut work is a reading of the item.               |
-| `documents:a-changed-agreement-is-a-revision`      | No command can tell a cut the agreement allowed from a change to the agreement. |
+| Rule                                                  | Why no command decides it                                                        |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `documents:never-cut-work-is-not-negotiable-scope`    | Whether a listed item is never-cut work is a reading of the item.                |
+| `documents:a-changed-agreement-is-a-revision`         | No command can tell a cut the agreement allowed from a change to the agreement.  |
+| `documents:a-refused-option-names-the-reason-it-lost` | Whether a sentence states an approach and a reason is a reading of the sentence. |
 
 The shape gate proves that every required heading is present and no extra one was added. It cannot prove that a section was filled in, and it cannot express the example fence, the title-line identity, or the initiative token's resolution. Those belong to the cross-file checker.

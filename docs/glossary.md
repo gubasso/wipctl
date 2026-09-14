@@ -44,6 +44,7 @@ Each term links to the page that owns its full definition. A term defined here i
 - ranking preference: a project choice that orders entries after fixed constraints and before the final ID tie-break. [specs/SPEC-ranking.md](./specs/SPEC-ranking.md)
 - ranking procedure: the fixed constraints, declared preferences, and final ID tie-break that compute a lane's order. [specs/SPEC-ranking.md](./specs/SPEC-ranking.md)
 - rank: an entry's computed position in its lane. [specs/SPEC-ranking.md](./specs/SPEC-ranking.md)
+- refused option: a second approach to a story's goal, recorded in the story with the reason it lost. [specs/SPEC-documents.md](./specs/SPEC-documents.md)
 - rename: the operation that changes a title, an id, or both while holding them in agreement. It rewrites every reference and burns the old id, except where it frees nothing. [specs/SPEC-rename.md](./specs/SPEC-rename.md)
 - resolve: recording a person's decision on a conflict the replication verb reported. [specs/SPEC-sync.md](./specs/SPEC-sync.md)
 - rework rounds: entries into `doing` beyond the first. [specs/SPEC-metrics.md](./specs/SPEC-metrics.md)
