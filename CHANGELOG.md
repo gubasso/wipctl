@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.6.1](https://github.com/gubasso/wipctl/compare/v0.6.0...v0.6.1) - 2026-09-14
+
+### Fixed
+
+- `changelog`: Gate the footer a breaking entry is generated from ([#55](https://github.com/gubasso/wipctl/pull/55))
+
 ## [0.6.0](https://github.com/gubasso/wipctl/compare/v0.5.0...v0.6.0) - 2026-09-14
 
 ### Added
