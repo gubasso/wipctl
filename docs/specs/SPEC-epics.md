@@ -85,7 +85,7 @@ Verify: `cargo nextest run --test epics`
 
 ### `epics:the-order-is-not-a-schedule` — The order is not a schedule
 
-The resolution MUST order entries topologically, break ties with the record's key chain, and partition them into eligible and blocked groups while keeping that order.
+The resolution MUST order entries topologically, break ties with the record's ranking procedure, and partition them into eligible and blocked groups while keeping that order.
 
 #### Scenario: A consumer picks work from the plan
 

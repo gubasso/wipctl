@@ -44,14 +44,14 @@
     "ranking": {
       "type": "object",
       "additionalProperties": false,
-      "description": "The plan's ordered ranking key names. The cross-file checker owns the presence of this table and its keys. This schema owns the table, list, and string types.",
+      "description": "The plan's ordered ranking preferences. The cross-file checker owns the presence of this table and its preferences. This schema owns the table, list, and string types.",
       "properties": {
-        "keys": {
+        "preferences": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "The key chain in comparison order. The ranking checker owns the accepted names, uniqueness, fixed derived prefix, and residual suffix."
+          "description": "The project choices in comparison order. The ranking checker owns the accepted names and uniqueness. Product constraints and the final tie-break are fixed behavior and do not appear here."
         }
       }
     },

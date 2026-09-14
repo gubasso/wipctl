@@ -67,7 +67,7 @@ Inputs: `<PENDING_FRAGMENTS>` (§2).
    1 landed, 1 fragment removed
    ```
 
-   The drain writes fragments by their stated capture instants, with a residual tie on the full id, so the resulting bytes are identical on every machine. A dependency that closed meanwhile is reported as drift. After landing, the lane's key chain computes each entry's rank from the record facts.
+   The drain writes fragments by their stated capture instants, with a final tie-break on the full id, so the resulting bytes are identical on every machine. A dependency that closed meanwhile is reported as drift. After landing, the ranking procedure computes each entry's rank from the record facts.
 
 2. Validate the landed record:
 
@@ -75,7 +75,7 @@ Inputs: `<PENDING_FRAGMENTS>` (§2).
    $ wipctl validate
    ```
 
-   The check succeeds with no ranking repair because file sequence stores membership alone. The next preview or board read applies the total key chain.
+   The check succeeds with no ranking repair because file sequence stores membership alone. The next preview or board read applies the total ranking procedure.
 
 Outputs: none. The fragments are consumed, and the lane files hold the entries.
 

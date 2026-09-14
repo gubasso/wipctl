@@ -73,9 +73,9 @@
           "enum": [1, 2, 3],
           "description": "Units of irreducible human judgment. Work above 3 must split."
         },
-        "class": {
-          "enum": ["expedite", "standard", "intangible"],
-          "description": "Optional class of service. Values sort in enum order, and absence sorts at the standard position without adding a value."
+        "delay_cost": {
+          "enum": ["immediate", "deferred"],
+          "description": "When waiting harms this entry. Immediate sorts before absence, deferred sorts after absence, and absence is ordinary work without an added value."
         },
         "needs": {
           "type": "array",

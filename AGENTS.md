@@ -16,6 +16,8 @@ A requirement's rule id is how code and gates cite what binds them. Cite the id,
 
 The specs stay language-agnostic. They never name a programming language, a library, a package manager, or a concrete third-party tool as a requirement. They state the contract a capability satisfies, and any tool meeting the contract serves. Implementation choices belong in the code and its decision records, never in a spec. The one tool the specs name is git. It is the plan repository's replication substrate, specified against git and no other version control, per ADR-git-is-the-replication-substrate.
 
+Public language follows `docs/specs/SPEC-vocabulary.md`. A domain, concept, field, or field value uses one lean, plain-language name that states what it means.
+
 ## Before 1.0, correctness beats compatibility
 
 The product is below version 1.0, so its contract is not frozen. Where the right design needs a breaking change, the change lands. A compatibility shim, a fallback reader, or a second accepted form is never a reason to keep a worse design.

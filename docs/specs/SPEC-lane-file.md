@@ -5,15 +5,15 @@
 - [Purpose](#purpose)
 - [File shape](#file-shape)
 - [Entry fields](#entry-fields)
-- [Class of service](#class-of-service)
+- [Delay cost](#delay-cost)
 - [A dependency that crosses plans](#a-dependency-that-crosses-plans)
 - [Lane semantics](#lane-semantics)
 - [Requirements](#requirements)
   - [`lane-file:the-file-is-the-lane` — The file is the lane](#lane-filethe-file-is-the-lane--the-file-is-the-lane)
   - [`lane-file:an-id-is-unique-across-the-record` — An id is unique across the record](#lane-filean-id-is-unique-across-the-record--an-id-is-unique-across-the-record)
   - [`lane-file:the-points-scale-counts-judgments` — The points scale counts judgments](#lane-filethe-points-scale-counts-judgments--the-points-scale-counts-judgments)
-  - [`lane-file:a-class-of-service-is-optional-and-ordered` — A class of service is optional and ordered](#lane-filea-class-of-service-is-optional-and-ordered--a-class-of-service-is-optional-and-ordered)
-  - [`lane-file:an-absent-class-sorts-as-standard` — An absent class sorts as standard](#lane-filean-absent-class-sorts-as-standard--an-absent-class-sorts-as-standard)
+  - [`lane-file:delay-cost-records-an-exception` — Delay cost records an exception](#lane-filedelay-cost-records-an-exception--delay-cost-records-an-exception)
+  - [`lane-file:absent-delay-cost-is-ordinary` — Absent delay cost is ordinary](#lane-fileabsent-delay-cost-is-ordinary--absent-delay-cost-is-ordinary)
   - [`lane-file:a-summary-is-one-bounded-line` — A summary is one bounded line](#lane-filea-summary-is-one-bounded-line--a-summary-is-one-bounded-line)
   - [`lane-file:needs-is-the-only-sequencing-fact` — Dependencies are the only stored sequencing constraint](#lane-fileneeds-is-the-only-sequencing-fact--dependencies-are-the-only-stored-sequencing-constraint)
   - [`lane-file:a-prefixed-dependency-is-quoted` — A prefixed dependency is quoted](#lane-filea-prefixed-dependency-is-quoted--a-prefixed-dependency-is-quoted)
@@ -39,7 +39,7 @@ stories:
   - id: rate-limit-the-search-endpoint
     type: story
     points: 2
-    class: expedite
+    delay_cost: immediate
     summary: "Callers of the search endpoint are limited per token, and the limit is announced in the response headers rather than discovered by being cut off."
     needs: [secure-session-storage]
     epic: session-hardening
@@ -52,7 +52,7 @@ stories:
 | `id`           | required               | the title's slug; the story document's filename stem                                                    |
 | `type`         | required               | `story`, `spike`, or `chore`                                                                            |
 | `points`       | required               | `1`, `2`, or `3`, counting judgments                                                                    |
-| `class`        | optional               | `expedite`, `standard`, or `intangible`, ordered as written                                             |
+| `delay_cost`   | optional               | `immediate` or `deferred`; absence means the ordinary middle position                                   |
 | `summary`      | required               | one double-quoted line, 60 to 400 characters, no surrounding whitespace                                 |
 | `needs`        | optional               | one-line flow sequence of unique ids this entry depends on, each naming this record or an attached peer |
 | `epic`         | optional               | one id naming an existing epic document                                                                 |
@@ -66,18 +66,18 @@ stories:
 
 Points read as follows. `1` is confirmation only: named tests settle acceptance, and at most one unchanged contract is involved. `2` is one judgment: an interface, name, message, or existing contract needs human reasoning. `3` is two judgments, or one that is hard to reverse, such as a schema or a security control. The cap also bounds what a larger entry waits behind when points sort ascending.
 
-## Class of service
+## Delay cost
 
-A class states the shape of an entry's cost of delay. `expedite` means the cost is immediate. `standard` is the ordinary shape of work. `intangible` means the cost arrives late or never, as with technical debt, automation, or cleanup.
+Delay cost states when waiting harms an entry. `immediate` means waiting causes material harm now. `deferred` means the harm appears later, remains uncertain, or is negligible now. An absent field means the ordinary cost expected of planned work.
 
-An absent class occupies the `standard` sort position. The reader adds no value to the entry. A comparison position for an absent value is not a read-time default.
+The field records only an exception to ordinary work. The reader places absence between `immediate` and `deferred` without adding a value to the entry. A comparison position for absence is not a read-time default.
 
-The class vocabulary carries one ordering fact and none of its associated planning practices:
+Delay cost carries one ordering fact and no associated planning practice:
 
 - Fixed date is absent because it needs a date on an open entry, which would be a second stored ordering input.
 - Capacity allocation is absent because it is a planning practice, while the record states intent rather than policing it.
-- No rule limits expedite entries. Multiple expedite entries remain legal, and a workflow verb warns at exit 0 and changes nothing.
-- A class marks a row. It creates no swimlane or sixth lane.
+- No rule limits entries with immediate delay cost. Multiple entries remain legal, and a workflow verb warns at exit 0 and changes nothing.
+- Delay cost marks a row. It creates no swimlane or sixth lane.
 
 ## A dependency that crosses plans
 
@@ -125,7 +125,7 @@ A lane file MUST name the lane matching its basename and MUST declare an empty l
 #### Scenario: A status field is proposed
 
 - GIVEN a request for a status or priority field
-- WHEN the file answers lane membership and the key chain answers rank
+- WHEN the file answers lane membership and the ranking procedure answers rank
 - THEN each field is refused, because it would store a fact that already has one source
 
 Verify: `cargo nextest run --test schemas`
@@ -154,27 +154,27 @@ An entry MUST carry a point value of `1`, `2`, or `3`, and larger work MUST spli
 
 Verify: `cargo nextest run --test schemas`
 
-### `lane-file:a-class-of-service-is-optional-and-ordered` — A class of service is optional and ordered
+### `lane-file:delay-cost-records-an-exception` — Delay cost records an exception
 
-An entry MAY carry a class of service as `expedite`, `standard`, or `intangible`, ordered from first to last.
+An entry MAY carry `delay_cost` as `immediate` or `deferred`, ordered before and after absence respectively.
 
-#### Scenario: An entry carries a local class name
+#### Scenario: An entry carries an ordinary value
 
-- GIVEN an entry whose class is `critical`
+- GIVEN an entry whose `delay_cost` is `ordinary`
 - WHEN the lane schema reads it
-- THEN validation fails, because the shared vocabulary gives the value no ordering meaning
+- THEN validation fails because ordinary work records no exceptional value
 
 Verify: `cargo nextest run --test schemas`
 
-### `lane-file:an-absent-class-sorts-as-standard` — An absent class sorts as standard
+### `lane-file:absent-delay-cost-is-ordinary` — Absent delay cost is ordinary
 
-When an entry carries no class, the order computation MUST compare it at the `standard` position without adding a value to the entry.
+When an entry carries no `delay_cost`, the ranking procedure MUST compare it after `immediate` and before `deferred` without adding a value.
 
-#### Scenario: An absent class meets an explicit standard class
+#### Scenario: Ordinary work is compared
 
-- GIVEN two entries that differ only because one omits class and one states `standard`
-- WHEN the class key compares them
-- THEN they compare equal on that key and both lane entries remain unchanged
+- GIVEN an entry without `delay_cost` and another whose delay cost is deferred
+- WHEN the delay-cost preference compares them
+- THEN the entry without the field sorts first and both entries remain unchanged
 
 Verify: `cargo nextest run --test ranking`
 

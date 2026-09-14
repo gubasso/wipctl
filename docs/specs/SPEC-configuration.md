@@ -45,7 +45,7 @@ plan_id = "9f2c41a08b7d4e63a15c8f02d7e4b619"
 superseded_plan_ids = ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"]
 
 [ranking]
-keys = ["eligibility", "needs", "class", "points-ascending", "id"]
+preferences = ["delay-cost", "points-ascending"]
 ```
 
 Both identities are 128 random bits written as exactly 32 lowercase hexadecimal characters. Each is minted once, immutable, opaque, and parsed by nothing.
@@ -72,13 +72,13 @@ Verify: `cargo nextest run --test configuration`
 
 ### `configuration:the-ranking-section-is-required` — The ranking section is required
 
-The plan configuration MUST carry `[ranking].keys` as one ordered list of strings.
+The plan configuration MUST carry `[ranking].preferences` as one ordered list of strings and MUST NOT expose a fixed ranking stage as a preference.
 
 #### Scenario: A plan has no ranking table
 
 - GIVEN a plan configuration without `[ranking]`
 - WHEN the record loads
-- THEN the cross-file checker fails and names the table to add, because no key chain has a read-time default
+- THEN the cross-file checker fails and names the table to add because the project did not declare its preferences
 
 Verify: `cargo nextest run --test configuration`
 

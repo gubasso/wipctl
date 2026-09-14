@@ -6,7 +6,7 @@ One record and two machines, with no lock between them. What a capture writes so
 
 `wipctl new` writes a story document and a pending fragment, and touches no lane file. The fragment states the new entry, its capture instant, and its planning lane. It claims no position because it belongs to no lane order until it lands. [../specs/SPEC-pending-fragment.md](../specs/SPEC-pending-fragment.md) holds the shape and the boundary.
 
-The drain later reconciles every fragment into the lane files, in a total byte order derived from capture instant and full id. Every machine writes the same bytes. A drift is a dependency that closed while the fragment waited, and the drain reports it without editing the dependency. Once an entry lands, the record's key chain computes its rank from the facts people stated.
+The drain later reconciles every fragment into the lane files, in a total byte order derived from capture instant and full id. Every machine writes the same bytes. A drift is a dependency that closed while the fragment waited, and the drain reports it without editing the dependency. Once an entry lands, the ranking procedure computes its rank from the facts people stated.
 
 On one machine the lock already serialises captures, so the fragment is not needed for safety there. It is needed for the next section. A capture is a disjoint delta: one new file, named by an id nobody else was minting. Disjoint deltas are what make reconciliation between machines cheap. That choice was made so captures combine rather than conflict, and it pays exactly where no lock can reach.
 

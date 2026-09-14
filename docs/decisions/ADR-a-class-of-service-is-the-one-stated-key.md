@@ -22,7 +22,7 @@ The name is class rather than priority. A priority is a number. A class is a pol
 
 Class follows eligibility and same-lane dependencies, then precedes points. It affects no edge, eligibility result, or measure. Multiple expedite entries warn and remain legal, so the tool shows the condition without choosing priority.
 
-Enforced by `lane-file:a-class-of-service-is-optional-and-ordered`, `lane-file:an-absent-class-sorts-as-standard`, `ranking:a-class-orders-below-eligibility-and-above-size`, and `messages:an-excess-expedite-warning-names-the-count`.
+Current requirements: `lane-file:delay-cost-records-an-exception`, `lane-file:absent-delay-cost-is-ordinary`, `ranking:a-delay-cost-preference-orders-before-size`, and `messages:multiple-immediate-delay-costs-name-the-count`.
 
 ## Consequences
 
@@ -32,4 +32,6 @@ Enforced by `lane-file:a-class-of-service-is-optional-and-ordered`, `lane-file:a
 
 ## Status
 
-Accepted
+Superseded
+
+Superseded by [ADR-delay-cost-names-the-ordering-fact.md](./ADR-delay-cost-names-the-ordering-fact.md).

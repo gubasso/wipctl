@@ -4,17 +4,16 @@
 
 - [Purpose](#purpose)
 - [A node, and how it is written for a reader](#a-node-and-how-it-is-written-for-a-reader)
-- [The key chain](#the-key-chain)
+- [The ranking procedure](#the-ranking-procedure)
 - [Requirements](#requirements)
   - [`ranking:eligibility-is-derived-from-three-edges` — Eligibility is derived from three edges](#rankingeligibility-is-derived-from-three-edges--eligibility-is-derived-from-three-edges)
   - [`ranking:an-order-is-computed-and-never-stored` — An order is computed and never stored](#rankingan-order-is-computed-and-never-stored--an-order-is-computed-and-never-stored)
-  - [`ranking:a-class-orders-below-eligibility-and-above-size` — A class orders below eligibility and above size](#rankinga-class-orders-below-eligibility-and-above-size--a-class-orders-below-eligibility-and-above-size)
-  - [`ranking:a-key-name-is-known-and-appears-once` — A key name is known and appears once](#rankinga-key-name-is-known-and-appears-once--a-key-name-is-known-and-appears-once)
-  - [`ranking:the-chain-ends-in-the-residual-key` — The chain ends in the residual key](#rankingthe-chain-ends-in-the-residual-key--the-chain-ends-in-the-residual-key)
-  - [`ranking:the-derived-keys-lead-and-are-not-reordered` — The derived keys lead and are not reordered](#rankingthe-derived-keys-lead-and-are-not-reordered--the-derived-keys-lead-and-are-not-reordered)
-  - [`ranking:the-key-chain-is-total` — The key chain is total](#rankingthe-key-chain-is-total--the-key-chain-is-total)
-  - [`ranking:a-key-reads-the-record-alone` — A key reads the record alone](#rankinga-key-reads-the-record-alone--a-key-reads-the-record-alone)
-  - [`ranking:the-residual-key-is-the-full-id` — The residual key is the full id](#rankingthe-residual-key-is-the-full-id--the-residual-key-is-the-full-id)
+  - [`ranking:a-delay-cost-preference-orders-before-size` — Delay cost orders before size in a scaffolded plan](#rankinga-delay-cost-preference-orders-before-size--delay-cost-orders-before-size-in-a-scaffolded-plan)
+  - [`ranking:a-preference-name-is-known-and-appears-once` — A preference name is known and appears once](#rankinga-preference-name-is-known-and-appears-once--a-preference-name-is-known-and-appears-once)
+  - [`ranking:constraints-lead-and-are-fixed` — Constraints lead and are fixed](#rankingconstraints-lead-and-are-fixed--constraints-lead-and-are-fixed)
+  - [`ranking:the-ranking-procedure-is-total` — The ranking procedure is total](#rankingthe-ranking-procedure-is-total--the-ranking-procedure-is-total)
+  - [`ranking:an-ordering-input-reads-the-record-alone` — An ordering input reads the record alone](#rankingan-ordering-input-reads-the-record-alone--an-ordering-input-reads-the-record-alone)
+  - [`ranking:the-final-tie-break-is-the-full-id` — The final tie-break is the full id](#rankingthe-final-tie-break-is-the-full-id--the-final-tie-break-is-the-full-id)
   - [`ranking:the-dependency-graph-is-acyclic` — The dependency graph is acyclic](#rankingthe-dependency-graph-is-acyclic--the-dependency-graph-is-acyclic)
   - [`ranking:a-work-lane-entry-is-unblocked` — A work-lane entry is unblocked](#rankinga-work-lane-entry-is-unblocked--a-work-lane-entry-is-unblocked)
   - [`ranking:membership-is-never-an-edge` — Membership is never an edge](#rankingmembership-is-never-an-edge--membership-is-never-an-edge)
@@ -56,30 +55,38 @@ This is also why a cycle report is stable when the same cycle is found from eith
 
 A watch is legal on work already in flight. A question means the project does not know what to build, so the entry leaves the work lane. A watch means the project knows what to build and the outside world moved after work started. Sending that entry back to the scheduled lane would falsely say it never started and its clock never ran. The watch keeps that blocked row visible where it carries the most signal.
 
-## The key chain
+## The ranking procedure
 
-The record uses one ordering procedure. It compares close date first, ascending, for entries that carry one. Entries without a close date compare equal on that key. The plan configuration declares the remaining chain as one ordered list that the reader applies top to bottom.
+The record uses one ranking procedure. It applies product constraints, then project preferences, then one internal tie-break. A constraint protects a valid plan. A preference expresses which valid entry a project wants first. A tie-break makes the result deterministic without expressing preference.
+
+The procedure applies these stages in order:
+
+1. Compare closed entries by close date ascending.
+2. Place eligible entries before ineligible entries.
+3. Place each same-lane dependency before the entry that needs it.
+4. Apply the plan's declared preferences in their declared order.
+5. Compare the full id lexically when every earlier stage ties.
+
+The first three stages and the final stage are product behavior. The plan cannot enable, disable, or reorder them. The configuration exposes only the fourth stage:
 
 ```toml
 [ranking]
-keys = ["eligibility", "needs", "class", "points-ascending", "id"]
+preferences = ["delay-cost", "points-ascending"]
 ```
 
-The scaffold writes that chain. Five names are valid: `eligibility` sorts eligible entries first, `needs` orders same-lane dependencies topologically, `class` applies class of service, `points-ascending` puts smaller work first, and `id` compares the full id lexically.
+The scaffold writes both preference names in that order. `delay-cost` places `immediate` first, an absent value in the ordinary middle position, and `deferred` last. `points-ascending` places smaller work first. A project can omit either preference or declare an empty list.
 
-The first two keys express graph constraints by construction. Every chain begins with `eligibility` and then `needs`, so a same-lane dependency sorts before the entry that needs it. The project chooses which stated keys follow and their order. Every chain ends with `id` so the order stays total.
-
-Class is the only field a person states for ordering alone. It creates no dependency edge, changes no eligibility result, and enters no measure because it is not an event.
+Delay cost is the only field a person states for ordering alone. It creates no dependency edge, changes no eligibility result, and enters no measure because it is not an event.
 
 Smaller work first shortens the average wait. The three-point cap bounds what a larger entry can wait behind because larger work splits along its judgments.
 
 One record-wide procedure avoids four more chains to configure. The closed lane is the only lane with a distinct key, and the close-date comparison is equal everywhere else.
 
-The ranking domain owns the cross-file check for the section's presence because an absent section leaves the order undefined. The configuration schema owns the table, list, and string types, and `configuration:the-schema-owns-types-and-the-checker-owns-agreement` keeps presence with the checker.
+The ranking domain owns the accepted preference names and their uniqueness. The configuration domain owns the required declaration. An empty list states that the project chooses no ranking preference. It is not a default.
 
 The declaration lives in `.wipctl/plan.toml` because the file is committed and `sync` replicates it. Every worker then derives one order from one declaration. The host repository is per project checkout, the state directory is machine-local, and the cache is disposable, so none can carry a plan's order.
 
-An operator changes the chain by editing the plan configuration and committing it. No verb writes the chain because a configuration verb would need a grammar for every key. The plan hooks validate the commit under `transactions:the-plan-hooks-are-never-bypassed`, so no warning about an uncommitted edit is needed.
+An operator changes the preferences by editing the plan configuration and committing it. No verb writes them. The plan hooks validate the commit under `transactions:the-plan-hooks-are-never-bypassed`.
 
 ## Requirements
 
@@ -97,96 +104,84 @@ Verify: `cargo nextest run --test ranking`
 
 ### `ranking:an-order-is-computed-and-never-stored` — An order is computed and never stored
 
-The implementation MUST compute every lane's order from the configured key chain on each read and treat lane-file sequence as membership alone.
+The implementation MUST compute every lane's order with the ranking procedure on each read and treat lane-file sequence as membership alone.
 
 #### Scenario: A stored order is requested
 
 - GIVEN a request to store, fix, or hand-edit a lane's order
-- WHEN the key chain already computes it
+- WHEN the ranking procedure already computes it
 - THEN there is nothing to store and nothing to repair, and changing file sequence changes no rendered order
 
 Verify: `cargo nextest run --test ranking`
 
-### `ranking:a-class-orders-below-eligibility-and-above-size` — A class orders below eligibility and above size
+### `ranking:a-delay-cost-preference-orders-before-size` — Delay cost orders before size in a scaffolded plan
 
-The scaffolded ranking chain MUST compare class after eligibility and same-lane needs and before points.
+The scaffolded ranking preferences MUST place `delay-cost` before `points-ascending`.
 
-#### Scenario: A scaffolded plan has a blocked expedite entry
+#### Scenario: A scaffolded plan has immediate and small work
 
-- GIVEN the default chain, an expedite entry with an open dependency, and an eligible intangible entry in the same lane
-- WHEN the chain compares the entries
-- THEN the eligible intangible entry sorts first, because expedite does not make blocked work startable
+- GIVEN two eligible entries where one has immediate delay cost and three points and the other has one point
+- WHEN the scaffolded preferences compare the entries
+- THEN the entry with immediate delay cost sorts first
 
 Verify: `cargo nextest run --test ranking`
 
-### `ranking:a-key-name-is-known-and-appears-once` — A key name is known and appears once
+### `ranking:a-preference-name-is-known-and-appears-once` — A preference name is known and appears once
 
-When a ranking chain loads, the implementation MUST accept only `eligibility`, `needs`, `class`, `points-ascending`, and `id`, and each name MUST appear at most once.
+When ranking preferences load, the implementation MUST accept only `delay-cost` and `points-ascending`, and each name MUST appear at most once.
 
-#### Scenario: A chain repeats one unknown name
+#### Scenario: A preference list repeats one unknown name
 
-- GIVEN a chain containing `priority` twice
+- GIVEN a preference list containing `priority` twice
 - WHEN the configuration loads
 - THEN it fails naming the valid set and the repetition, because the unknown comparison has no meaning and the second occurrence is unreachable
 
 Verify: `cargo nextest run --test configuration`
 
-### `ranking:the-chain-ends-in-the-residual-key` — The chain ends in the residual key
+### `ranking:constraints-lead-and-are-fixed` — Constraints lead and are fixed
 
-The configured key chain MUST end with `id`.
+The ranking procedure MUST apply eligibility and same-lane dependency constraints before every configured preference.
 
-#### Scenario: Points is the last key
+#### Scenario: Immediate work is blocked
 
-- GIVEN a chain whose last key is `points-ascending`
-- WHEN the configuration loads
-- THEN it fails before a lane is read, because two entries can tie on points and leave the head undefined
+- GIVEN a blocked entry with immediate delay cost and an eligible entry with deferred delay cost
+- WHEN the ranking procedure compares the entries
+- THEN the eligible entry sorts first because a preference cannot override a constraint
 
-Verify: `cargo nextest run --test configuration`
+Verify: `cargo nextest run --test ranking`
 
-### `ranking:the-derived-keys-lead-and-are-not-reordered` — The derived keys lead and are not reordered
+### `ranking:the-ranking-procedure-is-total` — The ranking procedure is total
 
-The configured key chain MUST start with `eligibility` followed by `needs`.
+The ranking procedure MUST order every pair of entries in one lane so that no two entries compare equal.
 
-#### Scenario: A stated preference leads the chain
+#### Scenario: Every preference ties
 
-- GIVEN a chain that places `class` before either derived key
-- WHEN the configuration loads
-- THEN it fails because eligibility and dependency order are constraints, not preferences, and a chain that puts blocked work at the head contradicts `ranking:a-work-lane-entry-is-unblocked`
-
-Verify: `cargo nextest run --test configuration`
-
-### `ranking:the-key-chain-is-total` — The key chain is total
-
-The key chain MUST order every pair of entries in one lane so that no two entries compare equal.
-
-#### Scenario: Every stated key ties
-
-- GIVEN two entries with the same eligibility, same-lane needs relation, close date, class, and points
-- WHEN the chain reaches its residual key
+- GIVEN two entries with the same constraints, close date, delay cost, and points
+- WHEN the procedure reaches its final tie-break
 - THEN one id sorts first, so the preview and take verbs read one defined head
 
 Verify: `cargo nextest run --test ranking`
 
-### `ranking:a-key-reads-the-record-alone` — A key reads the record alone
+### `ranking:an-ordering-input-reads-the-record-alone` — An ordering input reads the record alone
 
-Every ordering key MUST read the current record's entries and plan configuration alone.
+Every ranking constraint, preference, and tie-break MUST read the current record's entries and plan configuration alone.
 
 #### Scenario: Two clones read one commit
 
 - GIVEN two clones at one commit with the same record and configuration
 - WHEN each computes a lane's order
-- THEN both produce one order, because no key reads a clock, history, a directory listing, or machine-local state
+- THEN both produce one order because no ordering input reads a clock, history, directory listing, or machine-local state
 
 Verify: `cargo nextest run --test ranking`
 
-### `ranking:the-residual-key-is-the-full-id` — The residual key is the full id
+### `ranking:the-final-tie-break-is-the-full-id` — The final tie-break is the full id
 
-The residual key MUST compare each full id lexically as one opaque string.
+The final tie-break MUST compare each full id lexically as one opaque string.
 
 #### Scenario: Two ids share every visible part
 
 - GIVEN two entries tied on every earlier key
-- WHEN the residual key compares their ids
+- WHEN the final tie-break compares their ids
 - THEN it parses no date, prefix, or filename from either id and compares each whole value once
 
 Verify: `cargo nextest run --test ranking`
@@ -229,7 +224,7 @@ Verify: `cargo nextest run --test ranking`
 
 ### `ranking:the-closed-lane-orders-by-date` — The closed lane orders by close date
 
-The order computation MUST compare closed entries by close date ascending before the configured chain and treat an absent close date as equal.
+The ranking procedure MUST compare closed entries by close date ascending before its other stages and treat an absent close date as equal.
 
 #### Scenario: An entry reopens and closes again
 
@@ -245,4 +240,4 @@ Verify: `cargo nextest run --test ranking`
 | ------------------------------------------------- | -------------------------------------------------------------------------------------- |
 | `ranking:eligibility-is-derived-from-three-edges` | Whether a proposed field restates a derived fact is a reading of what the field means. |
 
-A landed record's ranking is settled by a person. The key chain applies stated facts and breaks only otherwise indistinguishable ties.
+A landed record's ranking is settled by a person. The procedure applies stated facts and breaks only otherwise indistinguishable ties.

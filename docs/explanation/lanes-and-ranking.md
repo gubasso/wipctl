@@ -2,46 +2,51 @@
 
 ## The record's shape
 
-The lane files are the record. The file is the lane, so there is no `status` field. File sequence records membership alone, and the key chain computes rank from record facts on every read. A lane move is a reviewable membership diff, while a change to dependencies, class, points, or close date changes the computed order without relocating an entry by hand.
+The lane files are the record. The file is the lane, so there is no `status` field. File sequence records membership alone. The ranking procedure computes rank from record facts on every read. A lane move is a reviewable membership diff. A change to dependencies, delay cost, points, or close date changes the computed order without relocating an entry by hand.
 
-The lane entry carries what a scanner needs: type, points, class of service, summary, dependencies, epic, labels, and outcome. The story document carries what a session needs: goal, example, scope, references, acceptance, and tasks. The zone holds intent, so it is allowed to become false as work moves. That is why it must hold no durable fact. Durable facts live in the host project's documents, as [host-integration.md](./host-integration.md) states.
+The lane entry carries what a scanner needs: type, points, delay cost, summary, dependencies, epic, labels, and outcome. The story document carries what a session needs: goal, example, scope, references, acceptance, and tasks. The zone holds intent, so it can become false as work moves. It holds no durable fact. Durable facts live in the host project's documents, as [host-integration.md](./host-integration.md) states.
 
 ## Eligibility
 
-An entry is eligible when every id in its `needs` is closed and no open question or blocking watch blocks it. Blocked is always derived from those three edge kinds, never a lane and never a field. As a result, a view and a gate can never disagree about it.
+An entry is eligible when every id in its `needs` is closed and no open question or blocking watch blocks it. Blocked is always derived from those three edge kinds, never a lane and never a field. A view and a gate therefore cannot disagree about it.
 
-An id that carries an alias prefix is read in the peer that alias names. It gates this entry exactly as a local id does. [plans-and-peers.md](./plans-and-peers.md) says why the two forms are one edge.
+An id that carries an alias prefix is read in the peer that alias names. It gates this entry exactly as a local id does. [plans-and-peers.md](./plans-and-peers.md) explains why the two forms are one edge.
 
-## The key chain
+## The ranking procedure
 
-The record uses one order computation. Close date sorts first, ascending, where an entry carries one. The plan configuration's required `[ranking]` table declares the remaining comparisons as one ordered list. The scaffold writes this chain:
+The record uses one ranking procedure:
 
-1. eligible before ineligible
-2. topological over same-lane dependencies
-3. class of service: expedite, standard, intangible
-4. points ascending
-5. full id, compared lexically as one opaque string
+1. Close date places closed entries from oldest to newest.
+2. Eligibility places startable work first.
+3. Dependency order places each same-lane prerequisite before the entry that needs it.
+4. The plan's declared preferences order entries that satisfy the same constraints.
+5. The full id resolves any remaining tie.
 
-Every valid chain starts with eligibility and same-lane dependencies because they are constraints rather than preferences. A chain that put class first could put blocked work at its head. The project chooses which stated keys follow and their order, and the full id always ends the list. The residual id resolves only otherwise indistinguishable entries and makes the order total. The closed lane uses the same procedure, with close date equal everywhere else, so the record needs no separate chain per lane.
+Close date, eligibility, dependency order, and the final tie-break are fixed product behavior. They are not project preferences, so the configuration does not expose them. A project can choose only whether delay cost or points applies first, omit either preference, or state that it has none.
 
-The declaration lives in `.wipctl/plan.toml` because a commit and `sync` replicate it to every worker. The host repository would make it per checkout, the state directory would make it per machine, and the cache is disposable. An order that differs per machine is not an order.
+The scaffold writes:
 
-An operator changes the chain by editing the plan configuration and committing it. The plan repository's hooks validate the change before it lands. No verb writes the chain because a configuration verb would need a grammar for every key, and no warning duplicates the hook's refusal.
+```toml
+[ranking]
+preferences = ["delay-cost", "points-ascending"]
+```
 
-Class affects ordering alone. It creates no dependency, changes no eligibility result, and enters no measure. More than one open expedite entry is legal and produces a warning at exit 0, because the person who stated the classes decides whether to change them.
+The declaration lives in `.wipctl/plan.toml` because a commit and `sync` replicate it to every worker. An operator changes the preferences by editing that file and committing it. The plan repository's hooks validate the change before it lands.
 
-The two work lanes admit only entries whose dependencies are closed and whose questions are answered. The chain still computes their order, and a gap left by a reopening is not a defect because file sequence carries no rank.
+Delay cost states when waiting harms an entry. `immediate` sorts before ordinary work. `deferred` sorts after ordinary work. Ordinary work omits the field. Delay cost creates no dependency, changes no eligibility result, and enters no measure.
+
+The two work lanes admit only entries whose dependencies are closed and whose questions are answered. The procedure still computes their order. A gap left by a reopening is not a defect because file sequence carries no rank.
 
 ## Reading the order back
 
-A computed order a reader cannot explain is an order they cannot argue with. `wipctl board` renders each lane in chain order and marks each row's class with a glyph: `^` for expedite, nothing for standard, and `.` for intangible. Two ASCII characters survive a pipe and a colour-free terminal, which is why they are the mark rather than a colour.
+A computed order a reader cannot explain is an order they cannot challenge. `wipctl board` marks immediate delay cost with `^`, ordinary work with no glyph, and deferred delay cost with `.`. The marks survive a pipe and a colour-free terminal.
 
-`wipctl board --why` and `wipctl next --why` add one column naming the key that decided each row against the row above it. One key, never the whole chain and never a score, because the reader wants to know why this row sits here rather than one line up.
+`wipctl board --why` and `wipctl next --why` name the one constraint, preference, or tie-break that placed each row against the row above it. They show one reason, not the whole procedure or a score.
 
-Where the residual id decided a row, the board says so with no flag given. That mark is not optional, because a mark only a flag reveals is a mark nobody sees, and this is the one place the tool chose where a person did not.
+Where the final ID tie-break decides a row, the board says so without a flag. The tool chose where the record expressed no preference, so the output must expose that fact.
 
 The loop is read, edit the record, read again. Neither flag writes a byte, takes a lock, or exits non-zero.
 
-## Computed order, human priority
+## Computed order, human preference
 
-The tool computes rank; it does not author priority. Class is the one field a person writes for ordering alone. Every comparison above the residual id reads a fact a person wrote or a condition derived from those facts. The residual id chooses only when those facts express no preference. There is no stored order to validate, repair, or offer as a set of legal positions.
+The tool computes rank. It does not author priority. Fixed constraints keep the plan valid. Declared preferences apply facts a person wrote. The final ID tie-break chooses only when those facts express no preference. There is no stored order to validate, repair, or offer as a set of legal positions.

@@ -24,6 +24,7 @@ One spec per domain, each requirement carrying a rule id, an example scenario, a
 - [SPEC-external-sources.md](./specs/SPEC-external-sources.md): naming an item in a system outside the plan repository.
 - [SPEC-scaffold.md](./specs/SPEC-scaffold.md): what the scaffold lands, and the contract each landed file carries.
 - [SPEC-quality-gates.md](./specs/SPEC-quality-gates.md): what any implementation gates, and what it means to conform.
+- [SPEC-vocabulary.md](./specs/SPEC-vocabulary.md): how every public domain, concept, field, and field value names itself.
 - [SPEC-review.md](./specs/SPEC-review.md): the human review gate, holding every rule no command can decide.
 
 The shipped JSON Schemas live beside the spec that owns each shape, in the companion directory named for it.
