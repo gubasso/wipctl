@@ -36,6 +36,13 @@
           "items": { "$ref": "#/$defs/needs_id" },
           "uniqueItems": true
         },
+        "touches": {
+          "type": "array",
+          "maxItems": 12,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/path" },
+          "description": "The paths this entry's work probably changes, restated from the lane entry and carrying the same bound. Optional here, where the lane entry requires it, for the same reason points and summary are optional here: capture writes what it knows and the fragment is committed as captured. The drain refuses a fragment missing a field the lane entry requires, naming the file and the field."
+        },
         "epic": { "$ref": "#/$defs/id" },
         "tags": {
           "type": "array",
@@ -61,6 +68,12 @@
       "type": "string",
       "pattern": "^([a-z0-9]+(-[a-z0-9]+)*#)?[a-z0-9]+(-[a-z0-9]+)*$",
       "description": "A dependency target, restated from the lane entry: a bare id naming an entry in this record, or <alias>#<id> naming an entry in an attached peer. Keeping this mirror in agreement with the lane schema is the same review responsibility the entry object already carries."
+    },
+    "path": {
+      "type": "string",
+      "pattern": "^[^/\\s*?\\[\\]{}]+(/[^/\\s*?\\[\\]{}]+)*$",
+      "not": { "pattern": "(^|/)\\.\\.?(/|$)" },
+      "description": "One relative path, restated from the lane entry: no leading or trailing separator, no empty segment, no dot segment, no whitespace, and no glob character. Keeping this mirror in agreement with the lane schema is the same review responsibility the entry object already carries."
     }
   }
 }

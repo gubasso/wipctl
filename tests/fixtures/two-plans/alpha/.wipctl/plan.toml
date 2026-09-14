@@ -14,3 +14,17 @@ urls = ["https://git.example.org/acme/beta-plan.git"]
 [peers.platform]
 plan_id = "b7d0e94a15c8f0236a41e78c3d5b0f62"
 urls = ["https://git.example.org/acme/platform-plan.git"]
+
+# All three operations on one alias. The capability list a reader reports is
+# derived from these keys, so this row is the one that exercises the full
+# ordering inspect, contact, resume.
+[session_adapters.sessions]
+inspect = ["session-adapter", "inspect", "{key}"]
+contact = ["session-adapter", "contact", "{key}"]
+resume = ["session-adapter", "resume", "{key}"]
+
+# One operation and no inspect command. This row is the instance of the
+# nullable reading: inspection is unsupported here, which a detail row reports
+# as a null reading rather than as an unknown one.
+[session_adapters.detached]
+resume = ["detached-adapter", "resume", "{key}"]

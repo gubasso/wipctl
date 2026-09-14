@@ -4,7 +4,17 @@
   "description": "One epic resolved into its execution plan. Authoritative for what serves the epic and what each entry waits on. Its ordering past the eligible set is the dependency graph's, not a schedule: a consumer takes any entry from `eligible` and asks again once that entry closes. Derived from the record on every call and stored nowhere, so a payload that disagrees with the record is stale rather than authoritative.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "closed_points", "total_points", "open", "eligible", "blocked"],
+  "required": [
+    "id",
+    "closed_points",
+    "total_points",
+    "open",
+    "eligible",
+    "blocked",
+    "sessions",
+    "path_union",
+    "overlaps"
+  ],
   "properties": {
     "id": { "$ref": "#/$defs/id" },
     "closed_points": {
@@ -31,9 +41,98 @@
       "description": "Waiting on something, in the graph's order, each naming what it waits on.",
       "type": "array",
       "items": { "$ref": "#/$defs/entry" }
+    },
+    "sessions": {
+      "description": "One row per open direct member that carries a session claim, ordered by full entry id. Empty when no member claims a session, never absent. Each row names the operations the referenced adapter declares and carries that session's reading, so a reader sees which peers are reachable and how without opening the plan configuration. A row is a dated observation about one session and never a verdict about the epic: `epics:no-verb-reports-a-staleness-verdict` refuses a verdict at every tier, which is why the liveness vocabulary is active, ended, and unknown rather than stale.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/session_row" }
+    },
+    "path_union": {
+      "description": "Every path the epic's open direct members predict they will change, deduplicated and in lexical order. Empty when nothing is predicted, never absent. This is breadth and never complexity: points count judgments, and a story touching one central protocol file is often harder than one touching ten generated fixtures, so this number sits beside the points rather than instead of them. Derived on every call and stored nowhere.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/path" }
+    },
+    "overlaps": {
+      "description": "Every path more than one open direct member predicts, in lexical order, each carrying the entry ids that predicted it. Empty when no two members meet, never absent. An overlap is evidence for a person and never an edge: it adds nothing to the dependency graph and nothing to the order computation, per `lane-file:needs-is-the-only-sequencing-fact` and the charter's refusal of a machine-authored priority. The entry ids are the provenance an initiative fold preserves, so a path touched once in each of two epics still reads as an overlap one tier up.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/overlap" }
     }
   },
   "$defs": {
+    "path": {
+      "type": "string",
+      "pattern": "^[^/\\s*?\\[\\]{}]+(/[^/\\s*?\\[\\]{}]+)*$",
+      "description": "One predicted path, relative to the host's project root, restated from the lane entry's own grammar."
+    },
+    "session_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entry", "lane", "session", "capabilities", "reading"],
+      "properties": {
+        "entry": { "$ref": "#/$defs/id" },
+        "lane": {
+          "enum": ["doing", "review"],
+          "description": "A claim belongs to a work lane, so a row can carry no other lane."
+        },
+        "session": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*#[^\\s#]+$",
+          "description": "The locator the entry carries, as written: one declared adapter alias, one separator, and an opaque key."
+        },
+        "capabilities": {
+          "enum": [
+            ["inspect"],
+            ["contact"],
+            ["resume"],
+            ["inspect", "contact"],
+            ["inspect", "resume"],
+            ["contact", "resume"],
+            ["inspect", "contact", "resume"]
+          ],
+          "description": "The operations the referenced adapter declares, in the fixed order inspect, contact, resume. Derived from the keys the adapter table carries and stored nowhere, so this list cannot disagree with the commands that exist. At least one, because an adapter declaring nothing is refused at the configuration. The seven legal values are enumerated rather than described, which gates the order as well as the membership. A capability is availability and never authorization: the invoking host decides whether an agent may contact or resume a peer."
+        },
+        "reading": {
+          "description": "The normalized reading for this session, or null when the referenced adapter declares no inspect command. The null case is unsupported inspection and differs from an attempted inspection that failed, which carries a reading whose state is unknown. Resolved on this call and stored nowhere.",
+          "oneOf": [{ "$ref": "#/$defs/reading" }, { "type": "null" }]
+        }
+      }
+    },
+    "reading": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "observed_at"],
+      "description": "The shape `session-reading.schema.json` states, restated here so this payload depends on no path outside its own companion directory. A shipped artifact that reaches across directories to be readable is one a consumer can receive incomplete.",
+      "properties": {
+        "state": {
+          "enum": ["active", "ended", "unknown"],
+          "description": "Present evidence that the session can continue, present evidence that it cannot, or no evidence either way. An inability to look is never proof that a session ended."
+        },
+        "observed_at": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+          "description": "When the reading was taken, in the transition journal's textual form. Required on an unknown reading too, because an undated liveness claim is a claim about now that no reader can check."
+        },
+        "location": { "type": "string" },
+        "activity": { "type": "string" },
+        "address": { "type": "string" }
+      }
+    },
+    "overlap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "entries"],
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "entries": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" },
+          "description": "The open members that predicted this path, in lexical order. At least two, because one entry predicting a path is not an overlap. Dropping these ids would leave a reader a list of contested paths with nobody to talk to, and it is what the initiative fold has to carry upward."
+        }
+      }
+    },
     "id": {
       "type": "string",
       "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",

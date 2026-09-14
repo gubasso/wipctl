@@ -18,6 +18,20 @@
   },
   "allOf": [
     {
+      "description": "A session claim belongs to a work lane and nowhere else. An entry in a planning lane has nobody acting on it, and a closed entry's locator would point at a session nobody will resume. The transition strips the claim on the way out, inside the same transaction as the lane change.",
+      "if": {
+        "required": ["lane"],
+        "properties": { "lane": { "enum": ["doing", "review"] } }
+      },
+      "else": {
+        "properties": {
+          "stories": {
+            "items": { "not": { "required": ["session"] } }
+          }
+        }
+      }
+    },
+    {
       "if": {
         "required": ["lane"],
         "properties": { "lane": { "const": "closed" } }
@@ -59,10 +73,21 @@
       "pattern": "^([a-z0-9]+(-[a-z0-9]+)*#)?[a-z0-9]+(-[a-z0-9]+)*$",
       "description": "A dependency target: a bare id naming an entry in this record, or <alias>#<id> naming an entry in the peer that the plan configuration's peers section binds to that alias. The two forms mean the same thing, which is closed before this entry is eligible, and the graph, the eligibility rule, and the acyclicity proof treat them identically. The prefixed form is split exactly once, on the first separator: the alias half resolves in the peer table and the id half is carried whole, so the rule that no consumer parses an id survives. A prefixed id must be written double-quoted, which no schema can check because a schema reads a value the parser already unquoted; the canonical-subset parser holds that rule."
     },
+    "path": {
+      "type": "string",
+      "pattern": "^[^/\\s*?\\[\\]{}]+(/[^/\\s*?\\[\\]{}]+)*$",
+      "not": { "pattern": "(^|/)\\.\\.?(/|$)" },
+      "description": "One relative path, resolved against the host's project root, exactly as an Amends path is. No leading or trailing separator, no empty segment, no dot segment, and no whitespace, so a one-line flow sequence stays unambiguous. The glob characters are excluded because a touch item is one exact path: exact paths give a deterministic overlap set, and a pattern language brings containment questions and false precision. Nothing resolves the path against a tree — the record cannot see the host's repository, and a prediction that had to exist already could never name new work."
+    },
+    "session_ref": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*#[^\\s#]+$",
+      "description": "A session reference: one alias naming a table in the plan configuration's session_adapters section, one separator, and the opaque key that adapter's commands accept. The token is split exactly once, on the one separator, and the key half is carried whole because no consumer parses it. A prefixed reference must be written double-quoted, which no schema can check because a schema reads a value the parser already unquoted; the canonical-subset parser holds that rule. The cross-file checker resolves the alias against the declaration."
+    },
     "story": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "type", "points", "summary"],
+      "required": ["id", "type", "points", "summary", "touches"],
       "properties": {
         "id": { "$ref": "#/$defs/id" },
         "type": {
@@ -82,6 +107,17 @@
           "items": { "$ref": "#/$defs/needs_id" },
           "uniqueItems": true,
           "description": "Ids that must be closed before this story is eligible. An id may carry an alias prefix and name an entry in an attached peer."
+        },
+        "touches": {
+          "type": "array",
+          "maxItems": 12,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/path" },
+          "description": "The paths this entry's work probably changes, created, modified, or removed. Required on every landed entry, and an empty sequence is the decided form for work that changes no file: it says the author considered the question, where an absent key would say only that the entry is incomplete. Imprecise on purpose and checked against no tree. At most 12 items, which bounds the surface a reader compares rather than measuring complexity — points count judgments, and a story touching one central protocol file is often harder than one touching ten generated fixtures. Work predicting more paths splits along its outcomes. Every path a story's Amends section names appears here, which the cross-file checker decides because the assertion is in the document and the list is in this file. An overlap between two entries is advisory: it adds no edge, gates no transition, and enters no order computation."
+        },
+        "session": {
+          "$ref": "#/$defs/session_ref",
+          "description": "The coding session acting on this entry, as one <alias>#<key> locator. Optional, and permitted in the work lanes alone: its absence honestly says the record makes no session claim, which is what covers work performed without a resolvable coding session, so nobody needs a synthetic adapter alias. The record stores the locator and nothing else — whether the session runs, where it listens, and what it is working on stay owned by the session system and are resolved on use. A claim is not a lock: it blocks nobody, expires against nothing, and gates no transition."
         },
         "epic": {
           "$ref": "#/$defs/id",

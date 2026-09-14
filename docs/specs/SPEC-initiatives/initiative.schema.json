@@ -4,7 +4,16 @@
   "description": "One initiative decomposed into its member epics, as `wipctl initiative <id> --json` emits it. One row per member epic, each carrying the epic's own arithmetic; deliberately not an execution plan — entries are the epic verb's answer, and this payload never resolves them. Derived from the record on every call and stored nowhere, so a payload that disagrees with the record is stale rather than authoritative.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "closed_points", "total_points", "open", "epics"],
+  "required": [
+    "id",
+    "closed_points",
+    "total_points",
+    "open",
+    "epics",
+    "sessions",
+    "path_union",
+    "overlaps"
+  ],
   "properties": {
     "id": { "$ref": "#/$defs/id" },
     "closed_points": {
@@ -36,6 +45,22 @@
           "open": { "type": "integer", "minimum": 0 }
         }
       }
+    },
+    "sessions": {
+      "description": "One row per claimed session under this initiative, combined from the member epics' folds and ordered by full entry id. Empty when nothing is claimed, never absent. The fold runs one way through the ladder: this payload consumes the epic folds and performs no second scan from entries to initiatives. Each row stays a dated observation about one session, and `initiatives:the-rollup-reports-no-verdict` still refuses a verdict here.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/session_row" }
+    },
+    "path_union": {
+      "description": "Every path the open members of every member epic predict they will change, deduplicated across the epics and in lexical order. Empty when nothing is predicted, never absent. Breadth and never complexity, and it sits beside the points rather than instead of them.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/path" }
+    },
+    "overlaps": {
+      "description": "Every path more than one open member predicts, in lexical order, each carrying the entry ids that predicted it. The combination happens before the derivation, so a path touched once in each of two member epics still appears here with both ids. Advisory: it adds no edge, gates no transition, and enters no order computation, and this payload stays the flat coordination projection `initiatives:an-initiative-is-reported-never-executed` describes rather than a second execution plan.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/overlap" }
     }
   },
   "$defs": {
@@ -43,6 +68,72 @@
       "type": "string",
       "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
       "description": "The title's slug, plus at most a qualifying postfix where that slug was taken. Shared across stories, epics, initiatives, and questions, so one id names one thing."
+    },
+    "path": {
+      "type": "string",
+      "pattern": "^[^/\\s*?\\[\\]{}]+(/[^/\\s*?\\[\\]{}]+)*$",
+      "description": "One predicted path, relative to the host's project root, restated from the lane entry's own grammar."
+    },
+    "session_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entry", "lane", "session", "capabilities", "reading"],
+      "description": "The shape the epic detail states, restated here so this payload depends on no path outside its own companion directory.",
+      "properties": {
+        "entry": { "$ref": "#/$defs/id" },
+        "lane": { "enum": ["doing", "review"] },
+        "session": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*#[^\\s#]+$"
+        },
+        "capabilities": {
+          "enum": [
+            ["inspect"],
+            ["contact"],
+            ["resume"],
+            ["inspect", "contact"],
+            ["inspect", "resume"],
+            ["contact", "resume"],
+            ["inspect", "contact", "resume"]
+          ],
+          "description": "The operations the referenced adapter declares, in the fixed order inspect, contact, resume. The seven legal values are enumerated rather than described, which gates the order as well as the membership."
+        },
+        "reading": {
+          "description": "The normalized reading, or null where the referenced adapter declares no inspect command. The null case is unsupported inspection and differs from an attempted inspection that failed, which carries an unknown state.",
+          "oneOf": [{ "$ref": "#/$defs/reading" }, { "type": "null" }]
+        }
+      }
+    },
+    "reading": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "observed_at"],
+      "description": "The shape `session-reading.schema.json` states, restated here for the same reason the session row is.",
+      "properties": {
+        "state": { "enum": ["active", "ended", "unknown"] },
+        "observed_at": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+        },
+        "location": { "type": "string" },
+        "activity": { "type": "string" },
+        "address": { "type": "string" }
+      }
+    },
+    "overlap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "entries"],
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "entries": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" },
+          "description": "The open members that predicted this path, in lexical order. At least two, and they survive the combination through the epics, because an overlap a reader cannot trace back to two entries names nobody to talk to."
+        }
+      }
     }
   }
 }

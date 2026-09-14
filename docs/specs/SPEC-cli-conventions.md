@@ -53,8 +53,8 @@ wipctl attach --mint-uid
 wipctl attach --peers
 wipctl new <type> "<title>" [--id <id>] [--epic <id>] [--points <n>] [--lane <backlog|todo>]
 wipctl land [--report]
-wipctl move <id> --to <lane> [--outcome <o>] [--succeeded-by <id>] [--closed <date>] [--dry-run]
-wipctl start
+wipctl move <id> --to <lane> [--outcome <o>] [--succeeded-by <id>] [--closed <date>] [--session <ref>] [--dry-run]
+wipctl start [--session <ref>]
 wipctl delete <id> [--dry-run]
 wipctl rename <id> "<new title>" [--id <new-id>]
 wipctl rename <id> --id <new-id>

@@ -1,0 +1,71 @@
+{
+  "id": "trustworthy-sessions",
+  "closed_points": 3,
+  "total_points": 9,
+  "open": 3,
+  "epics": [
+    {
+      "id": "session-hardening",
+      "closed_points": 1,
+      "total_points": 4,
+      "open": 2
+    },
+    {
+      "id": "profile-surface",
+      "closed_points": 2,
+      "total_points": 5,
+      "open": 1
+    }
+  ],
+  "sessions": [
+    {
+      "entry": "audit-the-token-store",
+      "lane": "doing",
+      "session": "sessions#4f19a2",
+      "capabilities": ["inspect", "contact", "resume"],
+      "reading": {
+        "state": "active",
+        "observed_at": "2026-09-12T14:07:33Z",
+        "location": "the alpha checkout at the token-store worktree",
+        "activity": "running the permissive store case"
+      }
+    },
+    {
+      "entry": "profile-composition",
+      "lane": "review",
+      "session": "sessions#7d20be",
+      "capabilities": ["inspect", "contact", "resume"],
+      "reading": {
+        "state": "unknown",
+        "observed_at": "2026-09-12T14:07:34Z"
+      }
+    },
+    {
+      "entry": "secure-session-storage",
+      "lane": "review",
+      "session": "detached#c81b07",
+      "capabilities": ["resume"],
+      "reading": null
+    }
+  ],
+  "path_union": [
+    "docs/specs/SPEC-session.md",
+    "src/profile/page.rs",
+    "src/session/mod.rs",
+    "src/session/store.rs"
+  ],
+  "overlaps": [
+    {
+      "path": "docs/specs/SPEC-session.md",
+      "entries": ["audit-the-token-store", "secure-session-storage"]
+    },
+    {
+      "path": "src/session/store.rs",
+      "entries": [
+        "audit-the-token-store",
+        "profile-composition",
+        "secure-session-storage"
+      ]
+    }
+  ]
+}

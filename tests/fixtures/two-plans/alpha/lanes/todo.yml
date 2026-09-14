@@ -4,4 +4,5 @@ stories:
     type: story
     points: 2
     needs: [session-token-parsing, "beta#secure-session-storage"]
+    touches: [src/profile/page.rs, src/profile/mod.rs]
     summary: "Compose a reader's profile page from the session identity, so that a signed-in reader sees their own name and settings."

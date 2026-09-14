@@ -171,6 +171,8 @@ The subjects, each taught from zero:
 - that membership above the story flows through the epic
 - the lane semantics, the entry field list, the points scale, and the canonical subset
 - that a dependency id can carry an alias prefix naming an entry in a peer, and that it then means what a bare id means
+- that a work-lane entry may name the session acting on it, that the reference is a declared session-adapter alias and a key, that the presence of a command declares the inspect, contact, or resume capability, and that the record stores the locator alone
+- that every entry predicts at most 12 exact paths its work changes, that the prediction is imprecise on purpose and contains every amended path, and that it sequences nothing
 - the peer table, and the one command that fills every peer's slot on a machine
 - the id grammar, the slugification function, the mint's check against the live record and every tombstone, the rephrase resolution, and the hand-mint procedure
 - eligibility, the two ranking rules, and the blocking grammar

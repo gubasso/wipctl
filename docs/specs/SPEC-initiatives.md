@@ -6,6 +6,7 @@
 - [Requirements](#requirements)
   - [`initiatives:an-initiative-is-reported-never-executed` — An initiative is reported, never executed](#initiativesan-initiative-is-reported-never-executed--an-initiative-is-reported-never-executed)
   - [`initiatives:membership-is-searched-from-the-epics` — Membership is searched from the epics](#initiativesmembership-is-searched-from-the-epics--membership-is-searched-from-the-epics)
+  - [`initiatives:a-rollup-folds-through-the-epics` — A rollup folds through the epics](#initiativesa-rollup-folds-through-the-epics--a-rollup-folds-through-the-epics)
   - [`initiatives:every-entry-is-counted-once` — Every entry is counted once](#initiativesevery-entry-is-counted-once--every-entry-is-counted-once)
   - [`initiatives:work-outside-the-tier-is-outside-the-arithmetic` — Work outside the tier is outside the arithmetic](#initiativeswork-outside-the-tier-is-outside-the-arithmetic--work-outside-the-tier-is-outside-the-arithmetic)
   - [`initiatives:an-unjoined-initiative-appears-at-zero` — An unjoined initiative appears at zero](#initiativesan-unjoined-initiative-appears-at-zero--an-unjoined-initiative-appears-at-zero)
@@ -42,6 +43,20 @@ The implementation MUST search membership from the epic documents' initiative se
 - GIVEN an epic gaining an initiative section
 - WHEN the decomposition runs
 - THEN the member appears with no edit to the initiative document, because a member list goes stale on the first change
+
+Verify: `cargo nextest run --test initiatives`
+
+### `initiatives:a-rollup-folds-through-the-epics` — A rollup folds through the epics
+
+The implementation MUST combine the member epics' session rows and path-to-entry maps, preserving each map row's entry ids, before it derives the initiative's path union and overlap set from the combined map.
+
+#### Scenario: Two member epics each predict one file once
+
+- GIVEN a path predicted by one open member of each of two member epics
+- WHEN the decomposition renders
+- THEN the path appears as an overlap carrying both entry ids, because the combination happens before the derivation and a fold that dropped the ids would name a contested path with nobody to talk to
+
+Membership flows one way through the ladder, so this fold consumes the epic folds and performs no second scan from entries to initiatives. The result stays the flat coordination projection this domain reports, and it groups nothing into eligible and blocked.
 
 Verify: `cargo nextest run --test initiatives`
 

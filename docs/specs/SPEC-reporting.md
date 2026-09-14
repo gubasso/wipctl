@@ -16,6 +16,7 @@
   - [`reporting:the-preview-is-a-head-read` — The preview is a head read](#reportingthe-preview-is-a-head-read--the-preview-is-a-head-read)
   - [`reporting:a-defect-warns-and-the-line-prints` — A defect warns and the line prints](#reportinga-defect-warns-and-the-line-prints--a-defect-warns-and-the-line-prints)
   - [`reporting:pending-work-is-invisible-to-the-preview` — Pending work is invisible to the preview](#reportingpending-work-is-invisible-to-the-preview--pending-work-is-invisible-to-the-preview)
+  - [`reporting:a-rollup-states-its-imprecision` — A rollup states its imprecision](#reportinga-rollup-states-its-imprecision--a-rollup-states-its-imprecision)
   - [`reporting:the-composite-view-computes-nothing` — The composite view computes nothing](#reportingthe-composite-view-computes-nothing--the-composite-view-computes-nothing)
   - [`reporting:a-degraded-panel-degrades-only-itself` — A degraded panel degrades only itself](#reportinga-degraded-panel-degrades-only-itself--a-degraded-panel-degrades-only-itself)
   - [`reporting:membership-is-not-drawn-as-an-edge` — Membership is not drawn as an edge](#reportingmembership-is-not-drawn-as-an-edge--membership-is-not-drawn-as-an-edge)
@@ -191,6 +192,20 @@ The preview MUST NOT offer an unlanded entry as work to start.
 - GIVEN a fragment claiming the scheduled lane
 - WHEN the preview runs
 - THEN it is invisible, because an entry outside every lane is outside the chain
+
+Verify: `cargo nextest run --test reporting`
+
+### `reporting:a-rollup-states-its-imprecision` — A rollup states its imprecision
+
+The epic and initiative detail views MUST label every path union and overlap as a prediction, name each session's available operations, and print `observed_at` beside every non-null session state.
+
+#### Scenario: A reader acts on an overlap
+
+- GIVEN a detail naming a path two open entries predict
+- WHEN the reader decides what to do about it
+- THEN the label says the paths are predicted rather than observed, and the operations beside each claim say which peer can be contacted, because a prediction rendered as a fact is one a reader stops questioning
+
+An unsupported inspection renders as its own thing rather than as a failure. A null reading says the adapter declares no inspect command, and an unknown state says an attempted inspection decided nothing.
 
 Verify: `cargo nextest run --test reporting`
 

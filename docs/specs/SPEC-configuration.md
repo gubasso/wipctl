@@ -50,7 +50,7 @@ preferences = ["delay-cost", "points-ascending"]
 
 Both identities are 128 random bits written as exactly 32 lowercase hexadecimal characters. Each is minted once, immutable, opaque, and parsed by nothing.
 
-The plan file also holds its window and optional tables. The superseded list keeps discarded plan identities resolvable.
+The plan file also holds its window and its optional `peers`, `sources`, and `session_adapters` tables. The superseded list keeps discarded plan identities resolvable.
 
 ## Open question
 
@@ -132,9 +132,9 @@ Verify: `cargo nextest run --test schemas`
 
 ### `configuration:an-optional-section-is-legally-absent` — An optional section is legally absent
 
-The `peers` and `sources` sections MUST be optional, each absence MUST mean what its own domain states, and a present section MUST be complete.
+The `peers`, `sources`, and `session_adapters` sections MUST be optional, each absence MUST mean what its own domain states, and a present section MUST be complete.
 
-#### Scenario: A plan names no peer and declares no source
+#### Scenario: A plan names no peer, no source, and no session adapter
 
 - GIVEN a scaffolded plan repository carrying the core alone
 - WHEN the configuration is read

@@ -22,6 +22,8 @@ One spec per domain, each requirement carrying a rule id, an example scenario, a
 - The views: [SPEC-reporting.md](./specs/SPEC-reporting.md), [SPEC-metrics.md](./specs/SPEC-metrics.md), [SPEC-epics.md](./specs/SPEC-epics.md), [SPEC-initiatives.md](./specs/SPEC-initiatives.md), [SPEC-rendering.md](./specs/SPEC-rendering.md).
 - What is checked and by which half: [SPEC-validation.md](./specs/SPEC-validation.md), [SPEC-ranking.md](./specs/SPEC-ranking.md), [SPEC-repair.md](./specs/SPEC-repair.md), [SPEC-doctor.md](./specs/SPEC-doctor.md).
 - [SPEC-external-sources.md](./specs/SPEC-external-sources.md): naming an item in a system outside the plan repository.
+- [SPEC-agent-sessions.md](./specs/SPEC-agent-sessions.md): naming the coding session acting on an entry, and the operations that reach it.
+- [SPEC-touch-prediction.md](./specs/SPEC-touch-prediction.md): the paths an entry's work probably changes, and what an overlap between two of them means.
 - [SPEC-scaffold.md](./specs/SPEC-scaffold.md): what the scaffold lands, and the contract each landed file carries.
 - [SPEC-quality-gates.md](./specs/SPEC-quality-gates.md): what any implementation gates, and what it means to conform.
 - [SPEC-vocabulary.md](./specs/SPEC-vocabulary.md): how every public domain, concept, field, and field value names itself.
@@ -47,6 +49,11 @@ The shipped JSON Schemas live beside the spec that owns each shape, in the compa
 - [guides/wiring-host-docs.md](./guides/wiring-host-docs.md): connect stories to the host's own documents.
 - [guides/parallel-sessions.md](./guides/parallel-sessions.md): several agents on one record, and a second machine when you leave the first.
 - [guides/building-wipctl.md](./guides/building-wipctl.md): the milestone sequence for building the product from zero, with per-milestone acceptance.
+
+## Reference — exact values to look up
+
+- [reference/session-adapters.md](./reference/session-adapters.md): setup profiles for the session systems a session-adapter alias can front, with the reachability boundary each one carries.
+- [reference/tracking.yaml](./reference/tracking.yaml): the machine-readable record of facts that expire, and how to revalidate each one.
 
 ## Decisions
 

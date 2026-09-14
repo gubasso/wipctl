@@ -42,6 +42,7 @@ stories:
     delay_cost: immediate
     summary: "Callers of the search endpoint are limited per token, and the limit is announced in the response headers rather than discovered by being cut off."
     needs: [secure-session-storage]
+    touches: [src/http/limit.rs, src/http/mod.rs]
     epic: session-hardening
 ```
 
@@ -55,9 +56,11 @@ stories:
 | `delay_cost`   | optional               | `immediate` or `deferred`; absence means the ordinary middle position                                   |
 | `summary`      | required               | one double-quoted line, 60 to 400 characters, no surrounding whitespace                                 |
 | `needs`        | optional               | one-line flow sequence of unique ids this entry depends on, each naming this record or an attached peer |
+| `touches`      | required               | one-line flow sequence of at most 12 unique exact paths the work probably changes                       |
 | `epic`         | optional               | one id naming an existing epic document                                                                 |
 | `tags`         | optional               | one-line flow sequence of unique slugs; nothing gates on a tag                                          |
 | `branch`       | optional               | the code branch carrying the work                                                                       |
+| `session`      | work lanes only        | one `<alias>#<key>` token naming the coding session acting on the entry, through a declared adapter     |
 | `delivered`    | closed lane only       | the commit that delivered the work                                                                      |
 | `outcome`      | required when closed   | `done`, `cut`, or `reshaped`                                                                            |
 | `closed`       | required when closed   | the close date, and the velocity source                                                                 |

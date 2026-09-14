@@ -1,2 +1,8 @@
 lane: doing
-stories: []
+stories:
+  - id: audit-the-token-store
+    type: story
+    points: 1
+    touches: [src/session/store.rs, docs/specs/SPEC-session.md]
+    session: "sessions#4f19a2"
+    summary: "Read the token store for identities another process can reach, and record what the audit found so the hardening work has a starting list."

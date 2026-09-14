@@ -362,6 +362,386 @@ fn a_peer_url_hiding_a_password_in_an_escape_fails() {
 }
 
 #[test]
+fn a_lane_entry_without_its_touch_prediction_fails() {
+    // The prediction is required on every landed entry. An empty sequence says
+    // the author considered the question; an absent key says only that the
+    // entry is incomplete, and the two must not read alike.
+    // VERIFIES touch-prediction:a-touch-list-is-bounded-and-exact
+    let ok = accepts_fixture_with(
+        "touches-absent",
+        "alpha/lanes/closed.yml",
+        "    touches: []\n",
+        "",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "an entry with no touch prediction must fail the gate");
+}
+
+#[test]
+fn a_touch_list_past_the_bound_fails() {
+    // Twelve paths bound the surface a reader compares. Work predicting more
+    // splits along its outcomes, because a comparison nobody reads coordinates
+    // nothing.
+    // VERIFIES touch-prediction:a-touch-list-is-bounded-and-exact
+    let thirteen = (0..13)
+        .map(|n| format!("src/session/part{n}.rs"))
+        .collect::<Vec<_>>()
+        .join(", ");
+    let ok = accepts_fixture_with(
+        "touches-over-bound",
+        "beta/lanes/todo.yml",
+        "[src/session/store.rs, src/session/mod.rs, docs/specs/SPEC-session.md]",
+        &format!("[{thirteen}]"),
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a thirteenth predicted path must fail the gate");
+}
+
+#[test]
+fn a_repeated_touch_path_fails() {
+    // One list, one mention. A repeat states nothing the first mention did
+    // not, and it inflates the overlap set a reader acts on.
+    // VERIFIES touch-prediction:a-touch-list-is-bounded-and-exact
+    let ok = accepts_fixture_with(
+        "touches-repeat",
+        "alpha/lanes/todo.yml",
+        "[src/profile/page.rs, src/profile/mod.rs]",
+        "[src/profile/page.rs, src/profile/page.rs]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a repeated predicted path must fail the gate");
+}
+
+#[test]
+fn a_touch_path_carrying_a_dot_segment_fails() {
+    // A path resolves against the host's project root, as an amended path
+    // does. A dot segment climbs out of it, and two lists that both climb no
+    // longer compare.
+    // VERIFIES touch-prediction:a-touch-list-is-bounded-and-exact
+    let ok = accepts_fixture_with(
+        "touches-dot-segment",
+        "alpha/lanes/todo.yml",
+        "[src/profile/page.rs, src/profile/mod.rs]",
+        "[../other/page.rs, src/profile/mod.rs]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a path with a dot segment must fail the gate");
+}
+
+#[test]
+fn a_touch_item_that_is_a_pattern_fails() {
+    // Exact paths give a deterministic overlap set. A glob brings containment
+    // questions the first version answers by refusing the glob.
+    // VERIFIES touch-prediction:a-touch-item-is-not-a-pattern
+    let ok = accepts_fixture_with(
+        "touches-glob",
+        "alpha/lanes/todo.yml",
+        "[src/profile/page.rs, src/profile/mod.rs]",
+        "[src/profile/page*.rs, src/profile/mod.rs]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a glob item must fail the gate");
+}
+
+#[test]
+fn a_touch_item_that_is_a_directory_fails() {
+    // The other half of the same rule, and the form an author reaches for
+    // first. A directory prefix is a pattern written without a metacharacter.
+    // VERIFIES touch-prediction:a-touch-item-is-not-a-pattern
+    let ok = accepts_fixture_with(
+        "touches-directory",
+        "alpha/lanes/todo.yml",
+        "[src/profile/page.rs, src/profile/mod.rs]",
+        "[src/profile/, src/profile/mod.rs]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a directory prefix must fail the gate");
+}
+
+#[test]
+fn a_fragment_repeating_a_touch_path_fails() {
+    // The fragment mirrors the lane entry's field, so the mirror carries the
+    // same bounds. A mirror that gates less lets a defect land at the drain.
+    // VERIFIES touch-prediction:a-touch-list-is-bounded-and-exact
+    let ok = accepts_fixture_with(
+        "fragment-touches-repeat",
+        "alpha/pending/profile-export.yml",
+        "[src/profile/export.rs]",
+        "[src/profile/export.rs, src/profile/export.rs]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a repeated path in a fragment must fail the gate");
+}
+
+#[test]
+fn a_session_claim_in_a_planning_lane_fails() {
+    // A claim names the session acting on the entry, and nobody acts on
+    // scheduled work. The lane conditional is what keeps the claim honest.
+    // VERIFIES agent-sessions:a-session-reference-is-one-token
+    let ok = accepts_fixture_with(
+        "session-in-todo",
+        "alpha/lanes/todo.yml",
+        "    touches: [src/profile/page.rs, src/profile/mod.rs]\n",
+        "    touches: [src/profile/page.rs, src/profile/mod.rs]\n    session: \"sessions#4f19a2\"\n",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a claim in a planning lane must fail the gate");
+}
+
+#[test]
+fn a_session_claim_in_the_closed_lane_fails() {
+    // The other side of the same conditional. A locator on a closed entry
+    // points at a session nobody will resume, which is why the move strips it.
+    // VERIFIES agent-sessions:a-session-reference-is-one-token
+    let ok = accepts_fixture_with(
+        "session-in-closed",
+        "alpha/lanes/closed.yml",
+        "    touches: []\n",
+        "    touches: []\n    session: \"sessions#4f19a2\"\n",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a claim in the closed lane must fail the gate");
+}
+
+#[test]
+fn a_session_reference_with_a_second_separator_fails() {
+    // One alias, one separator, one opaque key. Two separators is the value a
+    // hand edit produces when a reader assumes the prefix nests, which is the
+    // assumption the one-hop reference refuses here as it does for needs.
+    // VERIFIES agent-sessions:a-session-reference-is-one-token
+    let ok = accepts_fixture_with(
+        "session-two-separators",
+        "alpha/lanes/doing.yml",
+        "\"sessions#4f19a2\"",
+        "\"sessions#detached#4f19a2\"",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a second separator must fail the gate");
+}
+
+#[test]
+fn a_session_reference_with_an_empty_key_fails() {
+    // An alias alone names a way to reach a session and no session to reach.
+    // VERIFIES agent-sessions:a-session-reference-is-one-token
+    let ok = accepts_fixture_with(
+        "session-empty-key",
+        "alpha/lanes/doing.yml",
+        "\"sessions#4f19a2\"",
+        "\"sessions#\"",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a reference with no key must fail the gate");
+}
+
+#[test]
+fn a_session_reference_alias_outside_the_slug_grammar_fails() {
+    // The alias half carries the slug grammar every other local alias does,
+    // because it has to match a declared table name exactly.
+    // VERIFIES agent-sessions:a-session-reference-is-one-token
+    let ok = accepts_fixture_with(
+        "session-alias-grammar",
+        "alpha/lanes/doing.yml",
+        "\"sessions#4f19a2\"",
+        "\"Sessions#4f19a2\"",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "an alias outside the slug grammar must fail the gate");
+}
+
+/// The three declared operations of the fixture's full adapter, exactly as
+/// they sit in `alpha/.wipctl/plan.toml`.
+const EVERY_OPERATION: &str = concat!(
+    "inspect = [\"session-adapter\", \"inspect\", \"{key}\"]\n",
+    "contact = [\"session-adapter\", \"contact\", \"{key}\"]\n",
+    "resume = [\"session-adapter\", \"resume\", \"{key}\"]"
+);
+
+/// Render an adapter table declaring exactly the named operations.
+fn adapter_body(operations: &[&str]) -> String {
+    operations
+        .iter()
+        .map(|op| format!("{op} = [\"session-adapter\", \"{op}\", \"{{key}}\"]"))
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+#[test]
+fn every_non_empty_operation_combination_is_accepted() {
+    // A declared command is the capability, so each of the seven non-empty
+    // subsets is a legal adapter. The accepting side is asserted as
+    // deliberately as the refusing one: a schema that rejected a contact-only
+    // adapter would make the whole capability model unusable, and no planted
+    // defect anywhere in this file would say so.
+    // VERIFIES agent-sessions:an-adapter-declares-its-operations
+    const COMBINATIONS: [&[&str]; 7] = [
+        &["inspect"],
+        &["contact"],
+        &["resume"],
+        &["inspect", "contact"],
+        &["inspect", "resume"],
+        &["contact", "resume"],
+        &["inspect", "contact", "resume"],
+    ];
+
+    for operations in COMBINATIONS {
+        let ok = accepts_fixture_with(
+            &format!("adapter-{}", operations.join("-")),
+            "alpha/.wipctl/plan.toml",
+            EVERY_OPERATION,
+            &adapter_body(operations),
+        )
+        .expect("the gate should be runnable");
+        let Some(ok) = ok else { return };
+        assert!(ok, "an adapter declaring {operations:?} must pass the gate");
+    }
+}
+
+#[test]
+fn an_adapter_declaring_no_operation_fails() {
+    // The other half of the same rule. An adapter table with nothing in it
+    // declares an alias a reference can name and no way to reach it, which is
+    // the row a reader would resolve to an empty capability list.
+    // VERIFIES agent-sessions:an-adapter-declares-its-operations
+    let ok = accepts_fixture_with(
+        "adapter-empty",
+        "alpha/.wipctl/plan.toml",
+        EVERY_OPERATION,
+        "",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "an adapter declaring no operation must fail the gate");
+}
+
+#[test]
+fn an_adapter_command_without_the_key_placeholder_fails() {
+    // The placeholder is where the reference's key goes. A command without one
+    // runs against whatever session the executable picks by itself, which is
+    // not the session the entry claimed.
+    // VERIFIES agent-sessions:an-adapter-command-is-one-argument-vector
+    let ok = accepts_fixture_with(
+        "adapter-no-key",
+        "alpha/.wipctl/plan.toml",
+        "\"inspect\", \"{key}\"]",
+        "\"inspect\"]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a command with no key placeholder must fail the gate");
+}
+
+#[test]
+fn an_adapter_command_repeating_the_key_placeholder_fails() {
+    // Exactly one substitution point, so the caller never has to decide which
+    // occurrence is the real one.
+    // VERIFIES agent-sessions:an-adapter-command-is-one-argument-vector
+    let ok = accepts_fixture_with(
+        "adapter-repeat-key",
+        "alpha/.wipctl/plan.toml",
+        "\"inspect\", \"{key}\"]",
+        "\"inspect\", \"{key}\", \"{key}\"]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a repeated key placeholder must fail the gate");
+}
+
+#[test]
+fn an_adapter_command_led_by_the_placeholder_fails() {
+    // The first item is the executable. A placeholder there would let the
+    // record's own opaque key choose the program that runs.
+    // VERIFIES agent-sessions:an-adapter-command-is-one-argument-vector
+    let ok = accepts_fixture_with(
+        "adapter-key-first",
+        "alpha/.wipctl/plan.toml",
+        "[\"session-adapter\", \"inspect\", \"{key}\"]",
+        "[\"{key}\", \"inspect\"]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a command led by the placeholder must fail the gate");
+}
+
+#[test]
+fn an_adapter_command_carrying_a_second_placeholder_fails() {
+    // One placeholder and no vocabulary to grow. A second one is a template
+    // language the record would have to define, check, and substitute.
+    // VERIFIES agent-sessions:an-adapter-command-is-one-argument-vector
+    let ok = accepts_fixture_with(
+        "adapter-placeholder",
+        "alpha/.wipctl/plan.toml",
+        "\"inspect\", \"{key}\"]",
+        "\"inspect\", \"{key}\", \"{plan}\"]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a second placeholder must fail the gate");
+}
+
+#[test]
+fn a_contact_message_in_the_argument_vector_fails() {
+    // The message travels on standard input. A message placeholder in argv
+    // puts what one agent said to another in the process table, where every
+    // other process on the machine reads it.
+    // VERIFIES agent-sessions:a-contact-message-travels-on-standard-input
+    let ok = accepts_fixture_with(
+        "adapter-message",
+        "alpha/.wipctl/plan.toml",
+        "\"contact\", \"{key}\"]",
+        "\"contact\", \"{key}\", \"{message}\"]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a message placeholder in argv must fail the gate");
+}
+
+#[test]
+fn an_unknown_adapter_operation_fails() {
+    // The adapter table is closed so that a wrong operation name fails instead
+    // of reading as an operation this alias does not support. Extensibility
+    // here would make every mistake look like a deliberate omission, and
+    // `status` is the name an author reaches for before reading the contract.
+    // VERIFIES agent-sessions:an-adapter-declares-its-operations
+    let ok = accepts_fixture_with(
+        "adapter-unknown-key",
+        "alpha/.wipctl/plan.toml",
+        "inspect = [\"session-adapter\"",
+        "status = [\"session-adapter\"",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "an unknown adapter operation must fail the gate");
+}
+
+#[test]
+fn an_adapter_alias_outside_the_slug_grammar_fails() {
+    // The same grammar every other local alias in this file carries, and the
+    // same defect a case-insensitive filesystem hides.
+    // VERIFIES agent-sessions:a-session-reference-is-one-token
+    let ok = accepts_fixture_with(
+        "adapter-alias",
+        "alpha/.wipctl/plan.toml",
+        "[session_adapters.sessions]",
+        "[session_adapters.Sessions]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "an alias outside the slug grammar must fail the gate");
+}
+
+#[test]
 fn an_output_sample_missing_a_required_field_fails() {
     // Every peer object states whether it is attached. Dropping that field is
     // the defect an implementer produces by emitting the field only when true.
@@ -473,6 +853,209 @@ fn a_batch_exit_code_that_contradicts_its_outcomes_fails() {
         !ok,
         "an exit code contradicting the slot outcomes must fail the gate"
     );
+}
+
+#[test]
+fn a_reading_without_its_state_fails() {
+    // Liveness is the answer a reading exists to give. A sample without it is
+    // the shape an adapter produces by emitting the field only when it knows.
+    // VERIFIES agent-sessions:an-unresolved-session-is-unknown
+    let ok = accepts_output_with(
+        "reading-no-state",
+        "session-reading.json",
+        "  \"state\": \"active\",\n",
+        "",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a reading with no state must fail the gate");
+}
+
+#[test]
+fn a_reading_without_its_instant_fails() {
+    // An undated liveness claim is a claim about now that no reader can check,
+    // and the failed inspection is exactly the case tempted to omit it.
+    // VERIFIES agent-sessions:a-reading-carries-its-instant
+    let ok = accepts_output_with(
+        "reading-no-instant",
+        "session-reading.json",
+        "  \"observed_at\": \"2026-09-12T14:07:33Z\",\n",
+        "",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a reading with no instant must fail the gate");
+}
+
+#[test]
+fn a_reading_state_outside_the_enum_fails() {
+    // The enum stays three-valued. An idle value would overlap the meaning
+    // active already carries, and a provider's own vocabulary belongs in the
+    // opaque activity field beside it.
+    // VERIFIES agent-sessions:an-unresolved-session-is-unknown
+    let ok = accepts_output_with(
+        "reading-state",
+        "session-reading.json",
+        "\"state\": \"active\"",
+        "\"state\": \"idle\"",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a fourth liveness value must fail the gate");
+}
+
+#[test]
+fn a_reading_instant_outside_its_form_fails() {
+    // One fixed textual form, the transition journal's, so that sorting a
+    // stream of observations needs no date parsing.
+    // VERIFIES agent-sessions:a-reading-carries-its-instant
+    let ok = accepts_output_with(
+        "reading-instant-form",
+        "session-reading.json",
+        "\"2026-09-12T14:07:33Z\"",
+        "\"2026-09-12 14:07:33\"",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "an instant outside the stated form must fail the gate");
+}
+
+#[test]
+fn a_reading_carrying_an_unknown_field_fails() {
+    // The reading is closed, and this is the field the closure exists to keep
+    // out. A reading is printed, piped, logged, and pasted into a report, so a
+    // credential in one leaks wherever any of those go.
+    // VERIFIES agent-sessions:a-runtime-secret-stays-out-of-the-reading
+    let ok = accepts_output_with(
+        "reading-unknown-field",
+        "session-reading.json",
+        "  \"state\": \"active\",\n",
+        "  \"state\": \"active\",\n  \"token\": \"PLACEHOLDER\",\n",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a reading carrying a credential must fail the gate");
+}
+
+#[test]
+fn an_epic_detail_missing_its_path_union_fails() {
+    // An empty result is an empty array and never an absent field. Emitting
+    // the key only when it holds something is the shape an implementer
+    // produces by accident, and it makes "nothing predicted" and "this build
+    // does not fold" read the same to a consumer.
+    // VERIFIES epics:a-rollup-is-folded-from-the-members
+    let ok = accepts_output_with(
+        "epic-no-path-union",
+        "epic.json",
+        "  \"path_union\": [\n    \"docs/specs/SPEC-session.md\",\n    \"src/session/mod.rs\",\n    \"src/session/store.rs\"\n  ],\n",
+        "",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a detail with no path union must fail the gate");
+}
+
+#[test]
+fn an_overlap_that_lost_its_provenance_fails() {
+    // The entry ids are the whole point of an overlap row. A path with one id
+    // is not an overlap, and a path with none names a contested file and
+    // nobody to talk to about it.
+    // VERIFIES epics:a-rollup-is-folded-from-the-members
+    let ok = accepts_output_with(
+        "epic-overlap-provenance",
+        "epic.json",
+        "\"entries\": [\"audit-the-token-store\", \"secure-session-storage\"]",
+        "\"entries\": [\"audit-the-token-store\"]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "an overlap naming one entry must fail the gate");
+}
+
+#[test]
+fn a_session_row_with_no_capabilities_fails() {
+    // An adapter declaring nothing is refused at the configuration, so a row
+    // deriving an empty list from one is reporting a state that cannot exist.
+    // VERIFIES epics:a-rollup-is-folded-from-the-members
+    let ok = accepts_output_with(
+        "epic-no-capabilities",
+        "epic.json",
+        "\"capabilities\": [\"resume\"]",
+        "\"capabilities\": []",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a row deriving no capability must fail the gate");
+}
+
+#[test]
+fn a_session_row_with_unordered_capabilities_fails() {
+    // The order is fixed at inspect, contact, resume, so two readers comparing
+    // two rows never have to normalize first. The seven legal values are
+    // enumerated in the schema, which is what gates the order.
+    // VERIFIES epics:a-rollup-is-folded-from-the-members
+    let ok = accepts_output_with(
+        "epic-capability-order",
+        "epic.json",
+        "\"capabilities\": [\"inspect\", \"contact\", \"resume\"]",
+        "\"capabilities\": [\"resume\", \"contact\", \"inspect\"]",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "capabilities out of order must fail the gate");
+}
+
+#[test]
+fn a_session_row_omitting_its_reading_fails() {
+    // Null is the answer for unsupported inspection, and it has to be written.
+    // An absent key would let a consumer read a missing field, an unsupported
+    // inspection, and a failed one as one thing, which is the distinction the
+    // whole liveness contract turns on.
+    // VERIFIES agent-sessions:an-unresolved-session-is-unknown
+    let ok = accepts_output_with(
+        "epic-absent-reading",
+        "epic.json",
+        ",\n      \"reading\": null",
+        "",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a session row with no reading must fail the gate");
+}
+
+#[test]
+fn an_initiative_overlap_across_two_epics_keeps_both_ids() {
+    // The accepting side of the fold order. The combination happens before the
+    // derivation, so a path predicted once inside each of two member epics is
+    // still an overlap one tier up. If this sample stopped validating, the
+    // refusing cases above would still pass and say nothing.
+    // VERIFIES initiatives:a-rollup-folds-through-the-epics
+    let ok = accepts(&[]).expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(ok, "the shipped initiative sample must pass the gate");
+
+    let sample = fs::read_to_string(repo().join("tests/fixtures/output/initiative.json"))
+        .expect("the shipped sample should be readable");
+    assert!(
+        sample.contains("\"path\": \"src/session/store.rs\""),
+        "the sample must keep the path two member epics both predict"
+    );
+}
+
+#[test]
+fn an_initiative_detail_missing_its_session_rows_fails() {
+    // The same empty-is-not-absent rule the epic detail carries, on the tier
+    // that combines the folds rather than performing one.
+    // VERIFIES initiatives:a-rollup-folds-through-the-epics
+    let ok = accepts_output_with(
+        "initiative-no-sessions",
+        "initiative.json",
+        "  \"sessions\": [\n",
+        "  \"absent_sessions\": [\n",
+    )
+    .expect("the gate should be runnable");
+    let Some(ok) = ok else { return };
+    assert!(!ok, "a detail with no session rows must fail the gate");
 }
 
 #[test]
