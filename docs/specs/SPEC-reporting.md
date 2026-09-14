@@ -11,8 +11,8 @@
   - [`reporting:a-blocked-entry-is-shown-never-hidden` — A blocked entry is shown, never hidden](#reportinga-blocked-entry-is-shown-never-hidden--a-blocked-entry-is-shown-never-hidden)
   - [`reporting:a-dependency-across-plans-is-visible` — A dependency across plans is visible](#reportinga-dependency-across-plans-is-visible--a-dependency-across-plans-is-visible)
   - [`reporting:the-board-offers-no-interaction` — The board offers no interaction](#reportingthe-board-offers-no-interaction--the-board-offers-no-interaction)
-  - [`reporting:a-row-names-the-key-that-placed-it` — A row names the key that placed it](#reportinga-row-names-the-key-that-placed-it--a-row-names-the-key-that-placed-it)
-  - [`reporting:a-residual-tie-is-marked-without-a-flag` — A residual tie is marked without a flag](#reportinga-residual-tie-is-marked-without-a-flag--a-residual-tie-is-marked-without-a-flag)
+  - [`reporting:a-row-names-the-reason-that-placed-it` — A row names the reason that placed it](#reportinga-row-names-the-reason-that-placed-it--a-row-names-the-reason-that-placed-it)
+  - [`reporting:a-final-tie-is-marked-without-a-flag` — A final tie is marked without a flag](#reportinga-final-tie-is-marked-without-a-flag--a-final-tie-is-marked-without-a-flag)
   - [`reporting:the-preview-is-a-head-read` — The preview is a head read](#reportingthe-preview-is-a-head-read--the-preview-is-a-head-read)
   - [`reporting:a-defect-warns-and-the-line-prints` — A defect warns and the line prints](#reportinga-defect-warns-and-the-line-prints--a-defect-warns-and-the-line-prints)
   - [`reporting:pending-work-is-invisible-to-the-preview` — Pending work is invisible to the preview](#reportingpending-work-is-invisible-to-the-preview--pending-work-is-invisible-to-the-preview)
@@ -120,23 +120,23 @@ The board MUST offer no interaction.
 
 Verify: `cargo nextest run --test reporting`
 
-### `reporting:a-row-names-the-key-that-placed-it` — A row names the key that placed it
+### `reporting:a-row-names-the-reason-that-placed-it` — A row names the reason that placed it
 
-Under the explain flag, the board and the preview MUST name one key per row, which is the key that decided that row against the row above it, and MUST print no score.
+Under the explain flag, the board and preview MUST name the one constraint, preference, or tie-break that placed each row against the row above it, and MUST print no score.
 
 #### Scenario: A reader asks why a row sits where it does
 
-- GIVEN a lane rendered in chain order under the explain flag
+- GIVEN a lane rendered in computed order under the explain flag
 - WHEN the reader reads one row
-- THEN one key is named and the rest of the chain is not, because the reader wants to know why this row is here rather than one line up
+- THEN one reason is named and the rest of the procedure is not because the reader wants to know why this row is here rather than one line up
 
-The board renders each lane in chain order, and the explain flag adds a column and never a write.
+The board renders each lane in computed order. The explain flag adds a column and never writes.
 
 ```text
 $ wipctl board --why
 
 TODO
-  ^  rate-limit-the-search-endpoint     class: expedite
+  ^  rate-limit-the-search-endpoint     delay cost: immediate
      secure-session-storage             points: 1
      profile-composition                points: 2
      audit-the-token-store              id (tied)
@@ -144,17 +144,17 @@ TODO
 
 Verify: `cargo nextest run --test reporting`
 
-### `reporting:a-residual-tie-is-marked-without-a-flag` — A residual tie is marked without a flag
+### `reporting:a-final-tie-is-marked-without-a-flag` — A final tie is marked without a flag
 
-Where the residual key decides a row, the board MUST mark that row whether or not the explain flag is given.
+Where the final ID tie-break decides a row, the board MUST mark that row whether or not the explain flag is given.
 
 #### Scenario: The ordinary board renders two tied entries
 
-- GIVEN two entries tied on every stated key, rendered with no flag
+- GIVEN two entries tied on every constraint and preference, rendered with no flag
 - WHEN the board draws
 - THEN the lower row carries the tie mark, because a mark only a flag reveals is a mark nobody sees and the tool must not look like it decided a priority
 
-`ranking:the-residual-key-is-the-full-id` makes the chain total, and a total chain hides the difference between a decided order and an accidental one. This mark puts the difference back.
+`ranking:the-final-tie-break-is-the-full-id` makes the procedure total. A total order hides the difference between a preferred order and an internal one. This mark restores that distinction.
 
 Verify: `cargo nextest run --test reporting`
 
@@ -166,7 +166,7 @@ The preview verb MUST print the head of the in-flight lane, or of the scheduled 
 
 - GIVEN a scheduled lane whose head is blocked
 - WHEN the preview runs
-- THEN it warns and prints the line anyway, because the chain's first key already sorts eligible entries above ineligible ones
+- THEN it warns and prints the line anyway because the fixed eligibility constraint sorts eligible entries first
 
 Verify: `cargo nextest run --test reporting`
 

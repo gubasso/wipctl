@@ -102,7 +102,7 @@ Verify: `cargo nextest run --test schemas`
 
 ### `pending-fragment:a-pending-entry-has-no-rank` — A pending entry has no rank
 
-A pending entry MUST remain outside every lane's key chain and take part in validation alone. It is ineligible, invisible to the next-work verb and the epic verbs, and outside epic arithmetic.
+A pending entry MUST remain outside every lane's ranking procedure and take part in validation alone. It is ineligible, invisible to the next-work verb and the epic verbs, and outside epic arithmetic.
 
 #### Scenario: An epic is summarised while a capture is pending
 

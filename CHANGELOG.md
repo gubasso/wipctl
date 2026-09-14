@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- breaking, `ranking`: Expose only project preferences in ranking configuration and name delay cost directly. An adopter replaces `[ranking].keys` with `[ranking].preferences`, containing only `delay-cost` and `points-ascending` in the chosen order. The tool fixes eligibility, dependency order, and the final ID tie-break outside configuration. An adopter replaces `class: expedite` with `delay_cost: immediate`, replaces `class: intangible` with `delay_cost: deferred`, and removes `class: standard` because absence means ordinary work.
+
 ## [0.5.0](https://github.com/gubasso/wipctl/compare/v0.4.1...v0.5.0) - 2026-09-10
 
 ### Added

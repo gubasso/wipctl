@@ -1,6 +1,6 @@
 # The method in one page
 
-Work is agreed as stories. A story is one vertical, demonstrable change, in one document, estimated in points that count human judgment rather than effort. Stories live in five lanes: `backlog`, `todo`, `doing`, `review`, and `closed`. The file is the lane, while a key chain computes rank from record facts on every read. The machine applies the graph constraints and the chain. People own priority through the dependencies, class of service, and points they state.
+Work is agreed as stories. A story is one vertical, demonstrable change, in one document, estimated in points that count human judgment rather than effort. Stories live in five lanes: `backlog`, `todo`, `doing`, `review`, and `closed`. The file is the lane, while a fixed procedure computes rank from record facts on every read. The machine applies constraints and a final tie-break. Each plan declares only its preferences, such as delay cost before points.
 
 The record is plain files in a plain git repository of its own. There is one live plan per project, shared by every worktree and clone on the machine, hosted wherever its operator chooses. It holds no derived state: no velocity, no blocked flags, no progress numbers, and no lane order. Every view is computed on every read, so the record can never disagree with itself about a number or a rank. The host project keeps one committed file naming its identity, and every checkout resolves the same plan through it.
 
@@ -19,7 +19,7 @@ The gate holds it all together. Validation proves the record coherent: shapes by
 The pages alongside this one unpack each piece:
 
 - [stories-and-estimation.md](./stories-and-estimation.md): the unit and the scale.
-- [lanes-and-ranking.md](./lanes-and-ranking.md): eligibility and the computed key chain.
+- [lanes-and-ranking.md](./lanes-and-ranking.md): eligibility and the ranking procedure.
 - [epics.md](./epics.md): what an epic is and is not.
 - [initiatives.md](./initiatives.md): the tier above, and why the ladder stops.
 - [transitions.md](./transitions.md): why lane changes are recorded events.

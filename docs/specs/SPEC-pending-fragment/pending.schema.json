@@ -24,6 +24,7 @@
         "id": { "$ref": "#/$defs/id" },
         "type": { "enum": ["story", "spike", "chore"] },
         "points": { "enum": [1, 2, 3] },
+        "delay_cost": { "enum": ["immediate", "deferred"] },
         "summary": {
           "type": "string",
           "minLength": 60,

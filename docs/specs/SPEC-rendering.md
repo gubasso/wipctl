@@ -11,7 +11,7 @@
   - [`rendering:a-panel-opens-with-its-finding` — A panel opens with its finding](#renderinga-panel-opens-with-its-finding--a-panel-opens-with-its-finding)
   - [`rendering:a-column-label-is-ascii` — A column label is ASCII](#renderinga-column-label-is-ascii--a-column-label-is-ascii)
   - [`rendering:the-locale-is-probed-before-drawing` — The locale is probed before drawing](#renderingthe-locale-is-probed-before-drawing--the-locale-is-probed-before-drawing)
-  - [`rendering:a-class-is-a-glyph` — A class is a glyph](#renderinga-class-is-a-glyph--a-class-is-a-glyph)
+  - [`rendering:delay-cost-is-a-glyph` — Delay cost is a glyph](#renderingdelay-cost-is-a-glyph--delay-cost-is-a-glyph)
   - [`rendering:a-bar-renders-at-eighth-cell-precision` — A bar renders at eighth-cell precision](#renderinga-bar-renders-at-eighth-cell-precision--a-bar-renders-at-eighth-cell-precision)
   - [`rendering:a-flat-series-renders-at-mid-height` — A flat series renders at mid-height](#renderinga-flat-series-renders-at-mid-height--a-flat-series-renders-at-mid-height)
   - [`rendering:the-dependency-drawing-is-a-ladder` — The dependency drawing is a ladder](#renderingthe-dependency-drawing-is-a-ladder--the-dependency-drawing-is-a-ladder)
@@ -110,15 +110,15 @@ Before a drawing verb renders, the implementation MUST assert a UTF-8 locale.
 
 Verify: `cargo nextest run --test rendering`
 
-### `rendering:a-class-is-a-glyph` — A class is a glyph
+### `rendering:delay-cost-is-a-glyph` — Delay cost is a glyph
 
-A board row MUST carry its class as `^` for expedite and `.` for intangible, with standard drawn as the absence of a mark, and colour MAY only reinforce it.
+A board row MUST carry delay cost as `^` for immediate and `.` for deferred, with ordinary absence drawn without a mark, and colour MAY only reinforce it.
 
 #### Scenario: A board is piped into a file
 
-- GIVEN rows carrying each of the three classes
+- GIVEN rows with immediate, ordinary, and deferred delay cost
 - WHEN the escapes are stripped
-- THEN the two glyphs survive and the classes still tell apart, because two ASCII characters need no locale probe and a reader with no colour keeps the value
+- THEN the two glyphs survive and the values remain distinct because two ASCII characters need no locale probe
 
 Verify: `cargo nextest run --test rendering`
 

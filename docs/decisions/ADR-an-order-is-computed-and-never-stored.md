@@ -19,7 +19,7 @@ Chosen option: one record-wide ordering procedure with a total key chain. The pr
 
 The lane file stores membership alone. The tool computes order on every read from current record facts. The residual id comparison makes the chain total and treats the id as one opaque string.
 
-Enforced by `ranking:an-order-is-computed-and-never-stored`, `ranking:the-key-chain-is-total`, `ranking:a-key-reads-the-record-alone`, and `ranking:the-residual-key-is-the-full-id`.
+Current requirements: `ranking:an-order-is-computed-and-never-stored`, `ranking:the-ranking-procedure-is-total`, `ranking:an-ordering-input-reads-the-record-alone`, and `ranking:the-final-tie-break-is-the-full-id`.
 
 ## Consequences
 
@@ -29,6 +29,6 @@ Enforced by `ranking:an-order-is-computed-and-never-stored`, `ranking:the-key-ch
 
 ## Status
 
-Accepted
+Superseded
 
-Supersedes the ordering half of [ADR-the-plan-record-is-five-lane-files.md](./ADR-the-plan-record-is-five-lane-files.md), whose lane-membership choice survives. Supersedes [ADR-a-position-names-only-a-landed-entry.md](./ADR-a-position-names-only-a-landed-entry.md).
+Superseded by [ADR-fixed-stages-frame-ranking-preferences.md](./ADR-fixed-stages-frame-ranking-preferences.md). This record superseded the ordering half of [ADR-the-plan-record-is-five-lane-files.md](./ADR-the-plan-record-is-five-lane-files.md), whose lane-membership choice survives. It also superseded [ADR-a-position-names-only-a-landed-entry.md](./ADR-a-position-names-only-a-landed-entry.md).

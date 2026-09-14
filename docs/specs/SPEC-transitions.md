@@ -91,7 +91,7 @@ A moved entry's original lines MUST enter the destination lane unchanged.
 
 #### Scenario: An entry arrives in a lane
 
-- GIVEN a destination whose order the key chain computes
+- GIVEN a destination whose order the ranking procedure computes
 - WHEN the entry lands anywhere in the file sequence
 - THEN its record facts determine its rank, so the arrival makes no separate rank claim
 
