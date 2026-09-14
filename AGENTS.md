@@ -24,6 +24,8 @@ The product is below version 1.0, so its contract is not frozen. Where the right
 
 A breaking change owes three things in the change that lands it. The spec states the new contract alone and carries no trace of the old one. The changelog entry names what breaks and what an adopter does next. The commit carries the Conventional Commits breaking marker, so the release tooling computes the bump instead of an author asserting it.
 
+The changelog is generated, so those last two are one act. Write the adopter guidance as a `BREAKING CHANGE:` footer in the squash body, at the start of its own line, and `release-plz.toml` renders it after the subject. Guidance written as a markdown heading, as prose, or by hand into an `Unreleased` section of `CHANGELOG.md` never reaches the released entry. A hand-written entry also collides with the generated section and stops the release on a duplicate heading. Never edit `CHANGELOG.md` by hand, correct a wrong entry where it is generated, and the `breaking-change-carries-a-footer` hook holds the footer.
+
 Migration is a verb the product offers, never a shape the product keeps.
 
 ## The repository is self-contained

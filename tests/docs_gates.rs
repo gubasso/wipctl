@@ -1,4 +1,4 @@
-//! Cases for the local documentation gates in `scripts/`.
+//! Cases for the local prose and message gates in `scripts/`.
 //!
 //! Every shipped artifact owes a case in the test suite, and a gate owes more
 //! than that: it must be shown to fail on a deliberate defect, because a gate
@@ -124,4 +124,99 @@ fn emphasis_gate_ignores_code_and_honours_the_escape_hatch() {
     .expect("the gate should be runnable")
     .expect("the script was present a moment ago");
     assert!(escaped, "the escape hatch must exempt the following line");
+}
+
+#[test]
+fn breaking_footer_gate_rejects_a_marked_subject_with_no_footer() {
+    // The defect this gate exists for, and the one it was written after two
+    // breaking changes shipped it. The marker tells the release tooling to
+    // compute a major bump, and the body then owes the guidance the generated
+    // entry is built from.
+    let missing = accepts(
+        "check-breaking-footer",
+        "no-footer",
+        "feat(record)!: rename the key\n\nSome context about the change.\n",
+    )
+    .expect("the gate should be runnable");
+    let Some(missing) = missing else { return };
+    assert!(
+        !missing,
+        "a marked subject with no footer must fail the gate"
+    );
+
+    // The two shapes an author reaches for instead. Neither reaches the
+    // generated entry, and before this gate neither failed anything.
+    let heading = accepts(
+        "check-breaking-footer",
+        "heading",
+        "feat(record)!: rename the key\n\n## Breaking change\n\nAn adopter renames it.\n",
+    )
+    .expect("the gate should be runnable")
+    .expect("the script was present a moment ago");
+    assert!(!heading, "a markdown heading is not a footer");
+
+    let prose = accepts(
+        "check-breaking-footer",
+        "prose",
+        "feat(record)!: rename the key\n\nBreaking: an adopter renames it.\n",
+    )
+    .expect("the gate should be runnable")
+    .expect("the script was present a moment ago");
+    assert!(!prose, "prose naming the break is not a footer");
+}
+
+#[test]
+fn breaking_footer_gate_admits_a_footer_and_ignores_what_is_not_breaking() {
+    // The accepting side. A gate that refused every message would pass the
+    // case above while making the repository uncommittable, and only the
+    // messages it must let through tell the two apart.
+    let footed = accepts(
+        "check-breaking-footer",
+        "footer",
+        "feat(record)!: rename the key\n\nSome context.\n\nBREAKING CHANGE: the key is renamed, so an adopter updates every row.\n",
+    )
+    .expect("the gate should be runnable");
+    let Some(footed) = footed else { return };
+    assert!(footed, "a message carrying its footer must pass");
+
+    // Conventional Commits accepts both spellings, and git-cliff reads both.
+    let hyphenated = accepts(
+        "check-breaking-footer",
+        "footer-hyphen",
+        "feat(record)!: rename the key\n\nBREAKING-CHANGE: the key is renamed, so an adopter updates every row.\n",
+    )
+    .expect("the gate should be runnable")
+    .expect("the script was present a moment ago");
+    assert!(hyphenated, "the hyphenated footer token must pass");
+
+    // No marker, no obligation.
+    let ordinary = accepts(
+        "check-breaking-footer",
+        "ordinary",
+        "feat(record): add a field\n\nSome context.\n",
+    )
+    .expect("the gate should be runnable")
+    .expect("the script was present a moment ago");
+    assert!(ordinary, "a message with no breaking marker must pass");
+
+    // The bot writes its own release message, and it carries no marker.
+    let release = accepts(
+        "check-breaking-footer",
+        "release",
+        "chore: release v0.6.0\n",
+    )
+    .expect("the gate should be runnable")
+    .expect("the script was present a moment ago");
+    assert!(release, "the release request's own message must pass");
+
+    // Git strips comment lines before it writes the commit, so a footer that
+    // only appears in the template's commentary is not a footer.
+    let commented = accepts(
+        "check-breaking-footer",
+        "commented",
+        "feat(record)!: rename the key\n\n# BREAKING CHANGE: an adopter renames it.\n",
+    )
+    .expect("the gate should be runnable")
+    .expect("the script was present a moment ago");
+    assert!(!commented, "a commented-out footer is not a footer");
 }
