@@ -8,7 +8,7 @@
     # The project's own `rk`, pinned at a release tag. `rk self-depend sync` moves
     # the tag and the lock together, and `.envrc` runs it on directory entry.
     release-kit = {
-      url = "github:gubasso/release-kit/v0.3.27";
+      url = "github:gubasso/release-kit/v0.4.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # `sdd`, the documentation gate, pinned at a release tag. `nix flake update
