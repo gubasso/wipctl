@@ -14,7 +14,7 @@
     # `sdd`, the documentation gate, pinned at a release tag. `nix flake update
     # spec-driven-docs` moves the lock; the tag in this URL is the version.
     spec-driven-docs = {
-      url = "github:gubasso/spec-driven-docs/v0.10.0";
+      url = "github:gubasso/spec-driven-docs/v0.10.2";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
