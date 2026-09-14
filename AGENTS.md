@@ -72,6 +72,8 @@ Report a documentation change by ownership: which source of truth changed, and w
 - Treat decision records as immutable rationale and load them only when asked why.
 - Read the writing style before you author or edit prose: `sdd method writing-style`.
 - Write and edit step-by-step guides to the adopted guides spec, `docs/specs/SPEC-guides.md`.
+- Name a document by a slug drawn from its subject, never by a number. Where its directory holds documents with no kind prefix, give that directory a `README.md` saying what it holds and what each document covers.
+- For a question about this method or about operating `sdd`, run `sdd docs` and read only the topic it names.
 - Run `sdd verify` before handoff.
 - Keep adopted specs, the tracking registry, and local integration instance-owned.
 <!-- END spec-driven-docs docs -->
