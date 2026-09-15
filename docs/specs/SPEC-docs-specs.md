@@ -6,6 +6,7 @@
 - [Requirements](#requirements)
   - [`docs-specs:requirement-carries-five-parts` — A requirement carries five parts](#docs-specsrequirement-carries-five-parts--a-requirement-carries-five-parts)
   - [`docs-specs:statement-uses-an-ears-pattern` — A statement uses one EARS pattern](#docs-specsstatement-uses-an-ears-pattern--a-statement-uses-one-ears-pattern)
+  - [`docs-specs:requirement-keyword-stays-in-the-spec-zone` — An uppercase requirement keyword stays in the spec zone](#docs-specsrequirement-keyword-stays-in-the-spec-zone--an-uppercase-requirement-keyword-stays-in-the-spec-zone)
   - [`docs-specs:rule-id-is-unique-and-slugged` — A rule ID is a slug pair and is unique](#docs-specsrule-id-is-unique-and-slugged--a-rule-id-is-a-slug-pair-and-is-unique)
   - [`docs-specs:rule-id-outlives-its-sentence` — A rule ID survives rewording](#docs-specsrule-id-outlives-its-sentence--a-rule-id-survives-rewording)
   - [`docs-specs:requirement-carries-a-verification` — A requirement carries a verification](#docs-specsrequirement-carries-a-verification--a-requirement-carries-a-verification)
@@ -45,6 +46,18 @@ The author MUST write every requirement statement as one sentence in an EARS pat
 - THEN the statement names no actor and no threshold, and the gate rejects it
 
 Verify: ``rg -UIo -r '$1' '^### `[a-z0-9-]+:[a-z0-9-]+`[^\n]*\n\n([^\n]+)' . --glob 'SPEC-*.md' | rg -v '(MUST|SHALL|SHOULD|MAY|REQUIRED)' | grep . && exit 1 || exit 0``
+
+### `docs-specs:requirement-keyword-stays-in-the-spec-zone` — An uppercase requirement keyword stays in the spec zone
+
+The author MUST keep every uppercase requirement keyword inside a spec under `docs/specs/`, and MUST cite the rule ID from anywhere else that needs it.
+
+#### Scenario: A guide states a rule in requirement language
+
+- GIVEN a guide whose step reads "the operator MUST run the command before the push"
+- WHEN a reader looks for what binds them
+- THEN the sentence binds while carrying no rule ID, no scenario, and no verification, so it reads as gated while nothing decides it, and the gate rejects the document
+
+Verify: `pre-commit run requirement-keyword-zone --all-files`
 
 ### `docs-specs:rule-id-is-unique-and-slugged` — A rule ID is a slug pair and is unique
 

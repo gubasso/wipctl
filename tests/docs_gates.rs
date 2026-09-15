@@ -127,6 +127,75 @@ fn emphasis_gate_ignores_code_and_honours_the_escape_hatch() {
 }
 
 #[test]
+fn requirement_keyword_gate_rejects_a_binding_sentence_outside_the_spec_zone() {
+    // The defect the gate exists for: a sentence that binds a reader while
+    // carrying no rule id, no scenario, and no verification.
+    let guide = accepts(
+        "check-requirement-keywords",
+        "guide",
+        "# Adopting\n\nThe operator MUST run the command before the push.\n",
+    )
+    .expect("the gate should be runnable");
+    let Some(guide) = guide else { return };
+    assert!(
+        !guide,
+        "an uppercase keyword outside the spec zone must fail"
+    );
+
+    // Every other RFC 2119 keyword binds the same way, and a negated form
+    // opens with one already listed, so the pattern needs no case of its own.
+    for (case, keyword) in [
+        ("shall", "SHALL"),
+        ("should-not", "SHOULD NOT"),
+        ("may", "MAY"),
+        ("required", "REQUIRED"),
+    ] {
+        let body = format!("# T\n\nThe record is {keyword} carry the field.\n");
+        let accepted = accepts("check-requirement-keywords", case, &body)
+            .expect("the gate should be runnable")
+            .expect("the script was present a moment ago");
+        assert!(!accepted, "{keyword} must fail the gate");
+    }
+}
+
+#[test]
+fn requirement_keyword_gate_ignores_code_and_honours_the_escape_hatch() {
+    // The false-positive case that decides whether the gate is usable. A
+    // keyword inside a fence or a code span is a quoted command or a grep
+    // pattern, and the lowercase word is ordinary English.
+    let safe = accepts(
+        "check-requirement-keywords",
+        "safe",
+        "# T\n\n```sh\nrg 'MUST|SHALL' docs/\n```\n\nThe `MUST NOT` keyword is capped, and a reader must read the spec.\n",
+    )
+    .expect("the gate should be runnable");
+    let Some(safe) = safe else { return };
+    assert!(
+        safe,
+        "fenced blocks, code spans and lowercase prose must pass"
+    );
+
+    let escaped = accepts(
+        "check-requirement-keywords",
+        "escape",
+        "# T\n\n<!-- allow-requirement-keyword: quoting the adopted rule verbatim -->\nThe author MUST give every requirement a verification line.\n",
+    )
+    .expect("the gate should be runnable")
+    .expect("the script was present a moment ago");
+    assert!(escaped, "the escape hatch must exempt the following line");
+
+    // A word that merely contains a keyword is not a keyword.
+    let substring = accepts(
+        "check-requirement-keywords",
+        "substring",
+        "# T\n\nThe MUSTARD constant and the plan's MAYBE branch are names.\n",
+    )
+    .expect("the gate should be runnable")
+    .expect("the script was present a moment ago");
+    assert!(substring, "a keyword inside a longer word must pass");
+}
+
+#[test]
 fn breaking_footer_gate_rejects_a_marked_subject_with_no_footer() {
     // The defect this gate exists for, and the one it was written after two
     // breaking changes shipped it. The marker tells the release tooling to

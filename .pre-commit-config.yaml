@@ -616,6 +616,23 @@ repos:
         files: '^docs/(explanation|guides)/.*\.(md|markdown)$'
         pass_filenames: true
 
+      # `docs/specs/` owns every binding rule. A sentence carrying an uppercase
+      # requirement keyword anywhere else binds a reader while carrying no rule
+      # id, no scenario, and no verification, so it reads as gated and is not.
+      #
+      # The selector is anchored to the documentation root
+      # `.spec-driven-docs/manifest.json` states, not to the tree. Both failures
+      # this gate was written after came from a tree-wide pattern: it caught the
+      # one line of the rendered release block in AGENTS.md that carries MUST.
+      # The spec zone is excluded because it is the zone the keywords belong to.
+      - id: requirement-keyword-zone
+        name: requirement keywords stay in the spec zone (docs-specs:requirement-keyword-stays-in-the-spec-zone)
+        entry: scripts/check-requirement-keywords
+        language: system
+        files: '^docs/.*\.(md|markdown)$'
+        exclude: '^docs/specs/'
+        pass_filenames: true
+
   # --- Markdown: canonical format (dprint) + style gate (markdownlint) ---
   #
   # Universal overlay: every project carries docs/READMEs, so its markdown is
