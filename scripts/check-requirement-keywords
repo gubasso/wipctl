@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# Keep an uppercase requirement keyword inside the spec zone
+# (docs-specs:requirement-keyword-stays-in-the-spec-zone).
+#
+# `docs/specs/` owns every binding rule, and each rule there carries an id, a
+# scenario, and a verification. The same sentence written in a guide, a chapter,
+# or a decision record binds a reader while carrying none of those, so it reads
+# as a requirement and is gated by nothing. This script finds that sentence.
+#
+# The caller chooses the files. The hook anchors to the instance's documentation
+# root and excludes the spec zone, so this script never judges a path itself: it
+# scans whatever it is handed. Anchoring to the tree instead would catch the one
+# line of the rendered release block in AGENTS.md that carries MUST.
+#
+# Fence-aware by necessity: a keyword inside a fenced block or a code span is a
+# quoted command or a grep pattern, not prose. Both are stripped before matching.
+#
+# Escape hatch: put `<!-- allow-requirement-keyword: <reason> -->` on the line
+# before, so quoting a rule verbatim costs a sentence in the diff.
+set -euo pipefail
+
+status=0
+
+for file in "$@"; do
+  [[ -f $file ]] || continue
+
+  while IFS=$'\t' read -r lineno keyword; do
+    printf '%s:%s: %s binds a reader outside the spec zone (docs-specs:requirement-keyword-stays-in-the-spec-zone)\n' \
+      "$file" "$lineno" "$keyword" >&2
+    status=1
+  done < <(
+    awk '
+      # Fenced blocks open and close on ``` or ~~~ at the start of a line
+      # (allowing the indent a list item gives them).
+      /^[[:space:]]*(```|~~~)/ { fence = !fence; next }
+      fence { next }
+
+      # An HTML comment line carrying the escape hatch exempts the NEXT line.
+      /<!--[[:space:]]*allow-requirement-keyword:/ { exempt = NR + 1; next }
+
+      {
+        line = $0
+
+        # Inline code spans hold commands and patterns, not prose. Strip them
+        # before matching, double-backtick spans first, for the reason the
+        # emphasis gate states: a span exists in that form to hold a backtick.
+        gsub(/``([^`]|`[^`])*``/, "", line)
+        gsub(/`[^`]*`/, "", line)
+        # A link target can carry a keyword inside a heading anchor.
+        gsub(/\]\([^)]*\)/, "]()", line)
+
+        if (NR == exempt) next
+
+        # RFC 2119 keywords, uppercase only, on word boundaries. The negated
+        # forms need no pattern of their own: each one opens with a keyword
+        # already listed here.
+        if (match(line, /(^|[^[:alnum:]_])(MUST|SHALL|SHOULD|MAY|REQUIRED|RECOMMENDED|OPTIONAL)([^[:alnum:]_]|$)/)) {
+          hit = substr(line, RSTART, RLENGTH)
+          gsub(/[^[:upper:]]/, "", hit)
+          print NR "\t" hit
+        }
+      }
+    ' "$file"
+  )
+done
+
+if ((status != 0)); then
+  printf '\nMove the rule into a spec under docs/specs/, where it gains an id, a\n' >&2
+  printf 'scenario, and a verification, and cite that id from here. Where the\n' >&2
+  printf 'keyword is quoted rather than binding, put it in a code span or take\n' >&2
+  # shellcheck disable=SC2016 # the backticks are literal markdown, not a substitution
+  printf '`<!-- allow-requirement-keyword: <reason> -->` on the preceding line.\n' >&2
+fi
+
+exit "$status"
