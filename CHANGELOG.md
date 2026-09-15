@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.6.3](https://github.com/gubasso/wipctl/compare/v0.6.2...v0.6.3) - 2026-09-15
+
+### Other
+
+- `specs`: Keep every requirement keyword in the specification zone ([#62](https://github.com/gubasso/wipctl/pull/62))
+
 ## [0.6.2](https://github.com/gubasso/wipctl/compare/v0.6.1...v0.6.2) - 2026-09-14
 
 ### Other
