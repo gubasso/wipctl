@@ -19,6 +19,8 @@ git_release_enable = false
 semver_check = false
 
 # No changelog section. release-plz writes CHANGELOG.md in its own form, and
-# the checks that rewrite or judge Markdown exclude it instead (the
-# generated-file rule of nix-secrets, ADR-0081). A breaking change carries its
-# adopter guidance in the release request and the commit body.
+# the checks that rewrite or judge Markdown exclude it instead. A project
+# configures a generator only as its tool documents, never to satisfy one of
+# its own checks. Source: the dev-environment rule of nix-secrets
+# (home/apps/claude-session/rules/dev-environment.md). A breaking change
+# carries its adopter guidance in the release request and the commit body.

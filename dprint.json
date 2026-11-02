@@ -10,8 +10,8 @@
     "**/package-lock.json",
     "**/*.jsonl",
     // rk writes the landing record and sdd installs .spec-driven-docs/, so both
-    // follow their tool's form (the generated-file rule of nix-secrets,
-    // ADR-0081).
+    // follow their tool's form. Source: the dev-environment rule of
+    // nix-secrets (home/apps/claude-session/rules/dev-environment.md).
     ".release-kit/manifest.json",
     ".spec-driven-docs/**"
   ],

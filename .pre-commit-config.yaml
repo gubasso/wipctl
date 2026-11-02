@@ -83,7 +83,8 @@ repos:
   # about a second to build once.
   #
   # A generated file follows its generator, and no hook here rewrites or judges
-  # it (the generated-file rule of nix-secrets, ADR-0081). The generated files
+  # it. Source: the dev-environment rule of nix-secrets
+  # (home/apps/claude-session/rules/dev-environment.md). The generated files
   # and their generators:
   #   CHANGELOG.md                             release-plz
   #   SECURITY.md, .github/workflows/pr-title.yml,
