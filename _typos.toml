@@ -13,7 +13,8 @@ Nd = "Nd"
 # The files that a tool generates follow their generator, and typos judges none
 # of them (the generated-file rule of nix-secrets, ADR-0081): release-plz writes
 # CHANGELOG.md, rk writes SECURITY.md, the landing record, and two workflows,
-# cargo-dist writes release.yml, and cargo and nix write the lock files. The
+# cargo-dist writes release.yml, sdd installs .spec-driven-docs/, and cargo and
+# nix write the lock files. The
 # hook passes --force-exclude, so this list also holds for the files that
 # pre-commit hands it.
 [files]
@@ -24,6 +25,7 @@ extend-exclude = [
   "/.github/workflows/pr-title.yml",
   "/.github/workflows/release-plz.yml",
   "/.github/workflows/release.yml",
+  "/.spec-driven-docs/",
   "Cargo.lock",
   "flake.lock",
 ]

@@ -9,9 +9,11 @@
     "**/*-lock.json",
     "**/package-lock.json",
     "**/*.jsonl",
-    // rk writes the landing record, so it follows rk's form (the
-    // generated-file rule of nix-secrets, ADR-0081).
-    ".release-kit/manifest.json"
+    // rk writes the landing record and sdd installs .spec-driven-docs/, so both
+    // follow their tool's form (the generated-file rule of nix-secrets,
+    // ADR-0081).
+    ".release-kit/manifest.json",
+    ".spec-driven-docs/**"
   ],
   "plugins": ["https://plugins.dprint.dev/json-0.23.0.wasm"]
 }

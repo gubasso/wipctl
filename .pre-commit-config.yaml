@@ -12,12 +12,6 @@ default_install_hook_types: [pre-commit, commit-msg, pre-push]
 # file and match nothing. `committed` opts back into commit-msg explicitly.
 default_stages: [pre-commit, pre-push]
 
-# Another tool installs `.spec-driven-docs/` and verifies it byte for byte, so
-# no hook here may touch it: a formatter's autofix there is drift that tool
-# refuses. Its own gates run through `sdd`, with `always_run`, so this exclude
-# does not reach them.
-exclude: '^\.spec-driven-docs/'
-
 repos:
 # BEGIN release-kit
 # The release convention's hooks. Install every stage they run at:
@@ -97,20 +91,22 @@ repos:
   #   .release-kit/manifest.json               rk
   #   .github/workflows/release.yml            cargo-dist
   #   Cargo.lock, flake.lock                   cargo, nix
+  #   .spec-driven-docs/                       sdd, which verifies it byte
+  #                                            for byte
   # Each tool excludes them in its own configuration: dprint.json,
   # dprint.markdown.json, .markdownlint-cli2.jsonc, _typos.toml, and
   # .editorconfig-checker.json; taplo skips Cargo.lock by itself. The fixers,
   # no-emphasis, and the two link-form rules have no configuration, so each
   # takes its own exclude. The reading hooks keep them: the parsers and the
-  # secret scans.
+  # secret scans. The sdd gates run with `always_run` and read no filenames.
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
-        exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml)$|(^|/)(Cargo|flake)\.lock$'
+        exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml)$|^\.spec-driven-docs/|(^|/)(Cargo|flake)\.lock$'
       - id: end-of-file-fixer
-        exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml)$|(^|/)(Cargo|flake)\.lock$'
+        exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml)$|^\.spec-driven-docs/|(^|/)(Cargo|flake)\.lock$'
       - id: check-added-large-files
         args: ['--maxkb=16384']
       - id: check-case-conflict
