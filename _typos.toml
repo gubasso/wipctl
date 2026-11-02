@@ -9,3 +9,21 @@
 # `Nd` is the rendering placeholder for a count of days in a lane label
 # (`id  title  <bar>  Nd`), not a misspelling of `And`.
 Nd = "Nd"
+
+# The files that a tool generates follow their generator, and typos judges none
+# of them (the generated-file rule of nix-secrets, ADR-0081): release-plz writes
+# CHANGELOG.md, rk writes SECURITY.md, the landing record, and two workflows,
+# cargo-dist writes release.yml, and cargo and nix write the lock files. The
+# hook passes --force-exclude, so this list also holds for the files that
+# pre-commit hands it.
+[files]
+extend-exclude = [
+  "/CHANGELOG.md",
+  "/SECURITY.md",
+  "/.release-kit/manifest.json",
+  "/.github/workflows/pr-title.yml",
+  "/.github/workflows/release-plz.yml",
+  "/.github/workflows/release.yml",
+  "Cargo.lock",
+  "flake.lock",
+]

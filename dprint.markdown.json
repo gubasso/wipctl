@@ -7,9 +7,13 @@
     "**/*.md",
     "**/*.markdown"
   ],
+  // release-plz writes CHANGELOG.md and rk renders SECURITY.md whole, so both
+  // follow their generator (the generated-file rule of nix-secrets, ADR-0081).
   "excludes": [
     ".git",
-    "node_modules"
+    "node_modules",
+    "CHANGELOG.md",
+    "SECURITY.md"
   ],
   "plugins": [
     "https://plugins.dprint.dev/markdown-0.22.1.wasm"

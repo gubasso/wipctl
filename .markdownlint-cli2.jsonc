@@ -87,6 +87,11 @@
     // A one-line `@AGENTS.md` import, which is Anthropic's documented bridge for
     // a tool that reads CLAUDE.md and not AGENTS.md. It carries no headings by
     // design, so MD041 (first-line-H1) can never hold on it.
-    "CLAUDE.md"
+    "CLAUDE.md",
+    // Generated: release-plz writes CHANGELOG.md and rk renders SECURITY.md
+    // whole, so both follow their generator (the generated-file rule of
+    // nix-secrets, ADR-0081).
+    "CHANGELOG.md",
+    "SECURITY.md"
   ]
 }

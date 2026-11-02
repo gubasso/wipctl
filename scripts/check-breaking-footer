@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 # A breaking change carries its adopter guidance as a footer.
 #
-# AGENTS.md states what a breaking change owes: a changelog entry naming what
-# breaks and what an adopter does next. That entry is generated rather than
-# written. `release-plz.toml` renders `commit.breaking_description` after the
-# subject, and that field is the `BREAKING CHANGE:` footer of this message. A
-# breaking commit with no footer therefore produces an entry with no guidance,
-# and the field falls back to the subject, so the entry repeats itself.
+# AGENTS.md states what a breaking change owes: the release request and the
+# commit body name what breaks and what an adopter does next. In the commit
+# body that guidance is the `BREAKING CHANGE:` footer, the one place Conventional
+# Commits tooling reads it from. release-plz writes the changelog in its own
+# form from the subjects, so the footer is where the guidance stays with the
+# change.
 #
-# Two authors in a row wrote the guidance somewhere the generator cannot read
-# it: once as a `## Breaking change` markdown heading in the body, once as a
-# hand-written block under `## [Unreleased]` in the changelog. Neither reaches
-# the released entry, and neither failed anything. This gate is what fails.
+# Two authors in a row wrote the guidance somewhere no tool reads it: once as a
+# `## Breaking change` markdown heading in the body, once as a hand-written
+# block under `## [Unreleased]` in the changelog. Neither failed anything. This
+# gate is what fails.
 #
 # Usage:
 #   scripts/check-breaking-footer <commit message file>
@@ -51,16 +51,15 @@ fi
 
 cat >&2 <<'MESSAGE'
 check-breaking-footer: this subject carries the breaking marker and the body
-check-breaking-footer: carries no BREAKING CHANGE footer, so the generated
-check-breaking-footer: changelog entry would name what breaks and not what an
-check-breaking-footer: adopter does next.
+check-breaking-footer: carries no BREAKING CHANGE footer, so the commit names
+check-breaking-footer: what breaks and not what an adopter does next.
 check-breaking-footer:
 check-breaking-footer: Add a footer to the body, at the start of its own line:
 check-breaking-footer:
 check-breaking-footer:   BREAKING CHANGE: <what breaks, and the step an adopter takes>
 check-breaking-footer:
-check-breaking-footer: The changelog is generated from this message. Do not write
-check-breaking-footer: the guidance into CHANGELOG.md by hand: an entry added under
+check-breaking-footer: Repeat the guidance in the release request. Do not write
+check-breaking-footer: it into CHANGELOG.md by hand: an entry added under
 check-breaking-footer: [Unreleased] collides with the generated section and stops
 check-breaking-footer: the release on a duplicate heading.
 MESSAGE

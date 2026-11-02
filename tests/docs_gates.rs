@@ -213,8 +213,8 @@ fn breaking_footer_gate_rejects_a_marked_subject_with_no_footer() {
         "a marked subject with no footer must fail the gate"
     );
 
-    // The two shapes an author reaches for instead. Neither reaches the
-    // generated entry, and before this gate neither failed anything.
+    // The two shapes an author reaches for instead. Neither is a footer, and
+    // before this gate neither failed anything.
     let heading = accepts(
         "check-breaking-footer",
         "heading",
