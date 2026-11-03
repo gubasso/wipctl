@@ -3,13 +3,12 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [Where each identity enters resolution](#where-each-identity-enters-resolution)
 - [Requirements](#requirements)
   - [`attachment:resolution-is-two-steps` — Resolution is two steps](#attachmentresolution-is-two-steps--resolution-is-two-steps)
   - [`attachment:the-two-identities-agree` — The two identities agree](#attachmentthe-two-identities-agree--the-two-identities-agree)
-  - [`attachment:a-plan-uid-is-minted-only-at-creation` — A global identity is minted only at creation](#attachmenta-plan-uid-is-minted-only-at-creation--a-global-identity-is-minted-only-at-creation)
-  - [`attachment:one-plan-occupies-one-slot` — One plan occupies one slot](#attachmentone-plan-occupies-one-slot--one-plan-occupies-one-slot)
   - [`attachment:duplicate-project-identities-are-ambiguous` — Duplicate project identities are ambiguous](#attachmentduplicate-project-identities-are-ambiguous--duplicate-project-identities-are-ambiguous)
+  - [`attachment:a-plan-uid-is-minted-only-at-creation` — A plan identity is minted only at creation](#attachmenta-plan-uid-is-minted-only-at-creation--a-plan-identity-is-minted-only-at-creation)
+  - [`attachment:one-plan-occupies-one-slot` — One plan occupies one slot](#attachmentone-plan-occupies-one-slot--one-plan-occupies-one-slot)
   - [`attachment:git-is-the-only-version-control` — Git is the only version control](#attachmentgit-is-the-only-version-control--git-is-the-only-version-control)
   - [`attachment:the-registry-is-the-filesystem` — The registry is the filesystem](#attachmentthe-registry-is-the-filesystem--the-registry-is-the-filesystem)
   - [`attachment:the-scaffold-does-not-walk-upward` — The scaffold does not walk upward](#attachmentthe-scaffold-does-not-walk-upward--the-scaffold-does-not-walk-upward)
@@ -209,22 +208,6 @@ The attach verb MUST NOT write into the host repository and MUST NOT push.
 - THEN no remote is configured and the host gains nothing, because hosting is the operator's decision per project
 
 Verify: `cargo nextest run --test attachment`
-
-## Where each identity enters resolution
-
-```text
-the ordinary path   walk upward to .wipctl/project.toml, read project_id,
-                    then find the slot whose plan file declares that value
-
-where a plan id     read plan_id from the peer row, then find the slot whose
-is given            plan file declares that value
-```
-
-The search reads `projects/*/plan-repo/.wipctl/plan.toml`, where both identities sit at a fixed depth. Two slots claiming one project are an ambiguity and never a choice.
-
-The directory that resolution opens carries a slot name, as [the slot naming domain](./SPEC-slot-naming.md) defines. Neither identity appears in a path.
-
-A slot holds one plan, whether it arrived as this machine's own project or as a peer another plan named. Once filled, nothing distinguishes the two. The peer attachment domain owns the walk that fills a peer's slot. The plan targeting domain owns the third resolution path, where an invocation names one of this plan's peers.
 
 ## Diagnostics
 

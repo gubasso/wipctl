@@ -6,26 +6,56 @@ Every instruction needed to configure a profile is stated here. An outbound link
 
 ## The generic adapter
 
-One table per alias in `.wipctl/plan.toml`, at the plan zone root.
+The `session_adapters` section sits in `.wipctl/plan.toml` beside the `sources` section, one table per alias. An alias names an integration profile rather than an agent. The section is optional, and a project that reaches no discoverable coding session declares nothing.
 
 ```toml
-[session_adapters.<alias>]
+# the session_adapters section of .wipctl/plan.toml
+
+[session_adapters.sessions]
 inspect = ["<the command that reads one session>", "{key}"]
 contact = ["<the command that contacts one session>", "{key}"]
 resume = ["<the command that resumes one session>", "{key}"]
 ```
 
-The invariants every profile below obeys:
+The example is a placeholder, and no coding agent is a requirement. wipctl supplies no default alias, command, or operation.
 
-- A declared command is a capability. An omitted command means that operation is unsupported for this alias.
-- Every adapter declares at least one operation, and an unknown configuration key is an error.
-- The opaque key is whatever token every command in that alias accepts. The record never parses it.
-- Inspect writes one reading on standard output, whose state is `active`, `ended`, or `unknown`. A failed or timed-out inspection is `unknown` and never `ended`.
-- Contact reads the complete UTF-8 message on standard input through end of file. Exit zero means accepted or queued, and nothing more.
-- A host-authorized agent may contact a peer without a separate wipctl confirmation. The native inbound policy still applies, and the message grants no authority.
-- Resume is explicit. No reading, age, or overlap infers it.
-- Addresses and credentials stay in native or adapter-owned protected runtime state. A reading may expose an opaque address and never a credential.
-- An inbound message carries information and no authority.
+The adapter table is closed. `inspect`, `contact`, and `resume` are its only keys, and `configuration:an-unknown-key-is-rejected` rejects every other one.
+
+The `session_adapters` half of `plan.schema.json` owns the section's shape, in the configuration spec's companion directory. The cross-file checker owns every fact spanning the section and a lane entry.
+
+A reference profile states whether its resume command is interactive, machine-callable, or both, and it warns where two clients interleave work in one session.
+
+Every profile below obeys these rules:
+
+- `agent-sessions:an-adapter-declares-its-operations`, and `configuration:an-unknown-key-is-rejected` for every other key
+- `agent-sessions:capabilities-are-derived-from-the-table`
+- `agent-sessions:an-adapter-command-is-one-argument-vector`
+- `agent-sessions:a-session-reference-is-one-token`
+- `agent-sessions:liveness-is-three-valued` and `agent-sessions:an-unresolved-session-is-unknown`
+- `agent-sessions:a-contact-message-travels-on-standard-input` and `agent-sessions:a-contact-is-bounded-and-never-retried`
+- `agent-sessions:contact-needs-no-second-confirmation`
+- `agent-sessions:resume-is-an-explicit-native-operation`, `agent-sessions:a-resume-profile-states-its-mode`, and `agent-sessions:a-reading-never-gates`
+- `agent-sessions:a-runtime-secret-stays-out-of-the-reading` and `agent-sessions:adapter-runtime-state-is-private`
+
+## The inspect operation
+
+An inspect adapter receives the key in place of the one `{key}` argument. On success it writes one `session-reading.schema.json` object on standard output.
+
+```text
+state        active | ended | unknown
+observed_at  the instant the reading was taken
+location     optional, opaque: where the session is working
+activity     optional, opaque: what the session is doing
+address      optional, opaque: where the adapter found the live session
+```
+
+`active` means the adapter holds present evidence that the session can continue. It does not mean that the session executes at that instant. `ended` means the adapter holds present evidence that the session cannot continue.
+
+The reading is a closed object requiring `state` and `observed_at`.
+
+Rules that bind this section: `agent-sessions:liveness-is-three-valued`, `agent-sessions:an-unresolved-session-is-unknown`, `agent-sessions:a-reading-carries-its-instant`, `agent-sessions:a-runtime-secret-stays-out-of-the-reading`.
+
+## The profiles
 
 Each profile below names a native mechanism and its boundaries. The version each mechanism arrived in is the operator's to confirm against the installation in front of them, because this project ships none of these executables.
 

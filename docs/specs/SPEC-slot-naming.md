@@ -3,20 +3,17 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [Deriving the project slug](#deriving-the-project-slug)
-- [Slot states](#slot-states)
-- [Open question](#open-question)
 - [Requirements](#requirements)
   - [`slot-naming:a-slot-name-is-minted-once` — A slot name is minted once](#slot-naminga-slot-name-is-minted-once--a-slot-name-is-minted-once)
+  - [`slot-naming:an-empty-or-repeated-segment-is-skipped` — An empty or repeated segment is skipped](#slot-namingan-empty-or-repeated-segment-is-skipped--an-empty-or-repeated-segment-is-skipped)
+  - [`slot-naming:a-minted-name-is-stable` — A minted name is stable](#slot-naminga-minted-name-is-stable--a-minted-name-is-stable)
+  - [`slot-naming:a-slot-name-is-one-opaque-token` — A slot name is one opaque token](#slot-naminga-slot-name-is-one-opaque-token--a-slot-name-is-one-opaque-token)
   - [`slot-naming:a-project-slug-follows-one-ladder` — A project slug follows one ladder](#slot-naminga-project-slug-follows-one-ladder--a-project-slug-follows-one-ladder)
   - [`slot-naming:a-derived-slug-decides-only-at-mint-time` — A derived slug decides only at mint time](#slot-naminga-derived-slug-decides-only-at-mint-time--a-derived-slug-decides-only-at-mint-time)
   - [`slot-naming:drift-is-a-healthy-state` — Drift is a healthy state](#slot-namingdrift-is-a-healthy-state--drift-is-a-healthy-state)
   - [`slot-naming:a-slot-name-is-recorded-only-as-the-directory` — A slot name is recorded only as the directory](#slot-naminga-slot-name-is-recorded-only-as-the-directory--a-slot-name-is-recorded-only-as-the-directory)
   - [`slot-naming:a-slot-name-never-replicates` — A slot name never replicates](#slot-naminga-slot-name-never-replicates--a-slot-name-never-replicates)
   - [`slot-naming:a-taken-name-escalates` — A taken name escalates](#slot-naminga-taken-name-escalates--a-taken-name-escalates)
-  - [`slot-naming:an-empty-or-repeated-segment-is-skipped` — An empty or repeated segment is skipped](#slot-namingan-empty-or-repeated-segment-is-skipped--an-empty-or-repeated-segment-is-skipped)
-  - [`slot-naming:a-minted-name-is-stable` — A minted name is stable](#slot-naminga-minted-name-is-stable--a-minted-name-is-stable)
-  - [`slot-naming:a-slot-name-is-one-opaque-token` — A slot name is one opaque token](#slot-naminga-slot-name-is-one-opaque-token--a-slot-name-is-one-opaque-token)
 
 <!--TOC-->
 
@@ -88,7 +85,7 @@ Verify: reviewer confirms no code splits a slot name to recover forge facts
 
 ### `slot-naming:a-project-slug-follows-one-ladder` — A project slug follows one ladder
 
-When a project slug is needed, the implementation MUST use the first available source in the stated derivation ladder.
+When a project slug is needed, the implementation MUST use the first available source of the ladder: the main worktree's forge project name, then the main worktree's directory name, then the directory holding `.wipctl/project.toml`, and MUST NOT select the `origin` remote by default.
 
 #### Scenario: A project has several worktrees
 
@@ -97,6 +94,8 @@ When a project slug is needed, the implementation MUST use the first available s
 - THEN both use the main worktree and produce one answer
 
 Verify: `cargo nextest run --test attachment`
+
+[NEEDS CLARIFICATION: which declared remote supplies the forge name and namespace where several answer: an explicit configuration key, or skipping the first step?]
 
 ### `slot-naming:a-derived-slug-decides-only-at-mint-time` — A derived slug decides only at mint time
 
@@ -148,7 +147,7 @@ Verify: `cargo nextest run --test attachment`
 
 ### `slot-naming:a-taken-name-escalates` — A taken name escalates
 
-When a candidate slot name is taken, the implementation MUST apply the postfix escalation until it finds a free name.
+When a candidate slot name is taken, the implementation MUST add, in order, the parent scope, the username, the forge, and then `01`, `02`, and the first free sequential number, until it finds a free name.
 
 #### Scenario: A peer derives a name already in use
 
@@ -157,53 +156,3 @@ When a candidate slot name is taken, the implementation MUST apply the postfix e
 - THEN the walk tries the next candidate instead of refusing the plan
 
 Verify: `cargo nextest run --test attachment`
-
-## Deriving the project slug
-
-A project slug is the readable name derived for the project. The first step that answers supplies it:
-
-```text
-1. the main worktree's forge project name
-2. the main worktree's directory name
-3. the directory holding .wipctl/project.toml
-```
-
-Git identifies the main worktree. The working directory does not supply the slug because several worktrees for one project can have different directory names.
-
-A host project does not need to be a git repository. The project file marks its root by its presence, so the third step supplies a slug without git.
-
-A peer has no host worktree. Its first url supplies the forge project name and namespace before the same escalation applies.
-
-The slot name becomes free by postfix escalation:
-
-```text
-1. <slug>
-2. + <parent-scope>
-3. + <username>
-4. + <forge>
-5. + 01, 02, and the first free sequential number
-```
-
-At mint time, the implementation derives the project slug, escalates it, and freezes the result as the slot name. At every read, it derives the slug again for display and drift detection.
-
-A derived slug never selects a path, resolves a record, or compares with a committed value. It decides only the first slot name candidate at mint time.
-
-## Slot states
-
-```text
-matching  the slot name and the derived slug agree
-drifted   they disagree; the record is intact and every verb works
-absent    the project file names a project that no slot holds
-```
-
-Drift is legal. It does not fail a check or a verb.
-
-Detection does not repair drift. A rename needs both slot-name locks, changes the registry, and moves machine-local state. An ordinary reader must not become that writer.
-
-The explicit repair is `wipctl fix --registry [<name>]`, as the repair domain specifies.
-
-The scaffold stays create-only. Every other write starts with a verb that a person ran.
-
-## Open question
-
-Which declared remote supplies the forge name and namespace remains open. The design does not select `origin` by default. It also does not choose between an explicit configuration key and skipping the first step where several remotes answer.

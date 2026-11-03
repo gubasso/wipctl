@@ -3,8 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The four locations](#the-four-locations)
-- [The zone](#the-zone)
 - [Requirements](#requirements)
   - [`zone-layout:the-record-lives-under-the-data-directory` — The record lives under the data directory](#zone-layoutthe-record-lives-under-the-data-directory--the-record-lives-under-the-data-directory)
   - [`zone-layout:a-base-directory-default-is-honoured` — A base-directory default is honoured](#zone-layouta-base-directory-default-is-honoured--a-base-directory-default-is-honoured)
@@ -40,7 +38,7 @@ Verify: `cargo nextest run --test zone_layout`
 
 ### `zone-layout:a-base-directory-default-is-honoured` — A base-directory default is honoured
 
-Where a base-directory variable is unset, empty, or relative, the implementation MUST use the specification's stated default.
+Where a base-directory variable is unset, empty, or relative, the implementation MUST use its default: `$HOME/.local/share` for data, `$HOME/.local/state` for state, and `$HOME/.cache` for cache.
 
 #### Scenario: A container sets an empty data directory
 
@@ -52,7 +50,7 @@ Verify: `cargo nextest run --test zone_layout`
 
 ### `zone-layout:the-lock-directory-has-a-stated-fallback` — The lock directory has a stated fallback
 
-Where the runtime directory is unset or empty, the implementation MUST use the stated fallback path, create it mode 0700, and warn naming the replacement.
+Where the runtime directory is unset or empty, the implementation MUST use the fallback path `/tmp/wipctl-<uid>/`, create it mode 0700, and warn naming the replacement.
 
 #### Scenario: An agent runs from a cron job
 
@@ -145,61 +143,6 @@ The schemas, the scaffold payload, and the worked example MUST stay under the in
 - THEN the copy is a second source of truth drifting from the version the gate runs
 
 Verify: `cargo nextest run --test journey`
-
-## The four locations
-
-```text
-host repo:
-  .wipctl/project.toml          identity only; committed; travels with every clone
-
-$XDG_DATA_HOME/wipctl/
-  projects/<slot name>/plan-repo/   the plan zone, its own repository, trunk only
-
-$XDG_STATE_HOME/wipctl/
-  projects/<slot name>/             replication bookkeeping, diagnostics
-    suppressions.toml               stale reminders hidden on this machine
-
-$XDG_CACHE_HOME/wipctl/
-  projects/<slot name>/             derived views; disposable; no verb reads it back
-
-$XDG_RUNTIME_DIR/wipctl/
-  <slot name>.lock                  writer lock; transaction-scoped; never in the record
-
-fallback, where XDG_RUNTIME_DIR is unset or empty:
-  /tmp/wipctl-<uid>/                 created mode 0700
-```
-
-The base-directory specification gives no default for the runtime directory, and unset is ordinary in cron jobs, containers, and remote sessions with no session manager. Those are exactly where agents run, so the fallback is stated rather than left open.
-
-A suppression belongs in state because it changes one machine's reminders. The plan configuration would replicate the silence to every clone. A lane entry has fixed fields and holds no durable local fact. The cache is disposable, and no verb reads it back.
-
-The transaction lock covers the plan record. A suppression file is local state outside that record, so its writers do not take the record lock.
-
-```text
-XDG_DATA_HOME    $HOME/.local/share
-XDG_STATE_HOME   $HOME/.local/state
-XDG_CACHE_HOME   $HOME/.cache
-```
-
-## The zone
-
-```text
-plan-repo/
-  .wipctl/plan.toml             the plan's whole configuration: both
-                                identities, the cadence, the peers it
-                                names, and the sources it references
-  README.md                     orientation for a reader arriving at the zone
-  AGENTS.md                     the method, self-sufficient, written by the scaffold
-  charter.md                    what the project is for, pillars, no-gos, cadence
-  open-questions.md             questions that block named entries
-  watches.md                    outside items that block named entries; earned
-  lanes/                        backlog, todo, doing, review, closed
-  stories/<id>.md               one document per story, optional sibling directory
-  epics/<id>.md                 one document per epic; earned, not scaffolded
-  initiatives/<id>.md           one document per initiative; earned the same way
-  journal/<id>.tsv              one transition stream per entry; created on first move
-  pending/<id>.yml              one fragment per captured entry; created on demand
-```
 
 ## Unenforced rules
 

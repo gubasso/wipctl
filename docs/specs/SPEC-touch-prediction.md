@@ -3,8 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The field](#the-field)
-- [The relation to the amended paths](#the-relation-to-the-amended-paths)
 - [Requirements](#requirements)
   - [`touch-prediction:an-amended-path-is-a-touched-path` — An amended path is a touched path](#touch-predictionan-amended-path-is-a-touched-path--an-amended-path-is-a-touched-path)
   - [`touch-prediction:a-touch-list-is-stated-never-verified` — A touch list is stated, never verified](#touch-predictiona-touch-list-is-stated-never-verified--a-touch-list-is-stated-never-verified)
@@ -49,7 +47,7 @@ Verify: `cargo nextest run --test validation`
 
 ### `touch-prediction:a-touch-list-is-bounded-and-exact` — A touch list is bounded and exact
 
-A touch list MUST carry at most 12 unique exact paths, and an empty sequence MUST mean the prediction that no file changes.
+A touch list MUST carry at most 12 unique exact paths, each relative, with no dot segment and no whitespace, resolving against the host's project root as an `Amends` path does, and an empty sequence MUST mean the prediction that no file changes.
 
 #### Scenario: An entry predicts twenty changed files
 
@@ -82,30 +80,6 @@ Each touch item MUST be one exact path, and a broader surface MUST be stated as 
 - THEN the schema refuses it, because exact paths give a deterministic overlap set and a pattern language brings containment questions and false precision
 
 Verify: `cargo nextest run --test schemas`
-
-## The field
-
-```yaml
-touches: [src/http/limit.rs, src/http/mod.rs, docs/specs/SPEC-http.md]
-```
-
-```yaml
-touches: []
-```
-
-Each item is a unique path, relative, carrying no dot segment and no whitespace, resolving against the host's project root exactly as an `Amends` path does. It predicts a file the work will create, modify, or remove. Reading or opening a file does not put it in the list. Existence is never checked, so a path that does not exist yet is ordinary, because a story can create it.
-
-The empty flow sequence is the decided form for a story that changes no file. It says that the author considered the question and predicted nothing. The key is required on every lane entry, so an absent key is an incomplete entry rather than a second meaning. A textual sentinel such as `none` states nothing the empty sequence does not.
-
-The list is a one-line flow sequence, because `lane-file:the-yaml-subset-is-narrow` admits nothing else. It carries at most 12 paths. That bound limits the coordination surface a reader compares. It is not a complexity measure, and it changes no point value. A story predicting more than 12 changed paths splits along its independently reviewable outcomes, or narrows its stated scope, before it enters a lane.
-
-## The relation to the amended paths
-
-A story document's `Amends` section is already a gated, file-precise list of paths the work changes. A free-standing touch list would be a second store of that fact, which the charter refuses. The two are not the same list: `Amends` is an obligation and a subset, and the other files the work changes are what can collide and are recorded nowhere else.
-
-The resolution is containment rather than independence. Every path in a story's `Amends` section appears in that entry's touch list. One rule decides it, and the two lists can never disagree.
-
-The checker reads each outbound item's leading inline-code token, removes the `new:` promise marker where the item carries one, and requires the resulting exact path in `touches`. The check spans a document and a lane file, so it belongs to the cross-file half rather than to either schema.
 
 ## Unenforced rules
 

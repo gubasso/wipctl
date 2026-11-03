@@ -3,7 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The commit grammar](#the-commit-grammar)
 - [Requirements](#requirements)
   - [`transactions:a-writer-holds-the-lock` — A writer holds the lock for one transaction](#transactionsa-writer-holds-the-lock--a-writer-holds-the-lock-for-one-transaction)
   - [`transactions:preflight-precedes-the-first-byte` — Preflight precedes the first byte](#transactionspreflight-precedes-the-first-byte--preflight-precedes-the-first-byte)
@@ -65,7 +64,7 @@ Verify: `cargo nextest run --test writer_guarantees`
 
 ### `transactions:the-commit-grammar-is-the-tools` — The commit grammar is the tool's
 
-The implementation MUST write each commit message in the fixed grammar above, and MUST NOT take the message from the project.
+The implementation MUST write each commit message in the fixed `plan:` grammar that [the commit grammar](../reference/plan-record-files.md#the-commit-grammar) lists, and MUST NOT take the message from the project.
 
 #### Scenario: A project has its own commit convention
 
@@ -170,19 +169,6 @@ The implementation MUST NOT push as part of a mutation's transaction.
 - THEN the commit lands locally and replication stays its own verb. A write that needs a network fails on a train
 
 Verify: `cargo nextest run --test writer_guarantees`
-
-## The commit grammar
-
-```text
-plan: capture <id>
-plan: move <id> from <from> to <to>
-plan: close <id> as <outcome>
-plan: land <n> fragments
-plan: rename <old> to <new>
-plan: delete <id>
-plan: reconcile <n> changes
-plan: resolve <id> keeping <side>
-```
 
 ## Unenforced rules
 

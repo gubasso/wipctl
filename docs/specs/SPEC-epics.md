@@ -3,7 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The point arithmetic](#the-point-arithmetic)
 - [Requirements](#requirements)
   - [`epics:the-arithmetic-has-one-implementation` — The arithmetic has one implementation](#epicsthe-arithmetic-has-one-implementation--the-arithmetic-has-one-implementation)
   - [`epics:a-rollup-is-folded-from-the-members` — A rollup is folded from the members](#epicsa-rollup-is-folded-from-the-members--a-rollup-is-folded-from-the-members)
@@ -29,7 +28,7 @@ Resolving one epic into its execution plan, and rolling every epic up into one r
 
 ### `epics:the-arithmetic-has-one-implementation` — The arithmetic has one implementation
 
-One implementation MUST compute the point arithmetic for every tier.
+One implementation MUST compute the point arithmetic that [the measures](../reference/measures.md#the-point-arithmetic) list, for every tier.
 
 #### Scenario: A number appears in two views
 
@@ -172,15 +171,6 @@ Where the resolution is written to the cache, a missing, stale, or corrupt cache
 - THEN every verb answers the same, because the cache is rewritten on each call and read back by nothing
 
 Verify: `cargo nextest run --test epics`
-
-## The point arithmetic
-
-| Outcome    | Contribution                                                      |
-| ---------- | ----------------------------------------------------------------- |
-| `done`     | delivers its own points                                           |
-| `cut`      | contributes nothing and stays in the total                        |
-| `reshaped` | delivers its own points exactly when its successor closed as done |
-| reopened   | counts as open                                                    |
 
 ## Unenforced rules
 

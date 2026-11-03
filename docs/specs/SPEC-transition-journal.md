@@ -3,7 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [Format](#format)
 - [Requirements](#requirements)
   - [`transition-journal:the-program-records-transitions` — The program records transitions](#transition-journalthe-program-records-transitions--the-program-records-transitions)
   - [`transition-journal:an-event-is-three-non-empty-fields` — An event is three non-empty fields](#transition-journalan-event-is-three-non-empty-fields--an-event-is-three-non-empty-fields)
@@ -52,7 +51,7 @@ Verify: `cargo nextest run --test validation`
 
 ### `transition-journal:an-instant-is-one-textual-form` — An instant is one textual form
 
-Every instant MUST be a valid coordinated universal time in the stated textual form, at second precision.
+Every instant MUST be a valid coordinated universal time in the one textual form `YYYY-MM-DDTHH:MM:SSZ`, at second precision.
 
 #### Scenario: A journal is sorted
 
@@ -157,18 +156,6 @@ The journal MUST NOT carry a who, a why, or a reason column.
 - THEN three columns is the whole of it. Nothing proves the verb was used rather than the file edited, which the lane-agreement gate catches
 
 Verify: `cargo nextest run --test validation`
-
-## Format
-
-One append-only stream per entry, one event per line, exactly three non-empty tab-separated fields.
-
-```text
-2026-08-14T09:52:31Z	todo	doing
-2026-08-15T16:03:10Z	doing	review
-2026-08-16T11:20:44Z	review	closed
-```
-
-Field one is the instant, field two is the lane left, and field three is the lane entered or a terminal token.
 
 ## Unenforced rules
 

@@ -6,6 +6,7 @@ This tree is organised by reader need:
 
 - a reader finishing a task starts in `guides/`
 - a reader looking up a binding rule starts in `specs/`
+- a reader looking up an exact value starts in `reference/`
 - a reader learning how an area fits together starts in `explanation/`
 - a reader asking why the project chose a shape starts in `decisions/`
 
@@ -37,6 +38,7 @@ The shipped JSON Schemas live beside the spec that owns each shape, in the compa
 - [explanation/overview.md](./explanation/overview.md): the method in one page. A team lead starts here.
 - [explanation/stories-and-estimation.md](./explanation/stories-and-estimation.md), [explanation/lanes-and-ranking.md](./explanation/lanes-and-ranking.md), [explanation/epics.md](./explanation/epics.md), [explanation/initiatives.md](./explanation/initiatives.md), [explanation/transitions.md](./explanation/transitions.md), [explanation/concurrency.md](./explanation/concurrency.md), and [explanation/replication.md](./explanation/replication.md): why the record is shaped this way.
 - [explanation/plans-and-peers.md](./explanation/plans-and-peers.md): what a peer is, why a plan carries two names, and why the checker refuses rather than fetches.
+- [explanation/agent-sessions.md](./explanation/agent-sessions.md): why an adapter table is closed, and why a session reading has three states.
 - [explanation/host-integration.md](./explanation/host-integration.md): the single assumption about an adopting project, and the doctrine that follows from it.
 - [explanation/architecture.md](./explanation/architecture.md): the components a conforming implementation needs, by responsibility and never by code structure.
 
@@ -52,8 +54,7 @@ The shipped JSON Schemas live beside the spec that owns each shape, in the compa
 
 ## Reference — exact values to look up
 
-- [reference/session-adapters.md](./reference/session-adapters.md): setup profiles for the session systems a session-adapter alias can front, with the reachability boundary each one carries.
-- [reference/tracking.yaml](./reference/tracking.yaml): the machine-readable record of facts that expire, and how to revalidate each one.
+[reference/README.md](./reference/README.md) lists every reference page: the command surface, the plan configuration, the record files and documents, identifiers and tokens, resolution, verb mechanics, the machine layout, measures, diagnostics, views, the scaffold payload, the session adapter profiles, and the tracking registry.
 
 ## Decisions
 

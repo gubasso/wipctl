@@ -3,8 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [A node, and how it is written for a reader](#a-node-and-how-it-is-written-for-a-reader)
-- [The ranking procedure](#the-ranking-procedure)
 - [Requirements](#requirements)
   - [`ranking:eligibility-is-derived-from-three-edges` — Eligibility is derived from three edges](#rankingeligibility-is-derived-from-three-edges--eligibility-is-derived-from-three-edges)
   - [`ranking:an-order-is-computed-and-never-stored` — An order is computed and never stored](#rankingan-order-is-computed-and-never-stored--an-order-is-computed-and-never-stored)
@@ -15,6 +13,7 @@
   - [`ranking:an-ordering-input-reads-the-record-alone` — An ordering input reads the record alone](#rankingan-ordering-input-reads-the-record-alone--an-ordering-input-reads-the-record-alone)
   - [`ranking:the-final-tie-break-is-the-full-id` — The final tie-break is the full id](#rankingthe-final-tie-break-is-the-full-id--the-final-tie-break-is-the-full-id)
   - [`ranking:the-dependency-graph-is-acyclic` — The dependency graph is acyclic](#rankingthe-dependency-graph-is-acyclic--the-dependency-graph-is-acyclic)
+  - [`ranking:a-node-renders-relative-to-the-invoking-plan` — A node renders relative to the invoking plan](#rankinga-node-renders-relative-to-the-invoking-plan--a-node-renders-relative-to-the-invoking-plan)
   - [`ranking:a-work-lane-entry-is-unblocked` — A work-lane entry is unblocked](#rankinga-work-lane-entry-is-unblocked--a-work-lane-entry-is-unblocked)
   - [`ranking:membership-is-never-an-edge` — Membership is never an edge](#rankingmembership-is-never-an-edge--membership-is-never-an-edge)
   - [`ranking:the-closed-lane-orders-by-date` — The closed lane orders by close date](#rankingthe-closed-lane-orders-by-date--the-closed-lane-orders-by-close-date)
@@ -136,6 +135,18 @@ The dependency graph MUST be acyclic over the attached closure, and an entry MUS
 
 Verify: `cargo nextest run --test validation`
 
+### `ranking:a-node-renders-relative-to-the-invoking-plan` — A node renders relative to the invoking plan
+
+When a view names a graph node, it MUST print the bare id for the invoking plan's own entry, `<alias>#<id>` with this plan's alias for a peer this plan declares, and `<plan_id>:<id>` for a plan no row of this plan names.
+
+#### Scenario: A cycle runs two hops away
+
+- GIVEN `alpha` declares `beta`, and `beta` declares `gamma`
+- WHEN `alpha` reports a cycle through an entry of `gamma`
+- THEN it prints that node as `<plan_id>:<id>`, because the alias `beta` gives `gamma` resolves in no table `alpha` has
+
+Verify: `cargo nextest run --test ranking`
+
 ### `ranking:a-work-lane-entry-is-unblocked` — A work-lane entry is unblocked
 
 An entry in the in-flight or review lane MUST have every dependency closed and MUST be free of every open question.
@@ -171,68 +182,6 @@ The ranking procedure MUST compare closed entries by close date ascending before
 - THEN the computed order places it by that date, and the old gap is not a defect
 
 Verify: `cargo nextest run --test ranking`
-
-## A node, and how it is written for a reader
-
-The graph is built over pairs, and the pair is what makes the proof sound.
-
-```text
-a node       (plan_id, entry_id). The plan id, not the alias, because an
-             alias is local to the plan that declares it and two plans
-             can spell one peer two ways.
-
-an edge      one dependency, resolved in the record it was written in,
-             and pointing at the pair it names.
-```
-
-Rendering is the other half, and it is relative to the plan the invocation resolved to.
-
-```text
-the invoking plan's own entry     the bare id
-a peer this plan declares         <alias>#<id>, using THIS plan's alias
-a plan no row of this plan names  <plan_id>:<id>
-```
-
-The third case is real whenever a cycle runs through a plan two hops away. Reprinting the middle plan's own alias prints a name that resolves in no table the reader has.
-
-The third form uses a separator no dependency accepts, so it cannot be read as a local dependency. The plan identity resolves everywhere and belongs to no alias table.
-
-This is also why a cycle report is stable when the same cycle is found from either side. The nodes are the same pairs, and only the rendering changes.
-
-A watch is legal on work already in flight. A question means the project does not know what to build, so the entry leaves the work lane. A watch means the project knows what to build and the outside world moved after work started. Sending that entry back to the scheduled lane would falsely say it never started and its clock never ran. The watch keeps that blocked row visible where it carries the most signal.
-
-## The ranking procedure
-
-The record uses one ranking procedure. It applies product constraints, then project preferences, then one internal tie-break. A constraint protects a valid plan. A preference expresses which valid entry a project wants first. A tie-break makes the result deterministic without expressing preference.
-
-The procedure applies these stages in order:
-
-1. Compare closed entries by close date ascending.
-2. Place eligible entries before ineligible entries.
-3. Place each same-lane dependency before the entry that needs it.
-4. Apply the plan's declared preferences in their declared order.
-5. Compare the full id lexically when every earlier stage ties.
-
-The first three stages and the final stage are product behavior. The plan cannot enable, disable, or reorder them. The configuration exposes only the fourth stage:
-
-```toml
-[ranking]
-preferences = ["delay-cost", "points-ascending"]
-```
-
-The scaffold writes both preference names in that order. `delay-cost` places `immediate` first, an absent value in the ordinary middle position, and `deferred` last. `points-ascending` places smaller work first. A project can omit either preference or declare an empty list.
-
-Delay cost is the only field a person states for ordering alone. It creates no dependency edge, changes no eligibility result, and enters no measure because it is not an event.
-
-Smaller work first shortens the average wait. The three-point cap bounds what a larger entry can wait behind because larger work splits along its judgments.
-
-One record-wide procedure avoids four more chains to configure. The closed lane is the only lane with a distinct key, and the close-date comparison is equal everywhere else.
-
-The ranking domain owns the accepted preference names and their uniqueness. The configuration domain owns the required declaration. An empty list states that the project chooses no ranking preference. It is not a default.
-
-The declaration lives in `.wipctl/plan.toml` because the file is committed and `sync` replicates it. Every worker then derives one order from one declaration. The host repository is per project checkout, the state directory is machine-local, and the cache is disposable, so none can carry a plan's order.
-
-An operator changes the preferences by editing the plan configuration and committing it. No verb writes them. The plan hooks validate the commit under `transactions:the-plan-hooks-are-never-bypassed`.
 
 ## Unenforced rules
 

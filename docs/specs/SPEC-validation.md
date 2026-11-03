@@ -3,8 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The three diagnostic classes](#the-three-diagnostic-classes)
-- [The closure the checker reads](#the-closure-the-checker-reads)
 - [Requirements](#requirements)
   - [`validation:every-check-has-one-owner` — Every check has one owner](#validationevery-check-has-one-owner--every-check-has-one-owner)
   - [`validation:the-read-set-is-attached-or-the-run-fails` — The read set is attached, or the run fails](#validationthe-read-set-is-attached-or-the-run-fails--the-read-set-is-attached-or-the-run-fails)
@@ -224,25 +222,6 @@ Where the shipped schema directory is missing, the implementation MUST fail rath
 - THEN it fails as a broken install, because a missing optional tool and a missing shipped artifact are different faults
 
 Verify: `cargo nextest run --test validation`
-
-## The three diagnostic classes
-
-| Class   | Meaning                                                                | Exit     |
-| ------- | ---------------------------------------------------------------------- | -------- |
-| failure | the record states something incorrectly and no tool may decide the fix | non-zero |
-| warning | a fact the reader decides about                                        | zero     |
-
-## The closure the checker reads
-
-Every check in every domain applies to every plan the invocation reads: the plan the working directory resolves to, and every attached peer in its closure. A failure names the plan it was found in.
-
-One precondition holds before any of that runs. Every peer in the read set is attached on this machine. The read set is the peers a prefixed dependency reaches, transitively, and the peers domain names it beside the declared set. A peer in the read set with no slot is a failed check naming the alias and the attach form that fills it.
-
-Two consequences follow, and each is a thing a reader otherwise finds the hard way. Adding one prefixed dependency can make a run start failing on a machine where it passed a minute ago. The new id moved a peer into the read set. Attachment is also transitive through checking, not only through the walk. Reading a peer means checking it, so that peer's read set joins this one.
-
-The checker reads the files of this plan repository and the committed trees of every peer attached on this machine. It reads nothing else, and it opens no network connection. Its answer is a function of those trees at the moment of the read, so the census names the revision it read each peer at. The acyclicity proof is complete over that closure, which is why the closure is complete before the proof runs.
-
-The refusal is the whole design. A check that runs on one machine and quietly does not run on another is worse than one that fails loudly. The first teaches a reader that a green result means something it does not.
 
 ## Unenforced rules
 

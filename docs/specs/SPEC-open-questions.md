@@ -79,15 +79,3 @@ The implementation MUST derive blocking from the dependency edges, the question 
 - THEN the flag is refused, because a stored copy of a derived fact drifts on the first edit to any edge
 
 Verify: `cargo nextest run --test validation`
-
-## Section shape
-
-```markdown
-## Q-which-proof-closes-the-risk — Which proof closes the risk?
-
-Raised: 2026-08-14
-
-Blocks: choose-the-boundary, verify-the-contract — both entries depend on the answer.
-
-Exit: a decision record, measured against a worked example of both choices.
-```

@@ -3,12 +3,11 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [Grammar and slugification](#grammar-and-slugification)
-- [An id and a prefixed id](#an-id-and-a-prefixed-id)
 - [Requirements](#requirements)
   - [`ids:one-id-names-one-thing` — One id names one thing](#idsone-id-names-one-thing--one-id-names-one-thing)
   - [`ids:a-title-and-its-id-always-match` — A title and its id always match](#idsa-title-and-its-id-always-match--a-title-and-its-id-always-match)
   - [`ids:slugification-is-stated-once` — Slugification is stated once](#idsslugification-is-stated-once--slugification-is-stated-once)
+  - [`ids:an-id-follows-one-grammar` — An id follows one grammar](#idsan-id-follows-one-grammar--an-id-follows-one-grammar)
   - [`ids:the-id-is-the-filename` — The id is the filename](#idsthe-id-is-the-filename--the-id-is-the-filename)
   - [`ids:an-id-is-opaque-to-every-consumer` — An id is opaque to every consumer](#idsan-id-is-opaque-to-every-consumer--an-id-is-opaque-to-every-consumer)
   - [`ids:a-prefixed-id-is-split-once` — A prefixed id is split once](#idsa-prefixed-id-is-split-once--a-prefixed-id-is-split-once)
@@ -61,6 +60,18 @@ The implementation MUST use one slugification function for the mint, the rename,
 - GIVEN an apostrophe in a title
 - WHEN each consumer slugifies it
 - THEN all three remove it rather than hyphenate it, because three implementations of one function is how an id and a title come to disagree
+
+Verify: `cargo nextest run --test ids`
+
+### `ids:an-id-follows-one-grammar` — An id follows one grammar
+
+Every id MUST match `[a-z0-9]+(-[a-z0-9]+)*`, a question id MUST carry that grammar behind the fixed prefix `Q-`, and the slug function MUST apply, in order, the four steps that [the grammar](../reference/identifiers-and-tokens.md#grammar-and-slugification) lists.
+
+#### Scenario: A title carries an apostrophe
+
+- GIVEN the title `Don't drop the cache`
+- WHEN the mint slugifies it
+- THEN the id is `dont-drop-the-cache`, because the apostrophe is removed before the other runs become hyphens
 
 Verify: `cargo nextest run --test ids`
 
@@ -171,42 +182,6 @@ An entry, epic, initiative, or fragment MUST NOT claim an id a tombstone holds, 
 - THEN it refuses naming the tombstone and its date. The tombstone occupies the id-named path, so releasing the slug loses the fact of the deletion
 
 Verify: `cargo nextest run --test ids`
-
-## Grammar and slugification
-
-```text
-[a-z0-9]+(-[a-z0-9]+)*
-```
-
-A question id carries the same grammar behind the fixed prefix `Q-`.
-
-```text
-1. lowercase
-2. apostrophes are removed rather than hyphenated      don't -> dont
-3. every other run of characters outside a-z0-9 becomes a single hyphen
-4. leading and trailing hyphens are trimmed
-```
-
-```text
-id  ==  slugify(title)                     the ordinary case
-id  ==  slugify(title) + "-" + <postfix>   where the slug alone was taken
-```
-
-## An id and a prefixed id
-
-A dependency can name an entry in another plan, so two shapes appear where one used to.
-
-```text
-an id             one token; never parsed; names one thing in one record
-
-a prefixed id     an alias, a separator, and an id; split exactly once on
-                  the first separator; the alias half goes to the peer
-                  table and the id half is carried whole
-```
-
-Exactly one function in an implementation performs that split. Nothing else in the code splits a dependency value. A second splitter is how the two halves come to disagree.
-
-After the split, the id half is an ordinary id under the ordinary rule. So the opacity rule below survives the addition: it is the id that is never parsed, and a prefixed id is a pair that was never one id.
 
 ## Unenforced rules
 

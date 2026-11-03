@@ -3,7 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [Glyph tiers](#glyph-tiers)
 - [Requirements](#requirements)
   - [`rendering:the-terminal-is-the-only-target` — The terminal is the only target](#renderingthe-terminal-is-the-only-target--the-terminal-is-the-only-target)
   - [`rendering:a-renderer-is-pipe-safe` — A renderer is pipe-safe](#renderinga-renderer-is-pipe-safe--a-renderer-is-pipe-safe)
@@ -12,6 +11,7 @@
   - [`rendering:a-column-label-is-ascii` — A column label is ASCII](#renderinga-column-label-is-ascii--a-column-label-is-ascii)
   - [`rendering:the-locale-is-probed-before-drawing` — The locale is probed before drawing](#renderingthe-locale-is-probed-before-drawing--the-locale-is-probed-before-drawing)
   - [`rendering:delay-cost-is-a-glyph` — Delay cost is a glyph](#renderingdelay-cost-is-a-glyph--delay-cost-is-a-glyph)
+  - [`rendering:a-cross-plan-marker-is-one-glyph` — A cross-plan marker is one glyph](#renderinga-cross-plan-marker-is-one-glyph--a-cross-plan-marker-is-one-glyph)
   - [`rendering:a-bar-renders-at-eighth-cell-precision` — A bar renders at eighth-cell precision](#renderinga-bar-renders-at-eighth-cell-precision--a-bar-renders-at-eighth-cell-precision)
   - [`rendering:a-flat-series-renders-at-mid-height` — A flat series renders at mid-height](#renderinga-flat-series-renders-at-mid-height--a-flat-series-renders-at-mid-height)
   - [`rendering:the-dependency-drawing-is-a-ladder` — The dependency drawing is a ladder](#renderingthe-dependency-drawing-is-a-ladder--the-dependency-drawing-is-a-ladder)
@@ -111,6 +111,18 @@ A board row MUST carry delay cost as `^` for immediate and `.` for deferred, wit
 
 Verify: `cargo nextest run --test rendering`
 
+### `rendering:a-cross-plan-marker-is-one-glyph` — A cross-plan marker is one glyph
+
+A row whose dependency reaches another plan MUST carry one width-1 cross-plan marker from the default tier, with its plain-flag form from the ASCII tier.
+
+#### Scenario: The plain flag is set
+
+- GIVEN a board row with a prefixed dependency
+- WHEN the board renders under the plain flag
+- THEN the marker is one ASCII character, like every other badge
+
+Verify: `cargo nextest run --test rendering`
+
 ### `rendering:a-bar-renders-at-eighth-cell-precision` — A bar renders at eighth-cell precision
 
 A horizontal bar MUST render at eighth-cell precision using the left-anchored eighth blocks and the full block.
@@ -170,17 +182,6 @@ Where the implementation adopts an optional rendering tool, that tool MUST be pi
 - THEN one line names the degradation and the rest of the view is unchanged
 
 Verify: `cargo nextest run --test rendering`
-
-## Glyph tiers
-
-| Tier             | Use                                                                                                            |
-| ---------------- | -------------------------------------------------------------------------------------------------------------- |
-| ASCII            | the universal fallback, selected by the plain flag                                                             |
-| Block Elements   | the default drawing tier; every glyph is display-width 1                                                       |
-| Box Drawing      | junctions for the ladder graph, from the four direction bits                                                   |
-| Braille patterns | a density tier, weakest in font coverage, announced as braille by screen readers; no baseline view requires it |
-
-A cross-plan marker is drawn from the default tier, and its plain-flag form comes from the ASCII tier, like every other badge. It carries one fact, which is that a dependency of this row reaches another plan, so one width-1 glyph is the whole of it.
 
 ## Unenforced rules
 

@@ -3,12 +3,11 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The three flow measures](#the-three-flow-measures)
-- [Suppressions](#suppressions)
 - [Requirements](#requirements)
   - [`metrics:a-measure-is-folded-from-the-journal` — A measure is folded from the journal](#metricsa-measure-is-folded-from-the-journal--a-measure-is-folded-from-the-journal)
   - [`metrics:an-entry-outside-this-record-is-never-a-quantity` — An entry outside this record is never a quantity](#metricsan-entry-outside-this-record-is-never-a-quantity--an-entry-outside-this-record-is-never-a-quantity)
   - [`metrics:the-clock-is-read-once` — The clock is read once](#metricsthe-clock-is-read-once--the-clock-is-read-once)
+  - [`metrics:a-duration-is-shown-in-whole-days` — A duration is shown in whole days](#metricsa-duration-is-shown-in-whole-days--a-duration-is-shown-in-whole-days)
   - [`metrics:an-unmeasurable-entry-is-reported-unmeasured` — An unmeasurable entry is reported unmeasured](#metricsan-unmeasurable-entry-is-reported-unmeasured--an-unmeasurable-entry-is-reported-unmeasured)
   - [`metrics:an-out-of-order-journal-is-not-folded` — An out-of-order journal is not folded](#metricsan-out-of-order-journal-is-not-folded--an-out-of-order-journal-is-not-folded)
   - [`metrics:a-measure-is-the-same-on-any-clone` — A measure is the same on any clone](#metricsa-measure-is-the-same-on-any-clone--a-measure-is-the-same-on-any-clone)
@@ -17,6 +16,7 @@
   - [`metrics:the-threshold-is-undefaulted-and-never-gates` — The threshold is undefaulted and never gates](#metricsthe-threshold-is-undefaulted-and-never-gates--the-threshold-is-undefaulted-and-never-gates)
   - [`metrics:a-stale-row-is-announced-once-per-invocation` — A stale row is announced once per invocation](#metricsa-stale-row-is-announced-once-per-invocation--a-stale-row-is-announced-once-per-invocation)
   - [`metrics:a-suppression-is-local-and-never-replicates` — A suppression is local and never replicates](#metricsa-suppression-is-local-and-never-replicates--a-suppression-is-local-and-never-replicates)
+  - [`metrics:a-hide-names-one-end-condition` — A hide names one end condition](#metricsa-hide-names-one-end-condition--a-hide-names-one-end-condition)
   - [`metrics:a-suppression-hides-a-reminder-and-never-a-number` — A suppression hides a reminder and never a number](#metricsa-suppression-hides-a-reminder-and-never-a-number--a-suppression-hides-a-reminder-and-never-a-number)
   - [`metrics:a-suppression-is-announced-in-the-view-it-hides` — A suppression is announced in the view it hides](#metricsa-suppression-is-announced-in-the-view-it-hides--a-suppression-is-announced-in-the-view-it-hides)
   - [`metrics:a-marked-row-is-never-acted-on-without-an-answer` — A marked row is never acted on without an answer](#metricsa-marked-row-is-never-acted-on-without-an-answer--a-marked-row-is-never-acted-on-without-an-answer)
@@ -66,6 +66,18 @@ The implementation MUST read the clock once per invocation and MUST use that ins
 - GIVEN several entries with open intervals
 - WHEN the fold runs
 - THEN all of them are measured against one instant, because two clock reads make one report internally inconsistent
+
+Verify: `cargo nextest run --test metrics`
+
+### `metrics:a-duration-is-shown-in-whole-days` — A duration is shown in whole days
+
+When a view displays a flow duration, it MUST show it in whole days, floored.
+
+#### Scenario: An entry entered review 36 hours ago
+
+- GIVEN an open dwell of one day and twelve hours
+- WHEN the flow table renders
+- THEN it shows 1, because a floored day never claims time that has not passed
 
 Verify: `cargo nextest run --test metrics`
 
@@ -173,6 +185,18 @@ When an operator hides or shows a stale row, the implementation MUST write only 
 
 Verify: `cargo nextest run --test metrics`
 
+### `metrics:a-hide-names-one-end-condition` — A hide names one end condition
+
+A hide request MUST name an existing entry and exactly one end condition, or fail as a usage error naming both flags, and only the hide and show forms MUST write the suppression file, while a read path ignores and reports a suppression whose id names no entry.
+
+#### Scenario: A hide names no duration
+
+- GIVEN `wipctl stale --hide the-stale-alarm` with neither `--for` nor `--forever`
+- WHEN the verb parses it
+- THEN it exits 2 naming both flags, because a default duration is a value nobody chose
+
+Verify: `cargo nextest run --test metrics`
+
 ### `metrics:a-suppression-hides-a-reminder-and-never-a-number` — A suppression hides a reminder and never a number
 
 While a suppression is active, the implementation MUST omit its row from the ordinary stale view and warning count while preserving it on the board, in flow, in `wipctl doctor`, and in `stale --all`.
@@ -250,38 +274,6 @@ Where the window anchor or length changes, the implementation MUST restart the w
 - THEN it starts again from the anchor, because a window redefined mid-series compares two different things
 
 Verify: `cargo nextest run --test metrics`
-
-## The three flow measures
-
-| Measure | Definition                                                                                           |
-| ------- | ---------------------------------------------------------------------------------------------------- |
-| age     | from the first entry into the in-flight lane to the entry's last event when closed, otherwise to now |
-| dwell   | the summed intervals spent in the review lane, counting an open interval through now                 |
-| rework  | entries into the in-flight lane beyond the first                                                     |
-
-A duration is displayed in whole days, floored.
-
-## Suppressions
-
-The suppression file lives at `$XDG_STATE_HOME/wipctl/projects/<slot name>/suppressions.toml`. Each `[[suppression]]` table carries an entry `id` and exactly one end condition.
-
-```toml
-[[suppression]]
-id = "the-stale-alarm"
-until = "2026-10-09T12:00:00Z"
-
-[[suppression]]
-id = "keep-the-live-story"
-forever = true
-```
-
-`wipctl stale --hide <id> --for <duration>` records an expiry in the transition journal's stated UTC textual form. `wipctl stale --hide <id> --forever` records a permanent suppression. `wipctl stale --show <id>` removes either form.
-
-The hide form has no default duration. A hide request with neither end condition is a usage error that names both flags. An id that names no entry is a usage error.
-
-Only the hide and show forms write the file. Read paths leave it unchanged. They ignore and report a suppression whose id names no entry.
-
-The file is local state, not a plan record or a machine output. It owes no schema. The metrics cases own its shape and behavior.
 
 ## Unenforced rules
 

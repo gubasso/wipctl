@@ -58,6 +58,22 @@ conflict is    exit 2, a refused preflight,     a semantic conflict report
 frequency      milliseconds of contention       whenever two machines worked
 ```
 
+## Syncing every plan at once
+
+`wipctl sync --all` is not the single-plan contract repeated. The single-plan contract validates before it pushes. Running it plan by plan validates the first plan against peers this same run has not fetched yet. That plan then fails against state the run is about to replace, and nothing revisits it. Peer graphs have cycles, so no ordering of slots fixes that. The batch is four named passes instead, which [verb mechanics](../reference/verb-mechanics.md#the-batch-run) lists.
+
+The reconcile pass loops because reconciling a peer can bring in a row this run never saw. That plan joins the declared set. Without the loop, a plan already in a slot is verified at a revision the run never fetched. The loop ends because the closure is finite and the visit list only grows.
+
+Publishing checks the recorded revision because verification releases every lock before it runs. A local writer can commit into a slot in that window. A slot whose trunk moved is reported and not pushed, so the run publishes no commit that verification never read.
+
+The single-plan contract holds one lock from the fetch to the push, and the batch cannot, because its verify pass reads every slot at once. So the batch states what replaces that hold: one lock at a time, and a push only of the revision verification read.
+
+The batch has a machine format of its own, `sync-all.schema.json`, beside the single-plan `sync.schema.json`. One is an object about one plan and the other is a run over many. One schema for both makes every field of the smaller one optional.
+
+## When the transport cannot finish
+
+Reconciliation is semantic, and its conflicts have their own diagnostics in the replication spec. The other class is the transport itself. It cannot complete a fetch, a fast-forward, or a push, or the slot is not as the tool left it. The messages domain owns that class, because relaying another tool's output is a rule about what a message says and not about replication. [Diagnostics](../reference/diagnostics.md#relaying-another-tools-output) shows its messages.
+
 ## A note on ids
 
 Every id in this chapter and in [concurrency.md](./concurrency.md) is a title's slug, such as `rate-limit-search`, and never a random suffix. That is a consequence of everything above. A random suffix is what a mint draws when it cannot see the record it is writing into. That was true when every clone held its own copy. With one live record behind one lock, the mint reads before it writes. A taken id is therefore refused at capture time. The answer is to rephrase the title, or to keep it and choose a qualifying postfix. The grammar and the checks are in [../specs/SPEC-ids.md](../specs/SPEC-ids.md).

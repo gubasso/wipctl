@@ -3,8 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The declared source](#the-declared-source)
-- [The reference](#the-reference)
 - [Requirements](#requirements)
   - [`external-sources:the-remote-system-stays-the-source-of-truth` — The remote system stays the source of truth](#external-sourcesthe-remote-system-stays-the-source-of-truth--the-remote-system-stays-the-source-of-truth)
   - [`external-sources:a-source-ref-names-a-declared-alias` — A source reference names a declared alias](#external-sourcesa-source-ref-names-a-declared-alias--a-source-reference-names-a-declared-alias)
@@ -194,41 +192,6 @@ The machine format MUST carry one object per declared alias, each stating whethe
 Verify: `cargo nextest run --test schemas`
 
 The shape is `sources-report.schema.json`, beside this page. The obligation to ship that schema and a case validating real output against it belongs to `cli-conventions:a-machine-format-is-verb-local`, and is not restated here.
-
-## The declared source
-
-The `sources` section sits in `.wipctl/plan.toml` at the plan zone root. It names each system the project's artifacts reference, one table per alias. The host repository gains nothing: its footprint stays the one project file.
-
-```toml
-# the sources section of .wipctl/plan.toml
-
-[sources.issues]
-url_template = "https://tracker.example/issues/{key}"
-list_command = ["<the command that lists open items>", "--format", "json"]
-
-[sources.tickets]
-url_template = "https://tickets.example/browse/{key}"
-list_command = ["<the command that lists open items>"]
-```
-
-The `sources` half of `plan.schema.json` owns the section's shape, in the configuration spec's companion directory. The cross-file checker owns every fact spanning the section and a document.
-
-## The reference
-
-A source reference is one token, `<alias>#<key>`. The alias names a table in the `sources` section. The key is the item's own name in that system, and this record never parses it.
-
-```markdown
-## Sources
-
-- `issues#412` — the report this story answers
-- `tickets#PAY-88` — the same work, tracked by the platform team
-```
-
-The section carries paths for no reason and resolves against no root, so it is not a path reference. Its item shape follows the same rule the other reference sections carry: the leading inline-code token is the datum, and everything after it is prose.
-
-The relation is many to many, and neither direction is capped. One artifact names as many items as it answers. One item is named by as many artifacts as answer it, at any tier, so an epic and its member stories can each reference it. Nothing is derived from that overlap, because membership still runs one way through the local ladder.
-
-The reverse question, which artifacts name one item, needs no stored index and no command. One fixed-string search for the token over the plan zone answers it. That search runs offline, and it still finds an item the remote system has closed, which the view cannot.
 
 ## Diagnostics
 

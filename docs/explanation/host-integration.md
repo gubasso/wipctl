@@ -36,6 +36,16 @@ rg -l 'issues#412' <the plan zone root>
 
 That answer costs nothing to keep true, because there is nothing to keep. It needs no network, no declared list command, and no cache. It also finds an artifact whose item the remote system has already closed, which a view built from an open list cannot.
 
+## The project slug
+
+A project's readable name is derived, never configured, by the ladder that [machine layout](../reference/machine-layout.md#deriving-the-project-slug) lists. It starts at the main worktree. The working directory does not supply the slug because several worktrees for one project can have different directory names.
+
+## Where machine state lives
+
+The plan record lives under the data directory, and everything a machine keeps for itself lives beside it, in the state, cache, and runtime directories that [machine layout](../reference/machine-layout.md) lists. The base-directory specification gives no default for the runtime directory, and unset is ordinary in cron jobs, containers, and remote sessions with no session manager. Those are exactly where agents run, so the fallback is stated rather than left open.
+
+A suppression belongs in state because it changes one machine's reminders. The plan configuration would replicate the silence to every clone. A lane entry has fixed fields and holds no durable local fact.
+
 ## A story is a diff, a durable document is a state
 
 This is the doctrine the whole integration rests on. A story describes a change, and the host's documents describe what is true. When a story closes, its acceptance assertions are rewritten in the present tense into the amended documents, together with the behavior. The story then freezes as history. The durable document carries the truth forward and keeps no inverse list of the stories that shaped it.

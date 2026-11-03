@@ -3,15 +3,15 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The writer](#the-writer)
-- [Filling the slots](#filling-the-slots)
 - [Requirements](#requirements)
   - [`peer-attachment:the-command-surface-owns-the-table` — The command surface owns the table](#peer-attachmentthe-command-surface-owns-the-table--the-command-surface-owns-the-table)
   - [`peer-attachment:a-clone-is-verified-before-it-fills-a-slot` — A clone is verified before it fills a slot](#peer-attachmenta-clone-is-verified-before-it-fills-a-slot--a-clone-is-verified-before-it-fills-a-slot)
   - [`peer-attachment:a-fresh-plan-id-is-provisional` — A fresh plan id is provisional](#peer-attachmenta-fresh-plan-id-is-provisional--a-fresh-plan-id-is-provisional)
   - [`peer-attachment:a-row-identity-comes-from-the-clone` — A row identity comes from the clone](#peer-attachmenta-row-identity-comes-from-the-clone--a-row-identity-comes-from-the-clone)
   - [`peer-attachment:the-network-read-is-outside-the-lock` — The network read is outside the lock](#peer-attachmentthe-network-read-is-outside-the-lock--the-network-read-is-outside-the-lock)
+  - [`peer-attachment:a-failed-clone-writes-nothing` — A failed clone writes nothing](#peer-attachmenta-failed-clone-writes-nothing--a-failed-clone-writes-nothing)
   - [`peer-attachment:the-walk-fills-the-declared-set` — The walk fills the declared set](#peer-attachmentthe-walk-fills-the-declared-set--the-walk-fills-the-declared-set)
+  - [`peer-attachment:no-table-is-nothing-to-attach` — No table is nothing to attach](#peer-attachmentno-table-is-nothing-to-attach--no-table-is-nothing-to-attach)
   - [`peer-attachment:the-walk-remembers-where-it-has-been` — The walk remembers where it went](#peer-attachmentthe-walk-remembers-where-it-has-been--the-walk-remembers-where-it-went)
   - [`peer-attachment:a-peer-mints-a-local-slot-name` — A peer mints a local slot name](#peer-attachmenta-peer-mints-a-local-slot-name--a-peer-mints-a-local-slot-name)
   - [`peer-attachment:a-reference-follows-its-alias` — A reference follows its alias](#peer-attachmenta-reference-follows-its-alias--a-reference-follows-its-alias)
@@ -87,6 +87,18 @@ The implementation MUST clone outside every slot, MUST take the writer lock only
 
 Verify: `cargo nextest run --test writer_guarantees`
 
+### `peer-attachment:a-failed-clone-writes-nothing` — A failed clone writes nothing
+
+When the clone of a peer fails, the implementation MUST leave the peer table byte-identical.
+
+#### Scenario: The url does not answer
+
+- GIVEN `wipctl peer add` naming a url that refuses the connection
+- WHEN the clone fails outside the lock
+- THEN the table is byte-identical and no row was written, because a row is written only after its clone is verified
+
+Verify: `cargo nextest run --test attachment`
+
 ### `peer-attachment:the-walk-fills-the-declared-set` — The walk fills the declared set
 
 The walk MUST read each attached peer's own table and MUST continue until every plan in the declared set sits in a slot.
@@ -96,6 +108,18 @@ The walk MUST read each attached peer's own table and MUST continue until every 
 - GIVEN a peer whose own table names a third plan
 - WHEN the walk runs
 - THEN the third plan is attached too, because a check reads slots and never fetches, so the closure is complete before any proof runs
+
+Verify: `cargo nextest run --test attachment`
+
+### `peer-attachment:no-table-is-nothing-to-attach` — No table is nothing to attach
+
+Where the plan configuration declares no peers, the walk MUST exit 0 with one line saying that the plan names no peers.
+
+#### Scenario: A plan with no peers section
+
+- GIVEN a plan configuration without `peers`
+- WHEN `wipctl attach --peers` runs
+- THEN it prints one line saying the plan names no peers and exits 0, because an absent table is the ordinary state of a plan that names no peers
 
 Verify: `cargo nextest run --test attachment`
 
@@ -158,67 +182,6 @@ The walk MUST NOT write into a peer's repository, MUST NOT push, and MUST NOT to
 - THEN nothing in that slot is changed, because bringing a plan up to date is replication and this verb only fills what is empty
 
 Verify: `cargo nextest run --test attachment`
-
-## The writer
-
-```text
-wipctl peer add <url> [--as <alias>]
-wipctl peer alias <alias> <new-alias>
-wipctl peer url <alias> (--add <url> | --remove <url> | --set <url>...)
-wipctl peer remove <alias>
-```
-
-The first positional argument is the operation, exactly as `wipctl new <type> "<title>"` takes a type first. So `peer` is one dispatchable unit, the verb list stays derived from the build, and the surface gains no subcommands.
-
-```text
-add        clone the plan at the url outside the lock, read its plan_id
-           and its project_id, then write the row. The alias is the peer's
-           derived project slug unless --as gives one.
-
-alias      change a row's alias to a name this project's readers prefer,
-           and rewrite every prefixed id that used the old one, in the
-           same transaction.
-
-url        --add appends a location. --remove drops one, and is refused
-           where it empties the list. --set replaces the whole list in the
-           order given, which is how a row is reordered and how a stale
-           first locator is taken out.
-
-remove     drop a row, refused while any prefixed id still uses the alias.
-```
-
-Two operations carry the weight. `add` makes the uid a machine's problem rather than a person's, which is what lets the design afford an opaque identity at all. `alias` makes the alias genuinely local, because a project renames a peer to whatever its own readers understand.
-
-Every form holds this plan's writer lock and ends in one plan trunk commit, like the writing verbs already named in the command surface. `add` is the one that also clones, so it follows the five steps below. Re-reading the table under the lock is what makes two concurrent additions of one plan a refusal rather than a duplicate row. A failed clone leaves the table byte-identical.
-
-An alias completes from the peer view, in the shape the command surface already requires: derived at completion time, and offering nothing where the source exits non-zero.
-
-## Filling the slots
-
-```text
-wipctl attach --peers
-```
-
-The verb resolves this project's plan first, as every verb does, then reads its table. No table is exit 0 with one line saying the plan names no peers.
-
-For each row absent from this machine, the verb clones from the first url that answers and verifies the plan identity. The sequence has five steps because each one prevents a distinct failure.
-
-```text
-1. clone the url into a temporary directory outside every slot
-2. read the clone's .wipctl/plan.toml and verify plan_id and project_id
-3. take this plan's writer lock, and re-read the peers section under it
-4. promote the temporary directory into the slot, create-only: a slot
-   that appeared meanwhile is a lost race, and the loser removes its
-   own temporary clone and reports the winner
-5. release the lock; the temporary directory is removed on every path,
-   including every failure path
-```
-
-The reason is the lock's own contract. A writer holds the lock from the deciding read to the commit, and hold times are subsecond. A clone over a network is neither bounded nor subsecond. Cloning straight into the slot is the other way to get this wrong. A reader resolving that uid then sees a directory that is not yet a verified plan.
-
-The walk is transitive and generous. After a peer is attached, its own table is read and every row of it is attached the same way. The walk ends when every plan in the declared set sits in a slot. It fills rows no entry references, because a row this plan declared is a plan this plan meant to work with.
-
-The walk fetches so that no check ever fetches. What it fills is a superset of what validation demands, and the peers domain names both sets.
 
 ## Diagnostics
 
