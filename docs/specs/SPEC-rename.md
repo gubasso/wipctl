@@ -23,25 +23,6 @@
 
 Changing an artifact's title, its id, or both, holding the two in agreement. Renaming is a supported operation with rules, not a drift a reader has to tolerate. It binds every artifact the identity invariant binds: a story, an epic, an initiative, and a question. The boundary runs at the identity: the ids domain owns the invariant and the burn, and this domain owns the operation that changes one.
 
-## The write set
-
-```text
-the lane entry's id, when an entry is renamed
-the story document and its title line
-the story's sibling directory, when one exists
-the epic or initiative document, when one is renamed
-the question's heading, when a question is renamed
-the journal, history travelling with the entry
-the pending fragment, when the entry is still a fragment
-every dependency entry naming the old id, in every lane
-every successor field naming the old id
-every blocking line naming the old id
-every epic field naming the old id, when an epic is renamed
-every initiative section naming the old id, when an initiative is renamed
-```
-
-A question has no lane entry, no journal, and no fragment, so its rename touches its heading and its inbound references alone.
-
 ## Requirements
 
 ### `rename:a-rename-holds-the-invariant` — A rename holds the title and id invariant
@@ -163,6 +144,25 @@ A rename MUST run every check before the first byte, MUST commit once, and MUST 
 - THEN no file changed, because a rename that half-applies leaves references pointing at two names
 
 Verify: `cargo nextest run --test writer_guarantees`
+
+## The write set
+
+```text
+the lane entry's id, when an entry is renamed
+the story document and its title line
+the story's sibling directory, when one exists
+the epic or initiative document, when one is renamed
+the question's heading, when a question is renamed
+the journal, history travelling with the entry
+the pending fragment, when the entry is still a fragment
+every dependency entry naming the old id, in every lane
+every successor field naming the old id
+every blocking line naming the old id
+every epic field naming the old id, when an epic is renamed
+every initiative section naming the old id, when an initiative is renamed
+```
+
+A question has no lane entry, no journal, and no fragment, so its rename touches its heading and its inbound references alone.
 
 ## Unenforced rules
 

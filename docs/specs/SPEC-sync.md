@@ -30,73 +30,6 @@
 
 Replication between machines, and the decision a person makes when two machines disagree. No lock spans machines and none is pretended. The boundary runs at the decision. This domain owns the fetch, the reconciliation, the push, and the recorded resolution. The ids domain owns what a collision recovery does to a name.
 
-## The four reconciliation cases
-
-| Case                                        | Outcome                                                                      |
-| ------------------------------------------- | ---------------------------------------------------------------------------- |
-| a capture on one side                       | merges by construction; the files are named by an id nobody else was minting |
-| different entries transitioned on each side | combined; different entry blocks and different journal files                 |
-| the same entry transitioned on both sides   | a semantic conflict, decided by a person                                     |
-| one slug minted on both sides               | an id collision, recovered by renaming the losing capture                    |
-| one plan, two minted global identities      | a semantic conflict, decided by a person, because no fact orders the mints   |
-
-## The batch run
-
-```text
-wipctl sync [--all] [--json]
-```
-
-Without `--all` the verb is unchanged: this plan's trunk, fetched, reconciled, validated, pushed fast-forward. `sync.schema.json` is unchanged with it.
-
-With `--all` the run is not that contract repeated, and the reason comes before the passes. The single-plan contract validates before it pushes. Running it plan by plan validates the first plan against peers this same run has not fetched yet. That plan then fails against state the run is about to replace, and nothing revisits it. Peer graphs have cycles, so no ordering of slots fixes that. The batch is four named passes instead.
-
-```text
-discover    resolve this plan, walk the declared set, and deduplicate by
-            plan_id, so a plan two rows reach is visited once. The
-            output of this pass is the visit list, in a stated order:
-            this plan first, then each plan in the order it was first
-            declared.
-
-reconcile   for each slot in turn: take that slot's writer lock, fetch,
-            fast-forward or reconcile, commit, release. No validation
-            here, and no push. One lock at a time. Then re-run discover
-            and repeat, until the visit list stops growing.
-
-verify      with every slot reconciled and no lock held, validate the
-            closure once, recording the revision each slot was read at.
-            This is the answer the run reports, and it is an answer
-            about the state on disk after the reconcile pass.
-
-publish     for each slot that gained a commit, in turn: take that
-            slot's lock, confirm the trunk still stands at the recorded
-            revision, push fast-forward, release. A slot that failed
-            verification is not pushed, and the summary says so.
-```
-
-The reconcile pass loops because reconciling a peer can bring in a row this run never saw. That plan joins the declared set. Without the loop, a plan already in a slot is verified at a revision the run never fetched. The loop ends because the closure is finite and the visit list only grows.
-
-Publishing checks the recorded revision because verification releases every lock before it runs. A local writer can commit into a slot in that window. A slot whose trunk moved is reported and not pushed, so the run publishes no commit that verification never read.
-
-Each slot is independent in the reconcile and publish passes. A failure in one slot stops that slot and nothing else, and the run continues so the summary names every slot's outcome. A slot whose lock is still held when the bounded wait expires is reported as locked.
-
-A slot's outcome is one of five: up to date, advanced, reconciled, failed, or locked. The single-plan contract holds one lock from the fetch to the push, and the batch cannot, because its verify pass reads every slot at once. So the batch states what replaces that hold: one lock at a time, and a push only of the revision verification read.
-
-The verb writes into a peer's slot only what replication writes into any slot: a fetch, a fast-forward, a reconciliation commit when both sides moved, and a push. It never edits a peer's record and never settles a peer's semantic conflict, which stays with that plan's owners and their own resolution verb.
-
-```text
-$ wipctl sync --all
-payments-acme      remote advanced; fetched 2 commits; nothing to push
-platform-acme      up to date
-profile-acme       reconciled 1 disjoint capture; pushed the plan trunk
-verified the closure: 63 entries, 3 plans, ok
-```
-
-`--json` under `--all` conforms to `sync-all.schema.json` and not to `sync.schema.json`. One is an object about one plan and the other is a run over many. One schema for both makes every field of the smaller one optional.
-
-## When the transport cannot finish
-
-Reconciliation here is semantic, and its conflicts have their own diagnostics below. The other class is the transport itself. It cannot complete a fetch, a fast-forward, or a push, or the slot is not as the tool left it. The messages domain owns that class, because relaying another tool's output is a rule about what a message says and not about replication.
-
 ## Requirements
 
 ### `sync:the-batch-runs-in-four-passes` — The batch runs in four passes
@@ -280,6 +213,73 @@ The resolution verb MUST require an id naming an open conflict, and MUST treat a
 - THEN it is a usage error listing what is open, because there is nothing to decide
 
 Verify: `cargo nextest run --test verb_contracts`
+
+## The four reconciliation cases
+
+| Case                                        | Outcome                                                                      |
+| ------------------------------------------- | ---------------------------------------------------------------------------- |
+| a capture on one side                       | merges by construction; the files are named by an id nobody else was minting |
+| different entries transitioned on each side | combined; different entry blocks and different journal files                 |
+| the same entry transitioned on both sides   | a semantic conflict, decided by a person                                     |
+| one slug minted on both sides               | an id collision, recovered by renaming the losing capture                    |
+| one plan, two minted global identities      | a semantic conflict, decided by a person, because no fact orders the mints   |
+
+## The batch run
+
+```text
+wipctl sync [--all] [--json]
+```
+
+Without `--all` the verb is unchanged: this plan's trunk, fetched, reconciled, validated, pushed fast-forward. `sync.schema.json` is unchanged with it.
+
+With `--all` the run is not that contract repeated, and the reason comes before the passes. The single-plan contract validates before it pushes. Running it plan by plan validates the first plan against peers this same run has not fetched yet. That plan then fails against state the run is about to replace, and nothing revisits it. Peer graphs have cycles, so no ordering of slots fixes that. The batch is four named passes instead.
+
+```text
+discover    resolve this plan, walk the declared set, and deduplicate by
+            plan_id, so a plan two rows reach is visited once. The
+            output of this pass is the visit list, in a stated order:
+            this plan first, then each plan in the order it was first
+            declared.
+
+reconcile   for each slot in turn: take that slot's writer lock, fetch,
+            fast-forward or reconcile, commit, release. No validation
+            here, and no push. One lock at a time. Then re-run discover
+            and repeat, until the visit list stops growing.
+
+verify      with every slot reconciled and no lock held, validate the
+            closure once, recording the revision each slot was read at.
+            This is the answer the run reports, and it is an answer
+            about the state on disk after the reconcile pass.
+
+publish     for each slot that gained a commit, in turn: take that
+            slot's lock, confirm the trunk still stands at the recorded
+            revision, push fast-forward, release. A slot that failed
+            verification is not pushed, and the summary says so.
+```
+
+The reconcile pass loops because reconciling a peer can bring in a row this run never saw. That plan joins the declared set. Without the loop, a plan already in a slot is verified at a revision the run never fetched. The loop ends because the closure is finite and the visit list only grows.
+
+Publishing checks the recorded revision because verification releases every lock before it runs. A local writer can commit into a slot in that window. A slot whose trunk moved is reported and not pushed, so the run publishes no commit that verification never read.
+
+Each slot is independent in the reconcile and publish passes. A failure in one slot stops that slot and nothing else, and the run continues so the summary names every slot's outcome. A slot whose lock is still held when the bounded wait expires is reported as locked.
+
+A slot's outcome is one of five: up to date, advanced, reconciled, failed, or locked. The single-plan contract holds one lock from the fetch to the push, and the batch cannot, because its verify pass reads every slot at once. So the batch states what replaces that hold: one lock at a time, and a push only of the revision verification read.
+
+The verb writes into a peer's slot only what replication writes into any slot: a fetch, a fast-forward, a reconciliation commit when both sides moved, and a push. It never edits a peer's record and never settles a peer's semantic conflict, which stays with that plan's owners and their own resolution verb.
+
+```text
+$ wipctl sync --all
+payments-acme      remote advanced; fetched 2 commits; nothing to push
+platform-acme      up to date
+profile-acme       reconciled 1 disjoint capture; pushed the plan trunk
+verified the closure: 63 entries, 3 plans, ok
+```
+
+`--json` under `--all` conforms to `sync-all.schema.json` and not to `sync.schema.json`. One is an object about one plan and the other is a run over many. One schema for both makes every field of the smaller one optional.
+
+## When the transport cannot finish
+
+Reconciliation here is semantic, and its conflicts have their own diagnostics below. The other class is the transport itself. It cannot complete a fetch, a fast-forward, or a push, or the slot is not as the tool left it. The messages domain owns that class, because relaying another tool's output is a rule about what a message says and not about replication.
 
 ## Unenforced rules
 

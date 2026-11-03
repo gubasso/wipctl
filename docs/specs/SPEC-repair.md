@@ -28,32 +28,6 @@
 
 What every writer owes the bytes it touches, and what each supported repair may change. The boundary runs at the act. This domain covers the mechanics of writing. The transactions domain covers the lock and the commit that wrap it, and each verb's own domain covers what it writes.
 
-## The slot repair
-
-```text
-wipctl fix --registry [<name>]
-```
-
-Without a name, the repair derives the project slug and escalates it until free. With a name, it uses that name and refuses an occupied destination.
-
-The repair takes the locks for the current and new slot names in lexical order. It then moves three filesystem parts in order:
-
-```text
-1. move the slot
-2. move the state directory
-3. remove the old cache directory
-```
-
-Each boundary is resumable. A later run finds the moved slot, then completes any state move and cache removal left under the old name.
-
-The repair writes no project file because a peer slot has no host repository. It commits and replicates nothing. It accepts the project underfoot and refuses the plan targeting flag.
-
-```text
-wipctl: slot renamed: payments -> payments-ben
-wipctl: state moved:  <state dir>/projects/payments-ben
-wipctl: cache removed: <cache dir>/projects/payments
-```
-
 ## Requirements
 
 ### `repair:a-slot-repair-moves-local-state-in-order` — A slot repair moves local state in order
@@ -235,3 +209,29 @@ When the repair finds a suppression whose id names no entry, the implementation 
 - THEN it removes and reports the suppression, because local state has no reminder left to hide
 
 Verify: `cargo nextest run --test writer_guarantees`
+
+## The slot repair
+
+```text
+wipctl fix --registry [<name>]
+```
+
+Without a name, the repair derives the project slug and escalates it until free. With a name, it uses that name and refuses an occupied destination.
+
+The repair takes the locks for the current and new slot names in lexical order. It then moves three filesystem parts in order:
+
+```text
+1. move the slot
+2. move the state directory
+3. remove the old cache directory
+```
+
+Each boundary is resumable. A later run finds the moved slot, then completes any state move and cache removal left under the old name.
+
+The repair writes no project file because a peer slot has no host repository. It commits and replicates nothing. It accepts the project underfoot and refuses the plan targeting flag.
+
+```text
+wipctl: slot renamed: payments -> payments-ben
+wipctl: state moved:  <state dir>/projects/payments-ben
+wipctl: cache removed: <cache dir>/projects/payments
+```

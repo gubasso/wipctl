@@ -25,15 +25,6 @@
 
 Resolving one epic into its execution plan, and rolling every epic up into one row each. The boundary runs at the tier. This domain owns the epic's resolution and the arithmetic every tier shares. The initiatives domain owns the tier above, and the documents domain owns the epic document's shape.
 
-## The point arithmetic
-
-| Outcome    | Contribution                                                      |
-| ---------- | ----------------------------------------------------------------- |
-| `done`     | delivers its own points                                           |
-| `cut`      | contributes nothing and stays in the total                        |
-| `reshaped` | delivers its own points exactly when its successor closed as done |
-| reopened   | counts as open                                                    |
-
 ## Requirements
 
 ### `epics:the-arithmetic-has-one-implementation` — The arithmetic has one implementation
@@ -181,6 +172,15 @@ Where the resolution is written to the cache, a missing, stale, or corrupt cache
 - THEN every verb answers the same, because the cache is rewritten on each call and read back by nothing
 
 Verify: `cargo nextest run --test epics`
+
+## The point arithmetic
+
+| Outcome    | Contribution                                                      |
+| ---------- | ----------------------------------------------------------------- |
+| `done`     | delivers its own points                                           |
+| `cut`      | contributes nothing and stays in the total                        |
+| `reshaped` | delivers its own points exactly when its successor closed as done |
+| reopened   | counts as open                                                    |
 
 ## Unenforced rules
 
