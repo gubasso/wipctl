@@ -24,18 +24,6 @@
 
 Lane files say where an entry is, and the journal says when it arrived. Every measure of flow is a question about arrival, so transitions are events in the record itself. The boundary runs at authority. The lane files are authoritative for current state and are the reviewable diff. The journal is authoritative for transitions. Neither is derived from the other.
 
-## Format
-
-One append-only stream per entry, one event per line, exactly three non-empty tab-separated fields.
-
-```text
-2026-08-14T09:52:31Z	todo	doing
-2026-08-15T16:03:10Z	doing	review
-2026-08-16T11:20:44Z	review	closed
-```
-
-Field one is the instant, field two is the lane left, and field three is the lane entered or a terminal token.
-
 ## Requirements
 
 ### `transition-journal:the-program-records-transitions` — The program records transitions
@@ -169,6 +157,18 @@ The journal MUST NOT carry a who, a why, or a reason column.
 - THEN three columns is the whole of it. Nothing proves the verb was used rather than the file edited, which the lane-agreement gate catches
 
 Verify: `cargo nextest run --test validation`
+
+## Format
+
+One append-only stream per entry, one event per line, exactly three non-empty tab-separated fields.
+
+```text
+2026-08-14T09:52:31Z	todo	doing
+2026-08-15T16:03:10Z	doing	review
+2026-08-16T11:20:44Z	review	closed
+```
+
+Field one is the instant, field two is the lane left, and field three is the lane entered or a terminal token.
 
 ## Unenforced rules
 

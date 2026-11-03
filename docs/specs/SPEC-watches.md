@@ -36,55 +36,6 @@ Validation includes the watch count in its census and reports zero when `watches
 
 `Q-` names a question section and `W-` names a watch section. A watch id is unique within `watches.md`, so a reader can cite it. Section ids do not enter the entry id namespace or consume tombstones.
 
-## Section shape
-
-```markdown
-## W-the-workflow-ships-upstream — The convention carries the Scorecard workflow
-
-Raised: 2026-09-09
-
-Watch: `issues#117`
-
-Until: closed as completed, and the landed version carries the workflow.
-
-Blocks: hand-over-the-workflow — nothing exists to hand over until it ships.
-
-Read: 2026-09-09 — open, and the snippet list names no such workflow.
-
-Every: 30 days
-```
-
-The heading carries the id and text. `Raised` dates the watch. `Watch` names who or what clears it. `Until` states the exit condition. `Blocks` names the affected entries. `Read` dates the latest observation. The optional `Every` line sets this watch's reading cadence. The parts appear in that order.
-
-The `Read` line carries the `YYYY-MM-DD` date when a person looked, an em dash, and one sentence describing what they saw. The sentence records a dated observation rather than a remote field. It can say that an item was open because the date keeps that statement true as an observation about that day.
-
-A reading is cold when its date is older than the watch's `Every` period or, without that line, the project's `stale_after.watch_days` period. Neither level has a default. A project that sets neither receives no cold-reading warning.
-
-The two project thresholds stay separate. `days` measures this project's own work going quiet, while `watch_days` measures an outside item going unread. A release cut monthly and a ticket triaged daily can also use different `Every` periods.
-
-The remote system remains the source of truth under `external-sources:a-source-ref-is-stated-and-never-verified`. No check reads a tracker. A person reads the item, tests the exit condition, and edits the record.
-
-A workflow verb announces a cold-reading count on stderr at exit 0 and names `wipctl stale` as the view that shows the watches. It folds both entry and watch counts against the one clock reading required by `metrics:the-clock-is-read-once`.
-
-The count includes a watch whose `Read` date is older than its threshold and whose blocked work remains open. It excludes a watch read inside the threshold. It also excludes a watch whose blocked entries have all closed, because `watches:a-stale-watch-is-reported` already reports that record error.
-
-Clearing a watch creates no separate event store. The section enters and leaves `watches.md` through ordinary commits, so `git log` on that file records when the block appeared and lifted, with its author and date. A future blocked-duration measure can fold from that history without storing or computing the measure here.
-
-The source view marks a reference-form watch as `still listed`, `no longer listed`, or `unjudged`. The words `no longer listed` mean only that the item left the command's open list. A person compares that fact with the `Until` condition. The view reports a phrase-form watch as `skipped` because it has no alias or key to compare.
-
-The mark is not a check, and it changes no exit code. It is not a clear, so the watch stays until a person edits the record. It is not eligibility, which derives from `watches.md` rather than the view. It is not a store under `external-sources:the-view-cache-is-authoritative-for-nothing`, because every run derives the report again.
-
-## Reference or phrase
-
-The `Watch` line has two forms.
-
-| Form      | Shape                                                                                                                                     |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| reference | The whole value is one inline-code `<alias>#<key>` token. The alias resolves in the plan configuration's `sources` section.               |
-| phrase    | The value is a 60 to 400 character line. It names the actor who clears the block, such as a credential owner or a person who must decide. |
-
-The reference form reuses the source reference whole. Its url template turns the key into a link. The phrase bound rejects `tbd` and nothing else. A reader decides whether the phrase names a real actor.
-
 ## Requirements
 
 ### `watches:a-watch-blocks-something` — A watch blocks something
@@ -242,6 +193,55 @@ When the source view renders, it MUST report each reference-form watch as `still
 - THEN it reports all four as `still listed`, `no longer listed`, `unjudged`, and `skipped`, while the record keeps deciding from its files alone
 
 Verify: `cargo nextest run --test verb_contracts`
+
+## Section shape
+
+```markdown
+## W-the-workflow-ships-upstream — The convention carries the Scorecard workflow
+
+Raised: 2026-09-09
+
+Watch: `issues#117`
+
+Until: closed as completed, and the landed version carries the workflow.
+
+Blocks: hand-over-the-workflow — nothing exists to hand over until it ships.
+
+Read: 2026-09-09 — open, and the snippet list names no such workflow.
+
+Every: 30 days
+```
+
+The heading carries the id and text. `Raised` dates the watch. `Watch` names who or what clears it. `Until` states the exit condition. `Blocks` names the affected entries. `Read` dates the latest observation. The optional `Every` line sets this watch's reading cadence. The parts appear in that order.
+
+The `Read` line carries the `YYYY-MM-DD` date when a person looked, an em dash, and one sentence describing what they saw. The sentence records a dated observation rather than a remote field. It can say that an item was open because the date keeps that statement true as an observation about that day.
+
+A reading is cold when its date is older than the watch's `Every` period or, without that line, the project's `stale_after.watch_days` period. Neither level has a default. A project that sets neither receives no cold-reading warning.
+
+The two project thresholds stay separate. `days` measures this project's own work going quiet, while `watch_days` measures an outside item going unread. A release cut monthly and a ticket triaged daily can also use different `Every` periods.
+
+The remote system remains the source of truth under `external-sources:a-source-ref-is-stated-and-never-verified`. No check reads a tracker. A person reads the item, tests the exit condition, and edits the record.
+
+A workflow verb announces a cold-reading count on stderr at exit 0 and names `wipctl stale` as the view that shows the watches. It folds both entry and watch counts against the one clock reading required by `metrics:the-clock-is-read-once`.
+
+The count includes a watch whose `Read` date is older than its threshold and whose blocked work remains open. It excludes a watch read inside the threshold. It also excludes a watch whose blocked entries have all closed, because `watches:a-stale-watch-is-reported` already reports that record error.
+
+Clearing a watch creates no separate event store. The section enters and leaves `watches.md` through ordinary commits, so `git log` on that file records when the block appeared and lifted, with its author and date. A future blocked-duration measure can fold from that history without storing or computing the measure here.
+
+The source view marks a reference-form watch as `still listed`, `no longer listed`, or `unjudged`. The words `no longer listed` mean only that the item left the command's open list. A person compares that fact with the `Until` condition. The view reports a phrase-form watch as `skipped` because it has no alias or key to compare.
+
+The mark is not a check, and it changes no exit code. It is not a clear, so the watch stays until a person edits the record. It is not eligibility, which derives from `watches.md` rather than the view. It is not a store under `external-sources:the-view-cache-is-authoritative-for-nothing`, because every run derives the report again.
+
+## Reference or phrase
+
+The `Watch` line has two forms.
+
+| Form      | Shape                                                                                                                                     |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| reference | The whole value is one inline-code `<alias>#<key>` token. The alias resolves in the plan configuration's `sources` section.               |
+| phrase    | The value is a 60 to 400 character line. It names the actor who clears the block, such as a credential owner or a person who must decide. |
+
+The reference form reuses the source reference whole. Its url template turns the key into a link. The phrase bound rejects `tbd` and nothing else. A reader decides whether the phrase names a real actor.
 
 ## Unenforced rules
 

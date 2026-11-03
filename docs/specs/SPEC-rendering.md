@@ -25,17 +25,6 @@
 
 The constraints every view verb obeys. Terminal text is the only rendering target. Dragging a card is exactly the judgment the method reserves for a person, and a second output format is a second implementation to keep true. The boundary runs at the drawing. This domain says how a view looks, and each verb's own domain says what it shows.
 
-## Glyph tiers
-
-| Tier             | Use                                                                                                            |
-| ---------------- | -------------------------------------------------------------------------------------------------------------- |
-| ASCII            | the universal fallback, selected by the plain flag                                                             |
-| Block Elements   | the default drawing tier; every glyph is display-width 1                                                       |
-| Box Drawing      | junctions for the ladder graph, from the four direction bits                                                   |
-| Braille patterns | a density tier, weakest in font coverage, announced as braille by screen readers; no baseline view requires it |
-
-A cross-plan marker is drawn from the default tier, and its plain-flag form comes from the ASCII tier, like every other badge. It carries one fact, which is that a dependency of this row reaches another plan, so one width-1 glyph is the whole of it.
-
 ## Requirements
 
 ### `rendering:the-terminal-is-the-only-target` — The terminal is the only target
@@ -181,6 +170,17 @@ Where the implementation adopts an optional rendering tool, that tool MUST be pi
 - THEN one line names the degradation and the rest of the view is unchanged
 
 Verify: `cargo nextest run --test rendering`
+
+## Glyph tiers
+
+| Tier             | Use                                                                                                            |
+| ---------------- | -------------------------------------------------------------------------------------------------------------- |
+| ASCII            | the universal fallback, selected by the plain flag                                                             |
+| Block Elements   | the default drawing tier; every glyph is display-width 1                                                       |
+| Box Drawing      | junctions for the ladder graph, from the four direction bits                                                   |
+| Braille patterns | a density tier, weakest in font coverage, announced as braille by screen readers; no baseline view requires it |
+
+A cross-plan marker is drawn from the default tier, and its plain-flag form comes from the ASCII tier, like every other badge. It carries one fact, which is that a dependency of this row reaches another plan, so one width-1 glyph is the whole of it.
 
 ## Unenforced rules
 

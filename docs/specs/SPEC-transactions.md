@@ -25,19 +25,6 @@
 
 What a verb that writes the record must hold, and what its transaction must end in. Ten verbs write a maintained record: `new`, `land`, `move`, `start`, `delete`, `rename`, `fix`, `sync`, `resolve`, and `peer`. Closing is not a verb of its own, because it is `move --to closed`. The boundary runs at the write. This domain covers the lock, the preflight, and the commit. Each verb's own domain covers what it writes.
 
-## The commit grammar
-
-```text
-plan: capture <id>
-plan: move <id> from <from> to <to>
-plan: close <id> as <outcome>
-plan: land <n> fragments
-plan: rename <old> to <new>
-plan: delete <id>
-plan: reconcile <n> changes
-plan: resolve <id> keeping <side>
-```
-
 ## Requirements
 
 ### `transactions:a-writer-holds-the-lock` — A writer holds the lock for one transaction
@@ -183,6 +170,19 @@ The implementation MUST NOT push as part of a mutation's transaction.
 - THEN the commit lands locally and replication stays its own verb. A write that needs a network fails on a train
 
 Verify: `cargo nextest run --test writer_guarantees`
+
+## The commit grammar
+
+```text
+plan: capture <id>
+plan: move <id> from <from> to <to>
+plan: close <id> as <outcome>
+plan: land <n> fragments
+plan: rename <old> to <new>
+plan: delete <id>
+plan: reconcile <n> changes
+plan: resolve <id> keeping <side>
+```
 
 ## Unenforced rules
 

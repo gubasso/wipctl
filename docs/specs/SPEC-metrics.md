@@ -31,38 +31,6 @@
 
 Age, dwell, rework, and delivery per window. Every number here is folded from the record, never from repository archaeology. Age and staleness are two things: age is the number of days, and the `stale_after` threshold is the line drawn across it. The boundary runs at the source: this domain owns the measures, the transition journal domain owns the events they fold, and the rendering domain owns how a bar is drawn.
 
-## The three flow measures
-
-| Measure | Definition                                                                                           |
-| ------- | ---------------------------------------------------------------------------------------------------- |
-| age     | from the first entry into the in-flight lane to the entry's last event when closed, otherwise to now |
-| dwell   | the summed intervals spent in the review lane, counting an open interval through now                 |
-| rework  | entries into the in-flight lane beyond the first                                                     |
-
-A duration is displayed in whole days, floored.
-
-## Suppressions
-
-The suppression file lives at `$XDG_STATE_HOME/wipctl/projects/<slot name>/suppressions.toml`. Each `[[suppression]]` table carries an entry `id` and exactly one end condition.
-
-```toml
-[[suppression]]
-id = "the-stale-alarm"
-until = "2026-10-09T12:00:00Z"
-
-[[suppression]]
-id = "keep-the-live-story"
-forever = true
-```
-
-`wipctl stale --hide <id> --for <duration>` records an expiry in the transition journal's stated UTC textual form. `wipctl stale --hide <id> --forever` records a permanent suppression. `wipctl stale --show <id>` removes either form.
-
-The hide form has no default duration. A hide request with neither end condition is a usage error that names both flags. An id that names no entry is a usage error.
-
-Only the hide and show forms write the file. Read paths leave it unchanged. They ignore and report a suppression whose id names no entry.
-
-The file is local state, not a plan record or a machine output. It owes no schema. The metrics cases own its shape and behavior.
-
 ## Requirements
 
 ### `metrics:a-measure-is-folded-from-the-journal` — A measure is folded from the journal
@@ -282,6 +250,38 @@ Where the window anchor or length changes, the implementation MUST restart the w
 - THEN it starts again from the anchor, because a window redefined mid-series compares two different things
 
 Verify: `cargo nextest run --test metrics`
+
+## The three flow measures
+
+| Measure | Definition                                                                                           |
+| ------- | ---------------------------------------------------------------------------------------------------- |
+| age     | from the first entry into the in-flight lane to the entry's last event when closed, otherwise to now |
+| dwell   | the summed intervals spent in the review lane, counting an open interval through now                 |
+| rework  | entries into the in-flight lane beyond the first                                                     |
+
+A duration is displayed in whole days, floored.
+
+## Suppressions
+
+The suppression file lives at `$XDG_STATE_HOME/wipctl/projects/<slot name>/suppressions.toml`. Each `[[suppression]]` table carries an entry `id` and exactly one end condition.
+
+```toml
+[[suppression]]
+id = "the-stale-alarm"
+until = "2026-10-09T12:00:00Z"
+
+[[suppression]]
+id = "keep-the-live-story"
+forever = true
+```
+
+`wipctl stale --hide <id> --for <duration>` records an expiry in the transition journal's stated UTC textual form. `wipctl stale --hide <id> --forever` records a permanent suppression. `wipctl stale --show <id>` removes either form.
+
+The hide form has no default duration. A hide request with neither end condition is a usage error that names both flags. An id that names no entry is a usage error.
+
+Only the hide and show forms write the file. Read paths leave it unchanged. They ignore and report a suppression whose id names no entry.
+
+The file is local state, not a plan record or a machine output. It owes no schema. The metrics cases own its shape and behavior.
 
 ## Unenforced rules
 

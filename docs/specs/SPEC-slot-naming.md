@@ -36,56 +36,6 @@ minted once  it tracks no value, so no change makes it stale
 free-able    the escalation ladder ends with a step that cannot fail
 ```
 
-## Deriving the project slug
-
-A project slug is the readable name derived for the project. The first step that answers supplies it:
-
-```text
-1. the main worktree's forge project name
-2. the main worktree's directory name
-3. the directory holding .wipctl/project.toml
-```
-
-Git identifies the main worktree. The working directory does not supply the slug because several worktrees for one project can have different directory names.
-
-A host project does not need to be a git repository. The project file marks its root by its presence, so the third step supplies a slug without git.
-
-A peer has no host worktree. Its first url supplies the forge project name and namespace before the same escalation applies.
-
-The slot name becomes free by postfix escalation:
-
-```text
-1. <slug>
-2. + <parent-scope>
-3. + <username>
-4. + <forge>
-5. + 01, 02, and the first free sequential number
-```
-
-At mint time, the implementation derives the project slug, escalates it, and freezes the result as the slot name. At every read, it derives the slug again for display and drift detection.
-
-A derived slug never selects a path, resolves a record, or compares with a committed value. It decides only the first slot name candidate at mint time.
-
-## Slot states
-
-```text
-matching  the slot name and the derived slug agree
-drifted   they disagree; the record is intact and every verb works
-absent    the project file names a project that no slot holds
-```
-
-Drift is legal. It does not fail a check or a verb.
-
-Detection does not repair drift. A rename needs both slot-name locks, changes the registry, and moves machine-local state. An ordinary reader must not become that writer.
-
-The explicit repair is `wipctl fix --registry [<name>]`, as the repair domain specifies.
-
-The scaffold stays create-only. Every other write starts with a verb that a person ran.
-
-## Open question
-
-Which declared remote supplies the forge name and namespace remains open. The design does not select `origin` by default. It also does not choose between an explicit configuration key and skipping the first step where several remotes answer.
-
 ## Requirements
 
 ### `slot-naming:a-slot-name-is-minted-once` — A slot name is minted once
@@ -207,3 +157,53 @@ When a candidate slot name is taken, the implementation MUST apply the postfix e
 - THEN the walk tries the next candidate instead of refusing the plan
 
 Verify: `cargo nextest run --test attachment`
+
+## Deriving the project slug
+
+A project slug is the readable name derived for the project. The first step that answers supplies it:
+
+```text
+1. the main worktree's forge project name
+2. the main worktree's directory name
+3. the directory holding .wipctl/project.toml
+```
+
+Git identifies the main worktree. The working directory does not supply the slug because several worktrees for one project can have different directory names.
+
+A host project does not need to be a git repository. The project file marks its root by its presence, so the third step supplies a slug without git.
+
+A peer has no host worktree. Its first url supplies the forge project name and namespace before the same escalation applies.
+
+The slot name becomes free by postfix escalation:
+
+```text
+1. <slug>
+2. + <parent-scope>
+3. + <username>
+4. + <forge>
+5. + 01, 02, and the first free sequential number
+```
+
+At mint time, the implementation derives the project slug, escalates it, and freezes the result as the slot name. At every read, it derives the slug again for display and drift detection.
+
+A derived slug never selects a path, resolves a record, or compares with a committed value. It decides only the first slot name candidate at mint time.
+
+## Slot states
+
+```text
+matching  the slot name and the derived slug agree
+drifted   they disagree; the record is intact and every verb works
+absent    the project file names a project that no slot holds
+```
+
+Drift is legal. It does not fail a check or a verb.
+
+Detection does not repair drift. A rename needs both slot-name locks, changes the registry, and moves machine-local state. An ordinary reader must not become that writer.
+
+The explicit repair is `wipctl fix --registry [<name>]`, as the repair domain specifies.
+
+The scaffold stays create-only. Every other write starts with a verb that a person ran.
+
+## Open question
+
+Which declared remote supplies the forge name and namespace remains open. The design does not select `origin` by default. It also does not choose between an explicit configuration key and skipping the first step where several remotes answer.
