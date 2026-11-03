@@ -3,13 +3,12 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [Where each identity enters resolution](#where-each-identity-enters-resolution)
 - [Requirements](#requirements)
   - [`attachment:resolution-is-two-steps` — Resolution is two steps](#attachmentresolution-is-two-steps--resolution-is-two-steps)
   - [`attachment:the-two-identities-agree` — The two identities agree](#attachmentthe-two-identities-agree--the-two-identities-agree)
-  - [`attachment:a-plan-uid-is-minted-only-at-creation` — A global identity is minted only at creation](#attachmenta-plan-uid-is-minted-only-at-creation--a-global-identity-is-minted-only-at-creation)
-  - [`attachment:one-plan-occupies-one-slot` — One plan occupies one slot](#attachmentone-plan-occupies-one-slot--one-plan-occupies-one-slot)
   - [`attachment:duplicate-project-identities-are-ambiguous` — Duplicate project identities are ambiguous](#attachmentduplicate-project-identities-are-ambiguous--duplicate-project-identities-are-ambiguous)
+  - [`attachment:a-plan-uid-is-minted-only-at-creation` — A plan identity is minted only at creation](#attachmenta-plan-uid-is-minted-only-at-creation--a-plan-identity-is-minted-only-at-creation)
+  - [`attachment:one-plan-occupies-one-slot` — One plan occupies one slot](#attachmentone-plan-occupies-one-slot--one-plan-occupies-one-slot)
   - [`attachment:git-is-the-only-version-control` — Git is the only version control](#attachmentgit-is-the-only-version-control--git-is-the-only-version-control)
   - [`attachment:the-registry-is-the-filesystem` — The registry is the filesystem](#attachmentthe-registry-is-the-filesystem--the-registry-is-the-filesystem)
   - [`attachment:the-scaffold-does-not-walk-upward` — The scaffold does not walk upward](#attachmentthe-scaffold-does-not-walk-upward--the-scaffold-does-not-walk-upward)
@@ -20,6 +19,7 @@
   - [`attachment:a-clone-must-agree-on-identity` — A clone must agree on identity](#attachmenta-clone-must-agree-on-identity--a-clone-must-agree-on-identity)
   - [`attachment:attaching-is-idempotent` — Attaching is idempotent](#attachmentattaching-is-idempotent--attaching-is-idempotent)
   - [`attachment:attach-touches-neither-host-nor-remote` — Attach touches neither host nor remote](#attachmentattach-touches-neither-host-nor-remote--attach-touches-neither-host-nor-remote)
+- [Where each identity enters resolution](#where-each-identity-enters-resolution)
 - [Diagnostics](#diagnostics)
 
 <!--TOC-->

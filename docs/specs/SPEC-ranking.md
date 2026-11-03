@@ -3,8 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [A node, and how it is written for a reader](#a-node-and-how-it-is-written-for-a-reader)
-- [The ranking procedure](#the-ranking-procedure)
 - [Requirements](#requirements)
   - [`ranking:eligibility-is-derived-from-three-edges` — Eligibility is derived from three edges](#rankingeligibility-is-derived-from-three-edges--eligibility-is-derived-from-three-edges)
   - [`ranking:an-order-is-computed-and-never-stored` — An order is computed and never stored](#rankingan-order-is-computed-and-never-stored--an-order-is-computed-and-never-stored)
@@ -15,9 +13,12 @@
   - [`ranking:an-ordering-input-reads-the-record-alone` — An ordering input reads the record alone](#rankingan-ordering-input-reads-the-record-alone--an-ordering-input-reads-the-record-alone)
   - [`ranking:the-final-tie-break-is-the-full-id` — The final tie-break is the full id](#rankingthe-final-tie-break-is-the-full-id--the-final-tie-break-is-the-full-id)
   - [`ranking:the-dependency-graph-is-acyclic` — The dependency graph is acyclic](#rankingthe-dependency-graph-is-acyclic--the-dependency-graph-is-acyclic)
+  - [`ranking:a-node-renders-relative-to-the-invoking-plan` — A node renders relative to the invoking plan](#rankinga-node-renders-relative-to-the-invoking-plan--a-node-renders-relative-to-the-invoking-plan)
   - [`ranking:a-work-lane-entry-is-unblocked` — A work-lane entry is unblocked](#rankinga-work-lane-entry-is-unblocked--a-work-lane-entry-is-unblocked)
   - [`ranking:membership-is-never-an-edge` — Membership is never an edge](#rankingmembership-is-never-an-edge--membership-is-never-an-edge)
   - [`ranking:the-closed-lane-orders-by-date` — The closed lane orders by close date](#rankingthe-closed-lane-orders-by-date--the-closed-lane-orders-by-close-date)
+- [A node, and how it is written for a reader](#a-node-and-how-it-is-written-for-a-reader)
+- [The ranking procedure](#the-ranking-procedure)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -135,6 +136,18 @@ The dependency graph MUST be acyclic over the attached closure, and an entry MUS
 - THEN it fails naming the same members, each written in the form that names its record. No order satisfies a cycle, and a cycle that crosses a boundary is still one cycle
 
 Verify: `cargo nextest run --test validation`
+
+### `ranking:a-node-renders-relative-to-the-invoking-plan` — A node renders relative to the invoking plan
+
+When a view names a graph node, it MUST print the bare id for the invoking plan's own entry, `<alias>#<id>` with this plan's alias for a peer this plan declares, and `<plan_id>:<id>` for a plan no row of this plan names.
+
+#### Scenario: A cycle runs two hops away
+
+- GIVEN `alpha` declares `beta`, and `beta` declares `gamma`
+- WHEN `alpha` reports a cycle through an entry of `gamma`
+- THEN it prints that node as `<plan_id>:<id>`, because the alias `beta` gives `gamma` resolves in no table `alpha` has
+
+Verify: `cargo nextest run --test ranking`
 
 ### `ranking:a-work-lane-entry-is-unblocked` — A work-lane entry is unblocked
 

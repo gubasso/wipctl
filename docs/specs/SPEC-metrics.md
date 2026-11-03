@@ -3,12 +3,11 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The three flow measures](#the-three-flow-measures)
-- [Suppressions](#suppressions)
 - [Requirements](#requirements)
   - [`metrics:a-measure-is-folded-from-the-journal` — A measure is folded from the journal](#metricsa-measure-is-folded-from-the-journal--a-measure-is-folded-from-the-journal)
   - [`metrics:an-entry-outside-this-record-is-never-a-quantity` — An entry outside this record is never a quantity](#metricsan-entry-outside-this-record-is-never-a-quantity--an-entry-outside-this-record-is-never-a-quantity)
   - [`metrics:the-clock-is-read-once` — The clock is read once](#metricsthe-clock-is-read-once--the-clock-is-read-once)
+  - [`metrics:a-duration-is-shown-in-whole-days` — A duration is shown in whole days](#metricsa-duration-is-shown-in-whole-days--a-duration-is-shown-in-whole-days)
   - [`metrics:an-unmeasurable-entry-is-reported-unmeasured` — An unmeasurable entry is reported unmeasured](#metricsan-unmeasurable-entry-is-reported-unmeasured--an-unmeasurable-entry-is-reported-unmeasured)
   - [`metrics:an-out-of-order-journal-is-not-folded` — An out-of-order journal is not folded](#metricsan-out-of-order-journal-is-not-folded--an-out-of-order-journal-is-not-folded)
   - [`metrics:a-measure-is-the-same-on-any-clone` — A measure is the same on any clone](#metricsa-measure-is-the-same-on-any-clone--a-measure-is-the-same-on-any-clone)
@@ -17,12 +16,15 @@
   - [`metrics:the-threshold-is-undefaulted-and-never-gates` — The threshold is undefaulted and never gates](#metricsthe-threshold-is-undefaulted-and-never-gates--the-threshold-is-undefaulted-and-never-gates)
   - [`metrics:a-stale-row-is-announced-once-per-invocation` — A stale row is announced once per invocation](#metricsa-stale-row-is-announced-once-per-invocation--a-stale-row-is-announced-once-per-invocation)
   - [`metrics:a-suppression-is-local-and-never-replicates` — A suppression is local and never replicates](#metricsa-suppression-is-local-and-never-replicates--a-suppression-is-local-and-never-replicates)
+  - [`metrics:a-hide-names-one-end-condition` — A hide names one end condition](#metricsa-hide-names-one-end-condition--a-hide-names-one-end-condition)
   - [`metrics:a-suppression-hides-a-reminder-and-never-a-number` — A suppression hides a reminder and never a number](#metricsa-suppression-hides-a-reminder-and-never-a-number--a-suppression-hides-a-reminder-and-never-a-number)
   - [`metrics:a-suppression-is-announced-in-the-view-it-hides` — A suppression is announced in the view it hides](#metricsa-suppression-is-announced-in-the-view-it-hides--a-suppression-is-announced-in-the-view-it-hides)
   - [`metrics:a-marked-row-is-never-acted-on-without-an-answer` — A marked row is never acted on without an answer](#metricsa-marked-row-is-never-acted-on-without-an-answer--a-marked-row-is-never-acted-on-without-an-answer)
   - [`metrics:only-a-delivered-close-counts` — Only a delivered close counts](#metricsonly-a-delivered-close-counts--only-a-delivered-close-counts)
   - [`metrics:an-empty-window-renders-at-zero` — An empty window renders at zero](#metricsan-empty-window-renders-at-zero--an-empty-window-renders-at-zero)
   - [`metrics:a-changed-cadence-restarts-the-series` — A changed cadence restarts the series](#metricsa-changed-cadence-restarts-the-series--a-changed-cadence-restarts-the-series)
+- [The three flow measures](#the-three-flow-measures)
+- [Suppressions](#suppressions)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -66,6 +68,18 @@ The implementation MUST read the clock once per invocation and MUST use that ins
 - GIVEN several entries with open intervals
 - WHEN the fold runs
 - THEN all of them are measured against one instant, because two clock reads make one report internally inconsistent
+
+Verify: `cargo nextest run --test metrics`
+
+### `metrics:a-duration-is-shown-in-whole-days` — A duration is shown in whole days
+
+When a view displays a flow duration, it MUST show it in whole days, floored.
+
+#### Scenario: An entry entered review 36 hours ago
+
+- GIVEN an open dwell of one day and twelve hours
+- WHEN the flow table renders
+- THEN it shows 1, because a floored day never claims time that has not passed
 
 Verify: `cargo nextest run --test metrics`
 
@@ -170,6 +184,18 @@ When an operator hides or shows a stale row, the implementation MUST write only 
 - GIVEN two machines attached to the same plan
 - WHEN an operator hides one stale row on the first machine
 - THEN the second machine still shows the row, because a local reminder is not a team decision
+
+Verify: `cargo nextest run --test metrics`
+
+### `metrics:a-hide-names-one-end-condition` — A hide names one end condition
+
+A hide request MUST name an existing entry and exactly one end condition, or fail as a usage error naming both flags, and only the hide and show forms MUST write the suppression file, while a read path ignores and reports a suppression whose id names no entry.
+
+#### Scenario: A hide names no duration
+
+- GIVEN `wipctl stale --hide the-stale-alarm` with neither `--for` nor `--forever`
+- WHEN the verb parses it
+- THEN it exits 2 naming both flags, because a default duration is a value nobody chose
 
 Verify: `cargo nextest run --test metrics`
 

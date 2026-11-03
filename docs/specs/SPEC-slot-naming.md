@@ -3,20 +3,20 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [Deriving the project slug](#deriving-the-project-slug)
-- [Slot states](#slot-states)
-- [Open question](#open-question)
 - [Requirements](#requirements)
   - [`slot-naming:a-slot-name-is-minted-once` — A slot name is minted once](#slot-naminga-slot-name-is-minted-once--a-slot-name-is-minted-once)
+  - [`slot-naming:an-empty-or-repeated-segment-is-skipped` — An empty or repeated segment is skipped](#slot-namingan-empty-or-repeated-segment-is-skipped--an-empty-or-repeated-segment-is-skipped)
+  - [`slot-naming:a-minted-name-is-stable` — A minted name is stable](#slot-naminga-minted-name-is-stable--a-minted-name-is-stable)
+  - [`slot-naming:a-slot-name-is-one-opaque-token` — A slot name is one opaque token](#slot-naminga-slot-name-is-one-opaque-token--a-slot-name-is-one-opaque-token)
   - [`slot-naming:a-project-slug-follows-one-ladder` — A project slug follows one ladder](#slot-naminga-project-slug-follows-one-ladder--a-project-slug-follows-one-ladder)
   - [`slot-naming:a-derived-slug-decides-only-at-mint-time` — A derived slug decides only at mint time](#slot-naminga-derived-slug-decides-only-at-mint-time--a-derived-slug-decides-only-at-mint-time)
   - [`slot-naming:drift-is-a-healthy-state` — Drift is a healthy state](#slot-namingdrift-is-a-healthy-state--drift-is-a-healthy-state)
   - [`slot-naming:a-slot-name-is-recorded-only-as-the-directory` — A slot name is recorded only as the directory](#slot-naminga-slot-name-is-recorded-only-as-the-directory--a-slot-name-is-recorded-only-as-the-directory)
   - [`slot-naming:a-slot-name-never-replicates` — A slot name never replicates](#slot-naminga-slot-name-never-replicates--a-slot-name-never-replicates)
   - [`slot-naming:a-taken-name-escalates` — A taken name escalates](#slot-naminga-taken-name-escalates--a-taken-name-escalates)
-  - [`slot-naming:an-empty-or-repeated-segment-is-skipped` — An empty or repeated segment is skipped](#slot-namingan-empty-or-repeated-segment-is-skipped--an-empty-or-repeated-segment-is-skipped)
-  - [`slot-naming:a-minted-name-is-stable` — A minted name is stable](#slot-naminga-minted-name-is-stable--a-minted-name-is-stable)
-  - [`slot-naming:a-slot-name-is-one-opaque-token` — A slot name is one opaque token](#slot-naminga-slot-name-is-one-opaque-token--a-slot-name-is-one-opaque-token)
+- [Deriving the project slug](#deriving-the-project-slug)
+- [Slot states](#slot-states)
+- [Open question](#open-question)
 
 <!--TOC-->
 
@@ -88,7 +88,7 @@ Verify: reviewer confirms no code splits a slot name to recover forge facts
 
 ### `slot-naming:a-project-slug-follows-one-ladder` — A project slug follows one ladder
 
-When a project slug is needed, the implementation MUST use the first available source in the stated derivation ladder.
+When a project slug is needed, the implementation MUST use the first available source of the ladder: the main worktree's forge project name, then the main worktree's directory name, then the directory holding `.wipctl/project.toml`.
 
 #### Scenario: A project has several worktrees
 
@@ -148,7 +148,7 @@ Verify: `cargo nextest run --test attachment`
 
 ### `slot-naming:a-taken-name-escalates` — A taken name escalates
 
-When a candidate slot name is taken, the implementation MUST apply the postfix escalation until it finds a free name.
+When a candidate slot name is taken, the implementation MUST add, in order, the parent scope, the username, the forge, and then `01`, `02`, and the first free sequential number, until it finds a free name.
 
 #### Scenario: A peer derives a name already in use
 

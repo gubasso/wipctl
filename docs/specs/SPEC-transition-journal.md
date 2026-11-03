@@ -3,7 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [Format](#format)
 - [Requirements](#requirements)
   - [`transition-journal:the-program-records-transitions` — The program records transitions](#transition-journalthe-program-records-transitions--the-program-records-transitions)
   - [`transition-journal:an-event-is-three-non-empty-fields` — An event is three non-empty fields](#transition-journalan-event-is-three-non-empty-fields--an-event-is-three-non-empty-fields)
@@ -16,6 +15,7 @@
   - [`transition-journal:reopening-strips-the-close` — Reopening strips the close](#transition-journalreopening-strips-the-close--reopening-strips-the-close)
   - [`transition-journal:a-tombstone-is-a-terminal-journal` — A tombstone is a terminal journal](#transition-journala-tombstone-is-a-terminal-journal--a-tombstone-is-a-terminal-journal)
   - [`transition-journal:the-journal-records-no-reason` — The journal records no reason](#transition-journalthe-journal-records-no-reason--the-journal-records-no-reason)
+- [Format](#format)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -52,7 +52,7 @@ Verify: `cargo nextest run --test validation`
 
 ### `transition-journal:an-instant-is-one-textual-form` — An instant is one textual form
 
-Every instant MUST be a valid coordinated universal time in the stated textual form, at second precision.
+Every instant MUST be a valid coordinated universal time in the one textual form `YYYY-MM-DDTHH:MM:SSZ`, at second precision.
 
 #### Scenario: A journal is sorted
 

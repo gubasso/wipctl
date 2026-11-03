@@ -3,16 +3,14 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The five reconciliation cases](#the-five-reconciliation-cases)
-- [The batch run](#the-batch-run)
-- [When the transport cannot finish](#when-the-transport-cannot-finish)
 - [Requirements](#requirements)
   - [`sync:the-batch-runs-in-four-passes` — The batch runs in four passes](#syncthe-batch-runs-in-four-passes--the-batch-runs-in-four-passes)
   - [`sync:the-batch-publishes-only-what-it-verified` — The batch publishes only what it verified](#syncthe-batch-publishes-only-what-it-verified--the-batch-publishes-only-what-it-verified)
   - [`sync:the-batch-holds-one-lock-at-a-time` — The batch holds one lock at a time](#syncthe-batch-holds-one-lock-at-a-time--the-batch-holds-one-lock-at-a-time)
+  - [`sync:a-batch-reports-each-slot-in-a-stated-order` — A batch reports each slot in a stated order](#synca-batch-reports-each-slot-in-a-stated-order--a-batch-reports-each-slot-in-a-stated-order)
   - [`sync:the-aggregate-exit-code-has-a-precedence` — The aggregate exit code has a precedence](#syncthe-aggregate-exit-code-has-a-precedence--the-aggregate-exit-code-has-a-precedence)
   - [`sync:reconciliation-is-semantic-never-textual` — Reconciliation is semantic, never textual](#syncreconciliation-is-semantic-never-textual--reconciliation-is-semantic-never-textual)
-  - [`sync:two-minted-identities-are-reported` — Two minted identities are reported, never merged](#synctwo-minted-identities-are-reported--two-minted-identities-are-reported-never-merged)
+  - [`sync:two-minted-identities-are-reported` — Two minted identities are reported and settled](#synctwo-minted-identities-are-reported--two-minted-identities-are-reported-and-settled)
   - [`sync:the-reconciliation-runs-under-the-lock` — The reconciliation runs under the lock](#syncthe-reconciliation-runs-under-the-lock--the-reconciliation-runs-under-the-lock)
   - [`sync:a-conflict-stops-the-push` — A conflict stops the push](#synca-conflict-stops-the-push--a-conflict-stops-the-push)
   - [`sync:a-conflict-names-both-sides` — A conflict names both sides](#synca-conflict-names-both-sides--a-conflict-names-both-sides)
@@ -22,6 +20,9 @@
   - [`sync:a-person-decides-a-conflict` — A person decides a conflict](#synca-person-decides-a-conflict--a-person-decides-a-conflict)
   - [`sync:the-discarded-event-never-enters-the-journal` — The discarded event never enters the journal](#syncthe-discarded-event-never-enters-the-journal--the-discarded-event-never-enters-the-journal)
   - [`sync:a-resolution-names-an-open-conflict` — A resolution names an open conflict](#synca-resolution-names-an-open-conflict--a-resolution-names-an-open-conflict)
+- [The five reconciliation cases](#the-five-reconciliation-cases)
+- [The batch run](#the-batch-run)
+- [When the transport cannot finish](#when-the-transport-cannot-finish)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -67,6 +68,18 @@ The batch MUST hold one writer lock at a time, and MUST report a slot whose boun
 - THEN that slot alone is reported and the rest of the run proceeds, and no ordering of slots can deadlock against that agent
 
 Verify: `cargo nextest run --test writer_guarantees`
+
+### `sync:a-batch-reports-each-slot-in-a-stated-order` — A batch reports each slot in a stated order
+
+Under the batch flag, replication MUST visit this plan first and then each plan in the order it was first declared, and MUST report each slot's outcome as one of up to date, advanced, reconciled, failed, or locked.
+
+#### Scenario: Two rows reach one plan
+
+- GIVEN a declared set where two rows reach `platform`
+- WHEN `wipctl sync --all` runs
+- THEN `platform` is visited once, at the position of its first declaration, and its line names one of the five outcomes
+
+Verify: `cargo nextest run --test sync`
 
 ### `sync:the-aggregate-exit-code-has-a-precedence` — The aggregate exit code has a precedence
 

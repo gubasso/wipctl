@@ -3,8 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The two diagnostic classes](#the-two-diagnostic-classes)
-- [The closure the checker reads](#the-closure-the-checker-reads)
 - [Requirements](#requirements)
   - [`validation:every-check-has-one-owner` — Every check has one owner](#validationevery-check-has-one-owner--every-check-has-one-owner)
   - [`validation:the-read-set-is-attached-or-the-run-fails` — The read set is attached, or the run fails](#validationthe-read-set-is-attached-or-the-run-fails--the-read-set-is-attached-or-the-run-fails)
@@ -22,6 +20,8 @@
   - [`validation:the-verb-takes-no-argument` — The validation verb takes no argument](#validationthe-verb-takes-no-argument--the-validation-verb-takes-no-argument)
   - [`validation:success-prints-the-census` — Success prints the census](#validationsuccess-prints-the-census--success-prints-the-census)
   - [`validation:a-broken-install-is-not-a-skip` — A broken install is not a skip](#validationa-broken-install-is-not-a-skip--a-broken-install-is-not-a-skip)
+- [The two diagnostic classes](#the-two-diagnostic-classes)
+- [The closure the checker reads](#the-closure-the-checker-reads)
 - [Unenforced rules](#unenforced-rules)
 - [Diagnostics](#diagnostics)
 

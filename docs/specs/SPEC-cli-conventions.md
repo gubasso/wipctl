@@ -3,8 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [Exit codes](#exit-codes)
-- [The verb surface](#the-verb-surface)
 - [Requirements](#requirements)
   - [`cli-conventions:the-exit-code-is-an-interface` — The exit code is an interface](#cli-conventionsthe-exit-code-is-an-interface--the-exit-code-is-an-interface)
   - [`cli-conventions:stdout-carries-data-alone` — Stdout carries data alone](#cli-conventionsstdout-carries-data-alone--stdout-carries-data-alone)
@@ -22,6 +20,8 @@
   - [`cli-conventions:an-absent-verb-is-declared` — An absent verb is declared](#cli-conventionsan-absent-verb-is-declared--an-absent-verb-is-declared)
   - [`cli-conventions:the-version-is-one-bare-string` — The version is one bare string](#cli-conventionsthe-version-is-one-bare-string--the-version-is-one-bare-string)
   - [`cli-conventions:completion-derives-its-candidates` — Completion derives its candidates](#cli-conventionscompletion-derives-its-candidates--completion-derives-its-candidates)
+- [Exit codes](#exit-codes)
+- [The verb surface](#the-verb-surface)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -34,7 +34,7 @@ One command with capabilities as verbs, and the rules that bind every one of the
 
 ### `cli-conventions:the-exit-code-is-an-interface` — The exit code is an interface
 
-Every verb MUST use the four exit codes as stated, and a warning MUST NOT reach an exit code.
+Every verb MUST use the four exit codes, 0 when the command did what was asked, 1 when a check it performs did not hold, 2 when the invocation was wrong, and 3 when the writer lock was not acquired within the bounded wait, and a warning MUST NOT reach an exit code.
 
 #### Scenario: A caller retries on a failed check
 
@@ -82,7 +82,7 @@ Verify: `cargo nextest run --test verb_contracts`
 
 ### `cli-conventions:the-verb-names-are-fixed` — The verb names are fixed
 
-The implementation MUST use the verb names and the usage grammar this specification states, for every capability it ships.
+The implementation MUST use the verb names and the usage grammar that [the verb surface](#the-verb-surface) states, for every capability it ships.
 
 #### Scenario: An implementation renames a verb it finds clearer
 

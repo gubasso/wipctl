@@ -3,12 +3,11 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [Grammar and slugification](#grammar-and-slugification)
-- [An id and a prefixed id](#an-id-and-a-prefixed-id)
 - [Requirements](#requirements)
   - [`ids:one-id-names-one-thing` — One id names one thing](#idsone-id-names-one-thing--one-id-names-one-thing)
   - [`ids:a-title-and-its-id-always-match` — A title and its id always match](#idsa-title-and-its-id-always-match--a-title-and-its-id-always-match)
   - [`ids:slugification-is-stated-once` — Slugification is stated once](#idsslugification-is-stated-once--slugification-is-stated-once)
+  - [`ids:an-id-follows-one-grammar` — An id follows one grammar](#idsan-id-follows-one-grammar--an-id-follows-one-grammar)
   - [`ids:the-id-is-the-filename` — The id is the filename](#idsthe-id-is-the-filename--the-id-is-the-filename)
   - [`ids:an-id-is-opaque-to-every-consumer` — An id is opaque to every consumer](#idsan-id-is-opaque-to-every-consumer--an-id-is-opaque-to-every-consumer)
   - [`ids:a-prefixed-id-is-split-once` — A prefixed id is split once](#idsa-prefixed-id-is-split-once--a-prefixed-id-is-split-once)
@@ -18,6 +17,8 @@
   - [`ids:a-counter-is-forbidden-across-machines` — A counter is forbidden across machines](#idsa-counter-is-forbidden-across-machines--a-counter-is-forbidden-across-machines)
   - [`ids:a-freed-id-is-burned` — A freed id is burned](#idsa-freed-id-is-burned--a-freed-id-is-burned)
   - [`ids:a-burned-id-is-refused-at-the-mint` — A burned id is refused at the mint](#idsa-burned-id-is-refused-at-the-mint--a-burned-id-is-refused-at-the-mint)
+- [Grammar and slugification](#grammar-and-slugification)
+- [An id and a prefixed id](#an-id-and-a-prefixed-id)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -61,6 +62,18 @@ The implementation MUST use one slugification function for the mint, the rename,
 - GIVEN an apostrophe in a title
 - WHEN each consumer slugifies it
 - THEN all three remove it rather than hyphenate it, because three implementations of one function is how an id and a title come to disagree
+
+Verify: `cargo nextest run --test ids`
+
+### `ids:an-id-follows-one-grammar` — An id follows one grammar
+
+Every id MUST match `[a-z0-9]+(-[a-z0-9]+)*`, a question id MUST carry that grammar behind the fixed prefix `Q-`, and the slug function MUST apply, in order, the four steps that [the grammar](#grammar-and-slugification) lists.
+
+#### Scenario: A title carries an apostrophe
+
+- GIVEN the title `Don't drop the cache`
+- WHEN the mint slugifies it
+- THEN the id is `dont-drop-the-cache`, because the apostrophe is removed before the other runs become hyphens
 
 Verify: `cargo nextest run --test ids`
 

@@ -3,7 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [Relaying another tool's output](#relaying-another-tools-output)
 - [Requirements](#requirements)
   - [`messages:a-failure-names-its-resolution` — A failure names its resolution](#messagesa-failure-names-its-resolution--a-failure-names-its-resolution)
   - [`messages:a-warning-names-its-resolution` — A warning names its resolution](#messagesa-warning-names-its-resolution--a-warning-names-its-resolution)
@@ -15,6 +14,7 @@
   - [`messages:a-message-offers-no-undefined-flag` — A message offers no undefined flag](#messagesa-message-offers-no-undefined-flag--a-message-offers-no-undefined-flag)
   - [`messages:a-message-is-never-a-bare-code` — A message is never a bare code](#messagesa-message-is-never-a-bare-code--a-message-is-never-a-bare-code)
   - [`messages:the-text-is-stable-enough-to-match` — The text is stable enough to match](#messagesthe-text-is-stable-enough-to-match--the-text-is-stable-enough-to-match)
+- [Relaying another tool's output](#relaying-another-tools-output)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -108,7 +108,7 @@ Verify: `cargo nextest run --test verb_contracts`
 
 ### `messages:relayed-output-is-redacted-and-bounded` — Relayed output is redacted and bounded
 
-When a verb relays another tool's output, it MUST redact credentials, escape control bytes, bound the excerpt, and keep the whole in a named file.
+When a verb relays another tool's output, it MUST redact credentials, escape control bytes, bound the excerpt to the first 200 lines, and keep the whole in a named file.
 
 #### Scenario: A failing fetch prints a url carrying a credential
 

@@ -3,9 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [Payload inventory](#payload-inventory)
-- [The host pointer](#the-host-pointer)
-- [The stale conversation](#the-stale-conversation)
 - [Requirements](#requirements)
   - [`scaffold:the-host-receives-one-file` — The host receives one file](#scaffoldthe-host-receives-one-file--the-host-receives-one-file)
   - [`scaffold:the-payload-names-no-documentation-method` — The payload names no documentation method](#scaffoldthe-payload-names-no-documentation-method--the-payload-names-no-documentation-method)
@@ -20,6 +17,9 @@
   - [`scaffold:the-hook-set-is-printable-and-checked` — The hook set is printable and checked](#scaffoldthe-hook-set-is-printable-and-checked--the-hook-set-is-printable-and-checked)
   - [`scaffold:the-host-pointer-names-a-command-and-not-a-path` — The host pointer names a command and not a path](#scaffoldthe-host-pointer-names-a-command-and-not-a-path--the-host-pointer-names-a-command-and-not-a-path)
   - [`scaffold:the-host-pointer-is-placed-where-the-operator-says` — The host pointer is placed where the operator says](#scaffoldthe-host-pointer-is-placed-where-the-operator-says--the-host-pointer-is-placed-where-the-operator-says)
+- [Payload inventory](#payload-inventory)
+- [The host pointer](#the-host-pointer)
+- [The stale conversation](#the-stale-conversation)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -119,6 +119,7 @@ The subjects, each taught from zero:
 - replication, and when to run it
 - the reference split: inbound, outbound, the promise marker, the optional typed rule delta, and the acceptance transfer as a same-unit-of-review obligation
 - the gate commands, their exit codes, and the explicit list of what no gate catches
+- the stale conversation: its five steps in order, and its action vocabulary
 
 Verify: reviewer confirms the landed document covers each subject the list names
 

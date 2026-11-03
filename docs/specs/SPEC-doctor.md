@@ -3,7 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The dependency manifest](#the-dependency-manifest)
 - [Requirements](#requirements)
   - [`doctor:a-manifest-item-is-one-line` — A manifest item is one line](#doctora-manifest-item-is-one-line--a-manifest-item-is-one-line)
   - [`doctor:a-missing-item-names-its-remediation` — A missing item names its remediation](#doctora-missing-item-names-its-remediation--a-missing-item-names-its-remediation)
@@ -13,6 +12,7 @@
   - [`doctor:the-report-covers-the-plan-machinery` — The report covers the plan machinery](#doctorthe-report-covers-the-plan-machinery--the-report-covers-the-plan-machinery)
   - [`doctor:a-new-optional-tool-lands-whole` — A new optional tool lands whole](#doctora-new-optional-tool-lands-whole--a-new-optional-tool-lands-whole)
   - [`doctor:a-drifted-slot-is-healthy` — A drifted slot is healthy](#doctora-drifted-slot-is-healthy--a-drifted-slot-is-healthy)
+- [The dependency manifest](#the-dependency-manifest)
 - [Slot diagnostics](#slot-diagnostics)
 
 <!--TOC-->

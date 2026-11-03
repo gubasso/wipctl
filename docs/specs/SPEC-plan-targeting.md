@@ -3,17 +3,17 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The flag](#the-flag)
-- [The third resolution path](#the-third-resolution-path)
-- [The dispatch matrix](#the-dispatch-matrix)
-- [Parity, and what it costs](#parity-and-what-it-costs)
-- [What it does not change](#what-it-does-not-change)
 - [Requirements](#requirements)
   - [`plan-targeting:the-flag-selects-from-this-plans-table` — The flag selects from this plan's table](#plan-targetingthe-flag-selects-from-this-plans-table--the-flag-selects-from-this-plans-table)
   - [`plan-targeting:a-verb-that-resolves-nothing-refuses-it` — A verb that resolves nothing refuses the flag](#plan-targetinga-verb-that-resolves-nothing-refuses-it--a-verb-that-resolves-nothing-refuses-the-flag)
   - [`plan-targeting:the-dispatch-matrix-is-derived` — The dispatch matrix is derived](#plan-targetingthe-dispatch-matrix-is-derived--the-dispatch-matrix-is-derived)
   - [`plan-targeting:the-target-owns-the-lock-and-the-commit` — The target owns the lock and the commit](#plan-targetingthe-target-owns-the-lock-and-the-commit--the-target-owns-the-lock-and-the-commit)
   - [`plan-targeting:the-flag-names-one-plan` — The flag names one plan](#plan-targetingthe-flag-names-one-plan--the-flag-names-one-plan)
+- [The flag](#the-flag)
+- [The third resolution path](#the-third-resolution-path)
+- [The dispatch matrix](#the-dispatch-matrix)
+- [Parity, and what it costs](#parity-and-what-it-costs)
+- [What it does not change](#what-it-does-not-change)
 - [Diagnostics](#diagnostics)
 
 <!--TOC-->

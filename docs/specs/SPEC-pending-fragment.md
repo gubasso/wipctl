@@ -3,7 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [File shape](#file-shape)
 - [Requirements](#requirements)
   - [`pending-fragment:a-fragment-claims-a-planning-lane` — A fragment claims a planning lane](#pending-fragmenta-fragment-claims-a-planning-lane--a-fragment-claims-a-planning-lane)
   - [`pending-fragment:the-capture-instant-orders-the-drain` — The capture instant orders the drain](#pending-fragmentthe-capture-instant-orders-the-drain--the-capture-instant-orders-the-drain)
@@ -14,6 +13,7 @@
   - [`pending-fragment:a-claimed-document-is-not-an-orphan` — A claimed document is not an orphan](#pending-fragmenta-claimed-document-is-not-an-orphan--a-claimed-document-is-not-an-orphan)
   - [`pending-fragment:a-fragment-id-is-not-a-duplicate` — A fragment id is not a duplicate](#pending-fragmenta-fragment-id-is-not-a-duplicate--a-fragment-id-is-not-a-duplicate)
   - [`pending-fragment:the-drain-reports-drift-and-repairs-none` — The drain reports drift and repairs none](#pending-fragmentthe-drain-reports-drift-and-repairs-none--the-drain-reports-drift-and-repairs-none)
+- [File shape](#file-shape)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -38,7 +38,7 @@ Verify: `cargo nextest run --test schemas`
 
 ### `pending-fragment:the-capture-instant-orders-the-drain` — The capture instant orders the drain
 
-A fragment MUST state the capture instant in the stated timestamp form, and the drain MUST order by it.
+A fragment MUST state the capture instant in the journal's textual form, `YYYY-MM-DDTHH:MM:SSZ`, and the drain MUST order by it.
 
 #### Scenario: Two machines capture while apart
 

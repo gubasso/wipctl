@@ -3,10 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The section](#the-section)
-- [Two sets, named once](#two-sets-named-once)
-- [What the table is not](#what-the-table-is-not)
-- [The view](#the-view)
 - [Requirements](#requirements)
   - [`peers:the-view-answers-from-the-table-and-the-slots` — The view answers from the table and the slots](#peersthe-view-answers-from-the-table-and-the-slots--the-view-answers-from-the-table-and-the-slots)
   - [`peers:a-row-carries-a-uid-and-a-location` — A row carries a uid and a location](#peersa-row-carries-a-uid-and-a-location--a-row-carries-a-uid-and-a-location)
@@ -15,6 +11,10 @@
   - [`peers:the-table-is-earned` — The table is earned, never scaffolded](#peersthe-table-is-earned--the-table-is-earned-never-scaffolded)
   - [`peers:a-url-is-used-as-written` — A url is used as written](#peersa-url-is-used-as-written--a-url-is-used-as-written)
   - [`peers:no-check-opens-a-url` — No check opens a url](#peersno-check-opens-a-url--no-check-opens-a-url)
+- [The section](#the-section)
+- [Two sets, named once](#two-sets-named-once)
+- [What the table is not](#what-the-table-is-not)
+- [The view](#the-view)
 - [Diagnostics](#diagnostics)
 
 <!--TOC-->
@@ -27,7 +27,7 @@ The table a plan keeps of the other plans it names. A local alias names each pee
 
 ### `peers:the-view-answers-from-the-table-and-the-slots` — The view answers from the table and the slots
 
-The peer view MUST list every declared row, name whether each is attached and at which revision, and mark an unused row stale.
+The peer view MUST list every declared row, name whether each is attached and at which revision, group this record's prefixed dependencies under the peer they name with each target's lane, mark an unused row stale, and open no url.
 
 #### Scenario: The plan names no peers
 
@@ -87,7 +87,7 @@ Verify: `cargo nextest run --test scaffold`
 
 ### `peers:a-url-is-used-as-written` — A url is used as written
 
-Every url MUST carry an accepted scheme, MUST NOT carry credentials, and MUST reach the replication substrate exactly as the file states it.
+Every url MUST write out the `https` or the `ssh` scheme, MUST carry nothing in its userinfo but a bare account name, so a colon or a percent sign there is refused rather than redacted, and MUST reach the replication substrate exactly as the file states it.
 
 #### Scenario: A machine rewrites one location into another
 

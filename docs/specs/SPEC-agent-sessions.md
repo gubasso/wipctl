@@ -3,6 +3,22 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
+- [Requirements](#requirements)
+  - [`agent-sessions:the-session-system-owns-its-own-state` — The session system owns its own state](#agent-sessionsthe-session-system-owns-its-own-state--the-session-system-owns-its-own-state)
+  - [`agent-sessions:a-session-reference-is-one-token` — A session reference is one token](#agent-sessionsa-session-reference-is-one-token--a-session-reference-is-one-token)
+  - [`agent-sessions:an-adapter-declares-its-operations` — An adapter declares its operations](#agent-sessionsan-adapter-declares-its-operations--an-adapter-declares-its-operations)
+  - [`agent-sessions:capabilities-are-derived-from-the-table` — Capabilities are derived from the table](#agent-sessionscapabilities-are-derived-from-the-table--capabilities-are-derived-from-the-table)
+  - [`agent-sessions:an-adapter-command-is-one-argument-vector` — An adapter command is one argument vector](#agent-sessionsan-adapter-command-is-one-argument-vector--an-adapter-command-is-one-argument-vector)
+  - [`agent-sessions:a-contact-message-travels-on-standard-input` — A contact message travels on standard input](#agent-sessionsa-contact-message-travels-on-standard-input--a-contact-message-travels-on-standard-input)
+  - [`agent-sessions:a-contact-is-bounded-and-never-retried` — A contact is bounded and never retried](#agent-sessionsa-contact-is-bounded-and-never-retried--a-contact-is-bounded-and-never-retried)
+  - [`agent-sessions:contact-needs-no-second-confirmation` — Contact needs no second confirmation](#agent-sessionscontact-needs-no-second-confirmation--contact-needs-no-second-confirmation)
+  - [`agent-sessions:an-unresolved-session-is-unknown` — An unresolved session is unknown](#agent-sessionsan-unresolved-session-is-unknown--an-unresolved-session-is-unknown)
+  - [`agent-sessions:liveness-is-three-valued` — Liveness is three-valued](#agent-sessionsliveness-is-three-valued--liveness-is-three-valued)
+  - [`agent-sessions:a-reading-never-gates` — A reading never gates](#agent-sessionsa-reading-never-gates--a-reading-never-gates)
+  - [`agent-sessions:a-reading-carries-its-instant` — A reading carries its instant](#agent-sessionsa-reading-carries-its-instant--a-reading-carries-its-instant)
+  - [`agent-sessions:a-runtime-secret-stays-out-of-the-reading` — A runtime secret stays out of the reading](#agent-sessionsa-runtime-secret-stays-out-of-the-reading--a-runtime-secret-stays-out-of-the-reading)
+  - [`agent-sessions:adapter-runtime-state-is-private` — Adapter runtime state is private](#agent-sessionsadapter-runtime-state-is-private--adapter-runtime-state-is-private)
+  - [`agent-sessions:resume-is-an-explicit-native-operation` — Resume is an explicit native operation](#agent-sessionsresume-is-an-explicit-native-operation--resume-is-an-explicit-native-operation)
 - [The declared adapter](#the-declared-adapter)
 - [The reference](#the-reference)
 - [Capability discovery](#capability-discovery)
@@ -10,18 +26,6 @@
 - [The contact operation](#the-contact-operation)
 - [The resume operation](#the-resume-operation)
 - [Runtime addresses and credentials](#runtime-addresses-and-credentials)
-- [Requirements](#requirements)
-  - [`agent-sessions:the-session-system-owns-its-own-state` — The session system owns its own state](#agent-sessionsthe-session-system-owns-its-own-state--the-session-system-owns-its-own-state)
-  - [`agent-sessions:a-session-reference-is-one-token` — A session reference is one token](#agent-sessionsa-session-reference-is-one-token--a-session-reference-is-one-token)
-  - [`agent-sessions:an-adapter-declares-its-operations` — An adapter declares its operations](#agent-sessionsan-adapter-declares-its-operations--an-adapter-declares-its-operations)
-  - [`agent-sessions:an-adapter-command-is-one-argument-vector` — An adapter command is one argument vector](#agent-sessionsan-adapter-command-is-one-argument-vector--an-adapter-command-is-one-argument-vector)
-  - [`agent-sessions:a-contact-message-travels-on-standard-input` — A contact message travels on standard input](#agent-sessionsa-contact-message-travels-on-standard-input--a-contact-message-travels-on-standard-input)
-  - [`agent-sessions:contact-needs-no-second-confirmation` — Contact needs no second confirmation](#agent-sessionscontact-needs-no-second-confirmation--contact-needs-no-second-confirmation)
-  - [`agent-sessions:an-unresolved-session-is-unknown` — An unresolved session is unknown](#agent-sessionsan-unresolved-session-is-unknown--an-unresolved-session-is-unknown)
-  - [`agent-sessions:a-reading-never-gates` — A reading never gates](#agent-sessionsa-reading-never-gates--a-reading-never-gates)
-  - [`agent-sessions:a-reading-carries-its-instant` — A reading carries its instant](#agent-sessionsa-reading-carries-its-instant--a-reading-carries-its-instant)
-  - [`agent-sessions:a-runtime-secret-stays-out-of-the-reading` — A runtime secret stays out of the reading](#agent-sessionsa-runtime-secret-stays-out-of-the-reading--a-runtime-secret-stays-out-of-the-reading)
-  - [`agent-sessions:resume-is-an-explicit-native-operation` — Resume is an explicit native operation](#agent-sessionsresume-is-an-explicit-native-operation--resume-is-an-explicit-native-operation)
 - [Diagnostics](#diagnostics)
 - [Unenforced rules](#unenforced-rules)
 
@@ -71,9 +75,21 @@ A session adapter MUST declare at least one of `inspect`, `contact`, and `resume
 
 Verify: `cargo nextest run --test schemas`
 
+### `agent-sessions:capabilities-are-derived-from-the-table` — Capabilities are derived from the table
+
+When a reader reports a session, it MUST derive the supported operation names from the keys the adapter table carries, in the fixed order `inspect`, `contact`, `resume`, MUST carry that list on every session row of a detail report, MUST store it nowhere, and MUST read it as technical availability and never as permission.
+
+#### Scenario: A peer can only be resumed
+
+- GIVEN an adapter table that declares `resume` alone
+- WHEN a detail report lists a session claimed through it
+- THEN the row carries the list `resume`, so a reader tells it from an inspectable or a contactable peer without opening the configuration
+
+Verify: `cargo nextest run --test reporting`
+
 ### `agent-sessions:an-adapter-command-is-one-argument-vector` — An adapter command is one argument vector
 
-Each declared operation MUST be an argument vector of at least two non-empty strings, with an executable first and exactly one later item equal to `{key}`.
+Each declared operation MUST be an argument vector of at least two non-empty strings, with an executable first, exactly one later item equal to `{key}`, and no item carrying another placeholder.
 
 #### Scenario: A command is written as one shell string
 
@@ -85,7 +101,7 @@ Verify: `cargo nextest run --test schemas`
 
 ### `agent-sessions:a-contact-message-travels-on-standard-input` — A contact message travels on standard input
 
-A contact message MUST be passed as UTF-8 on standard input through end of file, and contact success MUST mean native acceptance or queuing alone.
+A contact message MUST be passed as UTF-8 on standard input through end of file, MUST appear in no argument vector, configuration file, or part of the plan record, and contact success MUST mean native acceptance or queuing alone.
 
 #### Scenario: A message is placed in the argument vector
 
@@ -95,9 +111,21 @@ A contact message MUST be passed as UTF-8 on standard input through end of file,
 
 Verify: `cargo nextest run --test verb_contracts`
 
+### `agent-sessions:a-contact-is-bounded-and-never-retried` — A contact is bounded and never retried
+
+When a caller runs a contact command, it MUST apply a bounded timeout, MUST report a nonzero exit, a timeout, a signal, or a missing executable as a failed contact, MUST ignore standard output, MUST read standard error as prose, and MUST NOT retry automatically.
+
+#### Scenario: A contact times out
+
+- GIVEN a native inbox that accepted the message and then stalled
+- WHEN the bounded timeout expires
+- THEN the contact is reported failed and is not sent again, because native acceptance need not be idempotent and a retry can deliver the message twice
+
+Verify: `cargo nextest run --test verb_contracts`
+
 ### `agent-sessions:contact-needs-no-second-confirmation` — Contact needs no second confirmation
 
-Where the invoking host authorizes the declared contact command, an agent MAY invoke it without a separate wipctl confirmation, and the receiving session's inbound policy and authority stay unchanged.
+Where the invoking host authorizes the declared contact command, an agent MAY invoke it without a separate wipctl confirmation, and an inbound message MUST carry information and no consent, leaving the receiving session's inbound policy and authority unchanged.
 
 #### Scenario: An agent answers a peer mid-session
 
@@ -109,13 +137,25 @@ Verify: `cargo nextest run --test verb_contracts`
 
 ### `agent-sessions:an-unresolved-session-is-unknown` — An unresolved session is unknown
 
-Where a declared inspect operation fails or returns no evidence, the reading MUST be reported as unknown, distinct from a session the adapter found ended and from an adapter that declares no inspect operation.
+Where a declared inspect operation fails, times out, emits an invalid object, or returns no evidence, the reading MUST be reported as unknown and stamped with the instant of that failure, distinct from a session the adapter found ended and from the null reading of an adapter that declares no inspect operation.
 
 #### Scenario: The inspect command is not installed on this machine
 
 - GIVEN a claim whose adapter declares inspection and whose executable is absent
 - WHEN the detail view renders
 - THEN the row carries an unknown reading with its instant, because an inability to look is a statement about the reader and not about the session
+
+Verify: `cargo nextest run --test schemas`
+
+### `agent-sessions:liveness-is-three-valued` — Liveness is three-valued
+
+A reading's state MUST be one of `active`, `ended`, and `unknown`, and a provider distinction such as idle, executing, or streaming MUST stay in the optional opaque activity.
+
+#### Scenario: A provider reports an idle session
+
+- GIVEN a session system that tells idle from executing
+- WHEN its adapter writes a reading
+- THEN the state is `active` and the distinction sits in `activity`, because an `idle` state beside `active` makes the two values overlap
 
 Verify: `cargo nextest run --test schemas`
 
@@ -145,7 +185,7 @@ Verify: `cargo nextest run --test schemas`
 
 ### `agent-sessions:a-runtime-secret-stays-out-of-the-reading` — A runtime secret stays out of the reading
 
-A normalized reading MAY carry a freshly resolved opaque address, and every adapter MUST resolve a credential from protected runtime state when an operation needs one.
+A normalized reading MAY carry a freshly resolved opaque address, every adapter MUST resolve each address and credential an operation needs from session-system or protected runtime state, and a credential MUST stay out of every reading, process argument, plan file, output stream, log, and diagnostic.
 
 #### Scenario: An adapter needs a token to reach its session
 
@@ -155,9 +195,21 @@ A normalized reading MAY carry a freshly resolved opaque address, and every adap
 
 Verify: `cargo nextest run --test schemas`
 
+### `agent-sessions:adapter-runtime-state-is-private` — Adapter runtime state is private
+
+Where an adapter keeps runtime state of its own, that state MUST be per-user, written atomically, closed to other users, and retired when the native session ends or rotates its credentials.
+
+#### Scenario: A second user shares the machine
+
+- GIVEN an adapter that stores a session token for its user
+- WHEN another user on the machine reads the adapter's state
+- THEN they read nothing, because the token reaches a session that user does not own
+
+Verify: reviewer reads how the adapter stores its runtime state, because the adapter is the operator's executable and no test of this project runs it
+
 ### `agent-sessions:resume-is-an-explicit-native-operation` — Resume is an explicit native operation
 
-A resume operation MUST run only when a caller invokes it explicitly, and it MUST preserve the native session system's distinction between attaching, reopening, and starting new work.
+A resume operation MUST run only when a caller invokes it explicitly, it MUST preserve the native session system's distinction between attaching, reopening, and starting new work, and its success MUST mean only that the native resume began.
 
 #### Scenario: A rollup shows an ended session on an overlapping path
 
@@ -260,3 +312,4 @@ Each fault names its own resolution.
 | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
 | `agent-sessions:the-session-system-owns-its-own-state` | Whether a proposed field is volatile session state or a stable declaration is a reading of what it asserts. |
 | `agent-sessions:contact-needs-no-second-confirmation`  | Whether a host authorized the declared command is the host's answer, and this record cannot read it.        |
+| `agent-sessions:adapter-runtime-state-is-private`      | The adapter is the operator's executable, and no test of this project runs it.                              |

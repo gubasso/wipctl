@@ -3,11 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [File shape](#file-shape)
-- [Entry fields](#entry-fields)
-- [Delay cost](#delay-cost)
-- [A dependency that crosses plans](#a-dependency-that-crosses-plans)
-- [Lane semantics](#lane-semantics)
 - [Requirements](#requirements)
   - [`lane-file:the-file-is-the-lane` — The file is the lane](#lane-filethe-file-is-the-lane--the-file-is-the-lane)
   - [`lane-file:an-id-is-unique-across-the-record` — An id is unique across the record](#lane-filean-id-is-unique-across-the-record--an-id-is-unique-across-the-record)
@@ -16,6 +11,7 @@
   - [`lane-file:absent-delay-cost-is-ordinary` — Absent delay cost is ordinary](#lane-fileabsent-delay-cost-is-ordinary--absent-delay-cost-is-ordinary)
   - [`lane-file:a-summary-is-one-bounded-line` — A summary is one bounded line](#lane-filea-summary-is-one-bounded-line--a-summary-is-one-bounded-line)
   - [`lane-file:needs-is-the-only-sequencing-fact` — Dependencies are the only stored sequencing constraint](#lane-fileneeds-is-the-only-sequencing-fact--dependencies-are-the-only-stored-sequencing-constraint)
+  - [`lane-file:a-dependency-may-name-a-peer-entry` — A dependency may name a peer entry](#lane-filea-dependency-may-name-a-peer-entry--a-dependency-may-name-a-peer-entry)
   - [`lane-file:a-prefixed-dependency-is-quoted` — A prefixed dependency is quoted](#lane-filea-prefixed-dependency-is-quoted--a-prefixed-dependency-is-quoted)
   - [`lane-file:an-entry-names-its-epic-and-nothing-higher` — An entry names its epic and nothing higher](#lane-filean-entry-names-its-epic-and-nothing-higher--an-entry-names-its-epic-and-nothing-higher)
   - [`lane-file:a-code-reference-is-stated-never-verified` — A code reference is stated, never verified](#lane-filea-code-reference-is-stated-never-verified--a-code-reference-is-stated-never-verified)
@@ -23,6 +19,11 @@
   - [`lane-file:a-reshaped-close-names-its-successor` — A reshaped close names its successor](#lane-filea-reshaped-close-names-its-successor--a-reshaped-close-names-its-successor)
   - [`lane-file:the-yaml-subset-is-narrow` — The accepted YAML subset is narrow](#lane-filethe-yaml-subset-is-narrow--the-accepted-yaml-subset-is-narrow)
   - [`lane-file:the-closed-lane-is-not-a-terminus` — The closed lane is not a terminus](#lane-filethe-closed-lane-is-not-a-terminus--the-closed-lane-is-not-a-terminus)
+- [File shape](#file-shape)
+- [Entry fields](#entry-fields)
+- [Delay cost](#delay-cost)
+- [A dependency that crosses plans](#a-dependency-that-crosses-plans)
+- [Lane semantics](#lane-semantics)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -114,6 +115,18 @@ The record MUST store hard sequencing constraints only as an entry's dependency 
 - GIVEN a request for a phase or milestone constraint
 - WHEN the dependency list already expresses it
 - THEN the field is refused, because two constraint stores disagree on the first edit
+
+Verify: `cargo nextest run --test validation`
+
+### `lane-file:a-dependency-may-name-a-peer-entry` — A dependency may name a peer entry
+
+A `needs` id MAY carry an alias prefix, `<alias>#<id>`, naming an entry in the peer that the peer table binds to that alias, and the implementation MUST treat both forms as one edge: closed before this entry is eligible.
+
+#### Scenario: A list mixes both forms
+
+- GIVEN `needs: [session-token-parsing, "payments#secure-session-storage"]`
+- WHEN eligibility, the graph, and the acyclicity proof read the entry
+- THEN each treats the two ids identically, because they are the same edge
 
 Verify: `cargo nextest run --test validation`
 

@@ -3,12 +3,12 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The slot repair](#the-slot-repair)
 - [Requirements](#requirements)
   - [`repair:a-slot-repair-moves-local-state-in-order` — A slot repair moves local state in order](#repaira-slot-repair-moves-local-state-in-order--a-slot-repair-moves-local-state-in-order)
   - [`repair:a-slot-repair-locks-both-names` — A slot repair locks both names](#repaira-slot-repair-locks-both-names--a-slot-repair-locks-both-names)
   - [`repair:an-explicit-slot-name-is-free` — An explicit slot name is free](#repairan-explicit-slot-name-is-free--an-explicit-slot-name-is-free)
   - [`repair:a-slot-repair-is-machine-local` — A slot repair is machine-local](#repaira-slot-repair-is-machine-local--a-slot-repair-is-machine-local)
+  - [`repair:a-slot-repair-takes-the-project-underfoot` — A slot repair takes the project underfoot](#repaira-slot-repair-takes-the-project-underfoot--a-slot-repair-takes-the-project-underfoot)
   - [`repair:the-repair-is-deterministic` — The repair is deterministic](#repairthe-repair-is-deterministic--the-repair-is-deterministic)
   - [`repair:the-repair-is-identity-preserving` — The repair is identity-preserving on legal input](#repairthe-repair-is-identity-preserving--the-repair-is-identity-preserving-on-legal-input)
   - [`repair:the-repair-is-idempotent` — The repair is idempotent](#repairthe-repair-is-idempotent--the-repair-is-idempotent)
@@ -20,7 +20,7 @@
   - [`repair:the-repair-never-names-a-plan-or-a-dependency` — The repair never names a plan or a dependency](#repairthe-repair-never-names-a-plan-or-a-dependency--the-repair-never-names-a-plan-or-a-dependency)
   - [`repair:the-slot-report-writes-nothing` — The slot report writes nothing](#repairthe-slot-report-writes-nothing--the-slot-report-writes-nothing)
   - [`repair:the-repair-removes-an-orphaned-suppression` — The repair removes an orphaned suppression](#repairthe-repair-removes-an-orphaned-suppression--the-repair-removes-an-orphaned-suppression)
-- [Unenforced rules](#unenforced-rules)
+- [The slot repair](#the-slot-repair)
 
 <!--TOC-->
 
@@ -77,6 +77,18 @@ When a slot repair runs, the implementation MUST change only this machine's regi
 - THEN no committed file changes and no remote receives a write
 
 Verify: `cargo nextest run --test writer_guarantees`
+
+### `repair:a-slot-repair-takes-the-project-underfoot` — A slot repair takes the project underfoot
+
+When a slot repair runs, the implementation MUST act on the project the working directory resolves to and MUST treat the plan targeting flag as a usage error.
+
+#### Scenario: An operator points the repair at a peer
+
+- GIVEN `wipctl --plan payments fix --registry`
+- WHEN the verb parses it
+- THEN it exits 2 naming the flag and the form, because the slot repair is the one form of `fix` that refuses the flag
+
+Verify: `cargo nextest run --test verb_contracts`
 
 ### `repair:the-repair-is-deterministic` — The repair is deterministic
 

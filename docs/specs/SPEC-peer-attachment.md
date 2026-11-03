@@ -3,20 +3,22 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The writer](#the-writer)
-- [Filling the slots](#filling-the-slots)
 - [Requirements](#requirements)
   - [`peer-attachment:the-command-surface-owns-the-table` — The command surface owns the table](#peer-attachmentthe-command-surface-owns-the-table--the-command-surface-owns-the-table)
   - [`peer-attachment:a-clone-is-verified-before-it-fills-a-slot` — A clone is verified before it fills a slot](#peer-attachmenta-clone-is-verified-before-it-fills-a-slot--a-clone-is-verified-before-it-fills-a-slot)
   - [`peer-attachment:a-fresh-plan-id-is-provisional` — A fresh plan id is provisional](#peer-attachmenta-fresh-plan-id-is-provisional--a-fresh-plan-id-is-provisional)
   - [`peer-attachment:a-row-identity-comes-from-the-clone` — A row identity comes from the clone](#peer-attachmenta-row-identity-comes-from-the-clone--a-row-identity-comes-from-the-clone)
   - [`peer-attachment:the-network-read-is-outside-the-lock` — The network read is outside the lock](#peer-attachmentthe-network-read-is-outside-the-lock--the-network-read-is-outside-the-lock)
+  - [`peer-attachment:a-failed-clone-writes-nothing` — A failed clone writes nothing](#peer-attachmenta-failed-clone-writes-nothing--a-failed-clone-writes-nothing)
   - [`peer-attachment:the-walk-fills-the-declared-set` — The walk fills the declared set](#peer-attachmentthe-walk-fills-the-declared-set--the-walk-fills-the-declared-set)
+  - [`peer-attachment:no-table-is-nothing-to-attach` — No table is nothing to attach](#peer-attachmentno-table-is-nothing-to-attach--no-table-is-nothing-to-attach)
   - [`peer-attachment:the-walk-remembers-where-it-has-been` — The walk remembers where it went](#peer-attachmentthe-walk-remembers-where-it-has-been--the-walk-remembers-where-it-went)
   - [`peer-attachment:a-peer-mints-a-local-slot-name` — A peer mints a local slot name](#peer-attachmenta-peer-mints-a-local-slot-name--a-peer-mints-a-local-slot-name)
   - [`peer-attachment:a-reference-follows-its-alias` — A reference follows its alias](#peer-attachmenta-reference-follows-its-alias--a-reference-follows-its-alias)
   - [`peer-attachment:a-row-in-use-is-not-removed` — A row in use is not removed](#peer-attachmenta-row-in-use-is-not-removed--a-row-in-use-is-not-removed)
   - [`peer-attachment:the-walk-writes-into-no-peer` — The walk writes into no peer](#peer-attachmentthe-walk-writes-into-no-peer--the-walk-writes-into-no-peer)
+- [The writer](#the-writer)
+- [Filling the slots](#filling-the-slots)
 - [Diagnostics](#diagnostics)
 
 <!--TOC-->
@@ -87,6 +89,18 @@ The implementation MUST clone outside every slot, MUST take the writer lock only
 
 Verify: `cargo nextest run --test writer_guarantees`
 
+### `peer-attachment:a-failed-clone-writes-nothing` — A failed clone writes nothing
+
+When the clone of a peer fails, the implementation MUST leave the peer table byte-identical.
+
+#### Scenario: The url does not answer
+
+- GIVEN `wipctl peer add` naming a url that refuses the connection
+- WHEN the clone fails outside the lock
+- THEN the table is byte-identical and no row was written, because a row is written only after its clone is verified
+
+Verify: `cargo nextest run --test attachment`
+
 ### `peer-attachment:the-walk-fills-the-declared-set` — The walk fills the declared set
 
 The walk MUST read each attached peer's own table and MUST continue until every plan in the declared set sits in a slot.
@@ -96,6 +110,18 @@ The walk MUST read each attached peer's own table and MUST continue until every 
 - GIVEN a peer whose own table names a third plan
 - WHEN the walk runs
 - THEN the third plan is attached too, because a check reads slots and never fetches, so the closure is complete before any proof runs
+
+Verify: `cargo nextest run --test attachment`
+
+### `peer-attachment:no-table-is-nothing-to-attach` — No table is nothing to attach
+
+Where the plan configuration declares no peers, the walk MUST exit 0 with one line saying that the plan names no peers.
+
+#### Scenario: A plan with no peers section
+
+- GIVEN a plan configuration without `peers`
+- WHEN `wipctl attach --peers` runs
+- THEN it prints one line saying the plan names no peers and exits 0, because an absent table is the ordinary state of a plan that names no peers
 
 Verify: `cargo nextest run --test attachment`
 

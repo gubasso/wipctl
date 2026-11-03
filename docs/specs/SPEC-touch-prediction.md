@@ -3,14 +3,14 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The field](#the-field)
-- [The relation to the amended paths](#the-relation-to-the-amended-paths)
 - [Requirements](#requirements)
   - [`touch-prediction:an-amended-path-is-a-touched-path` — An amended path is a touched path](#touch-predictionan-amended-path-is-a-touched-path--an-amended-path-is-a-touched-path)
   - [`touch-prediction:a-touch-list-is-stated-never-verified` — A touch list is stated, never verified](#touch-predictiona-touch-list-is-stated-never-verified--a-touch-list-is-stated-never-verified)
   - [`touch-prediction:a-touch-list-is-bounded-and-exact` — A touch list is bounded and exact](#touch-predictiona-touch-list-is-bounded-and-exact--a-touch-list-is-bounded-and-exact)
   - [`touch-prediction:a-prediction-never-sequences-and-never-ranks` — A prediction never sequences and never ranks](#touch-predictiona-prediction-never-sequences-and-never-ranks--a-prediction-never-sequences-and-never-ranks)
   - [`touch-prediction:a-touch-item-is-not-a-pattern` — A touch item is not a pattern](#touch-predictiona-touch-item-is-not-a-pattern--a-touch-item-is-not-a-pattern)
+- [The field](#the-field)
+- [The relation to the amended paths](#the-relation-to-the-amended-paths)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -49,7 +49,7 @@ Verify: `cargo nextest run --test validation`
 
 ### `touch-prediction:a-touch-list-is-bounded-and-exact` — A touch list is bounded and exact
 
-A touch list MUST carry at most 12 unique exact paths, and an empty sequence MUST mean the prediction that no file changes.
+A touch list MUST carry at most 12 unique exact paths, each relative, with no dot segment and no whitespace, resolving against the host's project root as an `Amends` path does, and an empty sequence MUST mean the prediction that no file changes.
 
 #### Scenario: An entry predicts twenty changed files
 

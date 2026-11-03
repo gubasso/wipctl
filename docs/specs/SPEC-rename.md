@@ -3,7 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The write set](#the-write-set)
 - [Requirements](#requirements)
   - [`rename:a-rename-holds-the-invariant` — A rename holds the title and id invariant](#renamea-rename-holds-the-invariant--a-rename-holds-the-title-and-id-invariant)
   - [`rename:a-rename-takes-a-title-an-id-or-both` — A rename takes a title, an id, or both](#renamea-rename-takes-a-title-an-id-or-both--a-rename-takes-a-title-an-id-or-both)
@@ -15,6 +14,7 @@
   - [`rename:a-collision-recovery-rephrases` — A collision recovery rephrases](#renamea-collision-recovery-rephrases--a-collision-recovery-rephrases)
   - [`rename:a-rename-is-narrated-in-revisions` — A rename is narrated in revisions](#renamea-rename-is-narrated-in-revisions--a-rename-is-narrated-in-revisions)
   - [`rename:a-refused-rename-writes-nothing` — A refused rename writes nothing](#renamea-refused-rename-writes-nothing--a-refused-rename-writes-nothing)
+- [The write set](#the-write-set)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -51,7 +51,7 @@ Verify: `cargo nextest run --test verb_contracts`
 
 ### `rename:the-write-set-covers-every-reference` — The write set covers every reference
 
-A rename MUST rewrite every artifact and every reference that names the old id, in one transaction.
+A rename MUST rewrite every artifact and every reference that names the old id, as [the rename write set](#the-write-set) lists, in one transaction.
 
 #### Scenario: A dependency in another lane names the entry
 

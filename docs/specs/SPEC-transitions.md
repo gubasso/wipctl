@@ -3,7 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The move preflight, in order](#the-move-preflight-in-order)
 - [Requirements](#requirements)
   - [`transitions:a-lane-change-is-the-verb` — A lane change is the verb and never an edit](#transitionsa-lane-change-is-the-verb--a-lane-change-is-the-verb-and-never-an-edit)
   - [`transitions:the-preflight-runs-entire-and-in-order` — The preflight runs entire and in order](#transitionsthe-preflight-runs-entire-and-in-order--the-preflight-runs-entire-and-in-order)
@@ -19,6 +18,7 @@
   - [`transitions:taking-work-is-atomic` — Taking work is atomic](#transitionstaking-work-is-atomic--taking-work-is-atomic)
   - [`transitions:taking-prints-what-the-preview-would` — Taking prints what the preview would](#transitionstaking-prints-what-the-preview-would--taking-prints-what-the-preview-would)
   - [`transitions:nothing-startable-terminates-the-loop` — Nothing startable terminates the loop](#transitionsnothing-startable-terminates-the-loop--nothing-startable-terminates-the-loop)
+- [The move preflight, in order](#the-move-preflight-in-order)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -43,7 +43,7 @@ Verify: `cargo nextest run --test validation`
 
 ### `transitions:the-preflight-runs-entire-and-in-order` — The preflight runs entire and in order
 
-The implementation MUST run the whole preflight in the stated order before the first byte, and a refused move MUST leave every file byte-identical.
+The implementation MUST run the whole preflight in the order that [the move preflight](#the-move-preflight-in-order) lists before the first byte, and a refused move MUST leave every file byte-identical.
 
 #### Scenario: An entry enters a work lane with an open dependency
 

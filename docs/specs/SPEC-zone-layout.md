@@ -3,8 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The host file and the four base directories](#the-host-file-and-the-four-base-directories)
-- [The zone](#the-zone)
 - [Requirements](#requirements)
   - [`zone-layout:the-record-lives-under-the-data-directory` — The record lives under the data directory](#zone-layoutthe-record-lives-under-the-data-directory--the-record-lives-under-the-data-directory)
   - [`zone-layout:a-base-directory-default-is-honoured` — A base-directory default is honoured](#zone-layouta-base-directory-default-is-honoured--a-base-directory-default-is-honoured)
@@ -16,6 +14,8 @@
   - [`zone-layout:the-plan-trunk-is-one-branch` — The plan trunk is one branch](#zone-layoutthe-plan-trunk-is-one-branch--the-plan-trunk-is-one-branch)
   - [`zone-layout:plan-history-is-append-only` — Plan history is append-only](#zone-layoutplan-history-is-append-only--plan-history-is-append-only)
   - [`zone-layout:the-shipped-payload-is-never-copied-in` — The shipped payload is never copied into a zone](#zone-layoutthe-shipped-payload-is-never-copied-in--the-shipped-payload-is-never-copied-into-a-zone)
+- [The host file and the four base directories](#the-host-file-and-the-four-base-directories)
+- [The zone](#the-zone)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -40,7 +40,7 @@ Verify: `cargo nextest run --test zone_layout`
 
 ### `zone-layout:a-base-directory-default-is-honoured` — A base-directory default is honoured
 
-Where a base-directory variable is unset, empty, or relative, the implementation MUST use the specification's stated default.
+Where a base-directory variable is unset, empty, or relative, the implementation MUST use its default: `$HOME/.local/share` for data, `$HOME/.local/state` for state, and `$HOME/.cache` for cache.
 
 #### Scenario: A container sets an empty data directory
 
@@ -52,7 +52,7 @@ Verify: `cargo nextest run --test zone_layout`
 
 ### `zone-layout:the-lock-directory-has-a-stated-fallback` — The lock directory has a stated fallback
 
-Where the runtime directory is unset or empty, the implementation MUST use the stated fallback path, create it mode 0700, and warn naming the replacement.
+Where the runtime directory is unset or empty, the implementation MUST use the fallback path `/tmp/wipctl-<uid>/`, create it mode 0700, and warn naming the replacement.
 
 #### Scenario: An agent runs from a cron job
 

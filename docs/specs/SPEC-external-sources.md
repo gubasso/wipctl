@@ -3,8 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The declared source](#the-declared-source)
-- [The reference](#the-reference)
 - [Requirements](#requirements)
   - [`external-sources:the-remote-system-stays-the-source-of-truth` — The remote system stays the source of truth](#external-sourcesthe-remote-system-stays-the-source-of-truth--the-remote-system-stays-the-source-of-truth)
   - [`external-sources:a-source-ref-names-a-declared-alias` — A source reference names a declared alias](#external-sourcesa-source-ref-names-a-declared-alias--a-source-reference-names-a-declared-alias)
@@ -19,6 +17,8 @@
   - [`external-sources:a-missing-source-command-degrades-loudly` — A missing source command degrades loudly](#external-sourcesa-missing-source-command-degrades-loudly--a-missing-source-command-degrades-loudly)
   - [`external-sources:the-view-cache-is-authoritative-for-nothing` — The view cache is authoritative for nothing](#external-sourcesthe-view-cache-is-authoritative-for-nothing--the-view-cache-is-authoritative-for-nothing)
   - [`external-sources:the-report-distinguishes-empty-from-unread` — The report distinguishes empty from unread](#external-sourcesthe-report-distinguishes-empty-from-unread--the-report-distinguishes-empty-from-unread)
+- [The declared source](#the-declared-source)
+- [The reference](#the-reference)
 - [Diagnostics](#diagnostics)
 
 <!--TOC-->

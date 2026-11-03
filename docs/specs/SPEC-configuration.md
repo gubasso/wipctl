@@ -3,11 +3,10 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [Configuration shape](#configuration-shape)
-- [Open question](#open-question)
 - [Requirements](#requirements)
   - [`configuration:no-key-has-a-read-time-default` — No key has a read-time default](#configurationno-key-has-a-read-time-default--no-key-has-a-read-time-default)
   - [`configuration:the-ranking-section-is-required` — The ranking section is required](#configurationthe-ranking-section-is-required--the-ranking-section-is-required)
+  - [`configuration:no-verb-writes-the-ranking-preferences` — No verb writes the ranking preferences](#configurationno-verb-writes-the-ranking-preferences--no-verb-writes-the-ranking-preferences)
   - [`configuration:the-project-file-carries-one-key` — The project file carries one key](#configurationthe-project-file-carries-one-key--the-project-file-carries-one-key)
   - [`configuration:the-project-file-marks-the-root` — The project file marks the project root](#configurationthe-project-file-marks-the-root--the-project-file-marks-the-project-root)
   - [`configuration:the-plan-declares-a-global-identity` — The plan declares a global identity](#configurationthe-plan-declares-a-global-identity--the-plan-declares-a-global-identity)
@@ -17,8 +16,6 @@
   - [`configuration:the-stale-threshold-is-optional-and-undefaulted` — The stale threshold is optional and undefaulted](#configurationthe-stale-threshold-is-optional-and-undefaulted--the-stale-threshold-is-optional-and-undefaulted)
   - [`configuration:the-project-file-owes-no-schema` — The project file owes no schema](#configurationthe-project-file-owes-no-schema--the-project-file-owes-no-schema)
   - [`configuration:the-configuration-directory-holds-one-file` — The configuration directory holds one file](#configurationthe-configuration-directory-holds-one-file--the-configuration-directory-holds-one-file)
-  - [`configuration:there-is-no-commit-configuration` — There is no commit configuration](#configurationthere-is-no-commit-configuration--there-is-no-commit-configuration)
-  - [`configuration:the-schema-owns-types-and-the-checker-owns-agreement` — The schema owns types and the checker owns agreement](#configurationthe-schema-owns-types-and-the-checker-owns-agreement--the-schema-owns-types-and-the-checker-owns-agreement)
   - [`configuration:a-superseded-plan-id-has-the-identity-grammar` — A superseded plan id has the identity grammar](#configurationa-superseded-plan-id-has-the-identity-grammar--a-superseded-plan-id-has-the-identity-grammar)
   - [`configuration:the-current-plan-id-is-not-superseded` — The current plan id is not superseded](#configurationthe-current-plan-id-is-not-superseded--the-current-plan-id-is-not-superseded)
   - [`configuration:a-superseded-plan-id-appears-once` — A superseded plan id appears once](#configurationa-superseded-plan-id-appears-once--a-superseded-plan-id-appears-once)
@@ -26,6 +23,10 @@
   - [`configuration:only-mint-settlement-adds-a-superseded-id` — Only mint settlement adds a superseded id](#configurationonly-mint-settlement-adds-a-superseded-id--only-mint-settlement-adds-a-superseded-id)
   - [`configuration:plan-identity-claims-are-disjoint` — Plan identity claims are disjoint](#configurationplan-identity-claims-are-disjoint--plan-identity-claims-are-disjoint)
   - [`configuration:a-peer-row-resolves-to-one-canonical-plan` — A peer row resolves to one canonical plan](#configurationa-peer-row-resolves-to-one-canonical-plan--a-peer-row-resolves-to-one-canonical-plan)
+  - [`configuration:there-is-no-commit-configuration` — There is no commit configuration](#configurationthere-is-no-commit-configuration--there-is-no-commit-configuration)
+  - [`configuration:the-schema-owns-types-and-the-checker-owns-agreement` — The schema owns types and the checker owns agreement](#configurationthe-schema-owns-types-and-the-checker-owns-agreement--the-schema-owns-types-and-the-checker-owns-agreement)
+- [Configuration shape](#configuration-shape)
+- [Open question](#open-question)
 
 <!--TOC-->
 
@@ -58,6 +59,18 @@ The plan configuration MUST carry `[ranking].preferences` as one ordered list of
 - THEN the cross-file checker fails and names the table to add because the project did not declare its preferences
 
 Verify: `cargo nextest run --test configuration`
+
+### `configuration:no-verb-writes-the-ranking-preferences` — No verb writes the ranking preferences
+
+The implementation MUST NOT offer a verb that writes `[ranking].preferences`, so an operator changes them by editing and committing the plan configuration.
+
+#### Scenario: An operator wants smaller work first
+
+- GIVEN a plan whose preferences place delay cost first
+- WHEN the operator wants points to lead
+- THEN they edit `.wipctl/plan.toml` and commit it, and the plan hooks validate the change, because a verb is a second writer of one declared choice
+
+Verify: `cargo nextest run --test verb_contracts`
 
 ### `configuration:the-project-file-carries-one-key` — The project file carries one key
 

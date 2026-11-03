@@ -3,8 +3,6 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [Section shape](#section-shape)
-- [Reference or phrase](#reference-or-phrase)
 - [Requirements](#requirements)
   - [`watches:a-watch-blocks-something` — A watch blocks something](#watchesa-watch-blocks-something--a-watch-blocks-something)
   - [`watches:a-watch-names-what-clears-it` — A watch names what clears it](#watchesa-watch-names-what-clears-it--a-watch-names-what-clears-it)
@@ -19,6 +17,8 @@
   - [`watches:a-cadence-is-optional-at-both-levels` — A cadence is optional at both levels](#watchesa-cadence-is-optional-at-both-levels--a-cadence-is-optional-at-both-levels)
   - [`watches:a-cold-reading-is-announced-and-never-gates` — A cold reading is announced and never gates](#watchesa-cold-reading-is-announced-and-never-gates--a-cold-reading-is-announced-and-never-gates)
   - [`watches:the-view-reports-a-watch-and-decides-nothing` — The view reports a watch and decides nothing](#watchesthe-view-reports-a-watch-and-decides-nothing--the-view-reports-a-watch-and-decides-nothing)
+- [Section shape](#section-shape)
+- [Reference or phrase](#reference-or-phrase)
 - [Unenforced rules](#unenforced-rules)
 - [Page budget](#page-budget)
 
@@ -52,7 +52,7 @@ Verify: `cargo nextest run --test validation`
 
 ### `watches:a-watch-names-what-clears-it` — A watch names what clears it
 
-Every watch section MUST carry a `Watch` line containing one declared source reference or one bounded phrase.
+Every watch section MUST carry a `Watch` line containing one declared source reference or one phrase of 60 to 400 characters.
 
 #### Scenario: A watch names an undeclared source
 
@@ -76,7 +76,7 @@ Verify: reviewer confirms every `Until` line can answer yes or no from evidence 
 
 ### `watches:a-watch-carries-a-section-per-part` — A watch carries a section per part
 
-Every watch section MUST carry its id and text, `Raised`, `Watch`, `Until`, `Blocks`, and `Read` in the stated order.
+Every watch section MUST carry its id and text, `Raised`, `Watch`, `Until`, `Blocks`, and `Read`, in that order.
 
 #### Scenario: A watch carries no reading
 
