@@ -19,6 +19,7 @@
   - [`agent-sessions:a-runtime-secret-stays-out-of-the-reading` — A runtime secret stays out of the reading](#agent-sessionsa-runtime-secret-stays-out-of-the-reading--a-runtime-secret-stays-out-of-the-reading)
   - [`agent-sessions:adapter-runtime-state-is-private` — Adapter runtime state is private](#agent-sessionsadapter-runtime-state-is-private--adapter-runtime-state-is-private)
   - [`agent-sessions:resume-is-an-explicit-native-operation` — Resume is an explicit native operation](#agent-sessionsresume-is-an-explicit-native-operation--resume-is-an-explicit-native-operation)
+  - [`agent-sessions:a-resume-profile-states-its-mode` — A resume profile states its mode](#agent-sessionsa-resume-profile-states-its-mode--a-resume-profile-states-its-mode)
 - [Diagnostics](#diagnostics)
 - [Unenforced rules](#unenforced-rules)
 
@@ -212,6 +213,18 @@ A resume operation MUST run only when a caller invokes it explicitly, it MUST pr
 
 Verify: `cargo nextest run --test verb_contracts`
 
+### `agent-sessions:a-resume-profile-states-its-mode` — A resume profile states its mode
+
+Where a reference profile declares a resume command, the profile MUST state whether that command is interactive, machine-callable, or both, and MUST warn where two clients can interleave work in one session.
+
+#### Scenario: Two terminals attach to one session
+
+- GIVEN a profile whose native resume attaches a second client to a live session
+- WHEN an operator reads the profile before resuming
+- THEN the profile warns that the two clients can interleave work, because an attach that looks like a fresh start loses the work of the first client
+
+Verify: reviewer reads each profile in the session adapters reference that declares a resume command
+
 ## Diagnostics
 
 Each fault names its own resolution.
@@ -228,3 +241,4 @@ Each fault names its own resolution.
 | `agent-sessions:the-session-system-owns-its-own-state` | Whether a proposed field is volatile session state or a stable declaration is a reading of what it asserts. |
 | `agent-sessions:contact-needs-no-second-confirmation`  | Whether a host authorized the declared command is the host's answer, and this record cannot read it.        |
 | `agent-sessions:adapter-runtime-state-is-private`      | The adapter is the operator's executable, and no test of this project runs it.                              |
+| `agent-sessions:a-resume-profile-states-its-mode`      | Whether a profile states its mode and its warning is a reading of prose.                                    |

@@ -85,7 +85,7 @@ Verify: reviewer confirms no code splits a slot name to recover forge facts
 
 ### `slot-naming:a-project-slug-follows-one-ladder` — A project slug follows one ladder
 
-When a project slug is needed, the implementation MUST use the first available source of the ladder: the main worktree's forge project name, then the main worktree's directory name, then the directory holding `.wipctl/project.toml`.
+When a project slug is needed, the implementation MUST use the first available source of the ladder: the main worktree's forge project name, then the main worktree's directory name, then the directory holding `.wipctl/project.toml`, and MUST NOT select the `origin` remote by default.
 
 #### Scenario: A project has several worktrees
 
@@ -95,7 +95,7 @@ When a project slug is needed, the implementation MUST use the first available s
 
 Verify: `cargo nextest run --test attachment`
 
-[NEEDS CLARIFICATION: which declared remote supplies the forge name and namespace where several answer: an explicit configuration key, or skipping the first step? Until it is settled, the ladder does not select `origin` by default.]
+[NEEDS CLARIFICATION: which declared remote supplies the forge name and namespace where several answer: an explicit configuration key, or skipping the first step?]
 
 ### `slot-naming:a-derived-slug-decides-only-at-mint-time` — A derived slug decides only at mint time
 

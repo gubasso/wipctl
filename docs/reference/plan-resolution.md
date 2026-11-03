@@ -18,7 +18,7 @@ The directory that resolution opens carries a slot name, as `slot-naming:a-slot-
 
 The peer attachment domain owns the walk that fills a peer's slot. The plan targeting domain owns the third resolution path, where an invocation names one of this plan's peers.
 
-Rules that bind this section: `attachment:duplicate-project-identities-are-ambiguous`.
+Rules that bind this section: `attachment:resolution-is-two-steps`, `attachment:duplicate-project-identities-are-ambiguous`, `slot-naming:a-slot-name-is-recorded-only-as-the-directory`.
 
 ## The third resolution path
 
@@ -32,6 +32,8 @@ no --plan     walk upward to .wipctl/project.toml, read project_id,
 ```
 
 The second path still starts with the first, because the table that binds the alias lives in this plan. A caller outside any project has no table to read, so the flag there is the ordinary no-configuration usage error.
+
+Rules that bind this section: `plan-targeting:the-flag-selects-from-this-plans-table`, `attachment:resolution-is-two-steps`.
 
 ## A dependency that crosses plans
 
@@ -57,3 +59,5 @@ alias#id      1. the alias resolves in the peers section to a plan_id
 A prefixed id names a lane entry and nothing else, exactly as a bare id does.
 
 The separator is `#`.
+
+Rules that bind this section: `lane-file:a-dependency-may-name-a-peer-entry`, `ids:a-prefixed-id-is-split-once`, `peers:an-alias-is-local-and-unique`, `validation:a-prefixed-dependency-resolves-or-fails`, `validation:a-peer-is-read-at-its-current-commit`, `lane-file:a-prefixed-dependency-is-quoted`.

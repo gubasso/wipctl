@@ -26,12 +26,7 @@ Close date, eligibility, dependency order, and the final tie-break are fixed pro
 
 Smaller work first shortens the average wait. The three-point cap bounds what a larger entry can wait behind because larger work splits along its judgments.
 
-The scaffold writes:
-
-```toml
-[ranking]
-preferences = ["delay-cost", "points-ascending"]
-```
+The scaffold writes both preferences, delay cost first, as [plan configuration](../reference/plan-configuration.md#ranking-preferences) shows.
 
 The declaration lives in `.wipctl/plan.toml` because a commit and `sync` replicate it to every worker. Every worker then derives one order from one declaration. The host repository is per project checkout, the state directory is machine-local, and the cache is disposable, so none can carry a plan's order. An operator changes the preferences by editing that file and committing it. The plan repository's hooks validate the change before it lands.
 

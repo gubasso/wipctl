@@ -68,7 +68,7 @@ Verify: `cargo nextest run --test writer_guarantees`
 
 ### `sync:a-batch-reports-each-slot-in-a-stated-order` — A batch reports each slot in a stated order
 
-Under the batch flag, replication MUST visit this plan first and then each plan in the order it was first declared, and MUST report each slot's outcome as one of up to date, advanced, reconciled, failed, or locked.
+When replication runs under the batch flag, it MUST visit this plan first and then each plan in the order it was first declared, and MUST report each slot's outcome as one of up to date, advanced, reconciled, failed, or locked.
 
 #### Scenario: Two rows reach one plan
 

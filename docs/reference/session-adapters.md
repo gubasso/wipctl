@@ -34,7 +34,7 @@ Every profile below obeys these rules:
 - `agent-sessions:liveness-is-three-valued` and `agent-sessions:an-unresolved-session-is-unknown`
 - `agent-sessions:a-contact-message-travels-on-standard-input` and `agent-sessions:a-contact-is-bounded-and-never-retried`
 - `agent-sessions:contact-needs-no-second-confirmation`
-- `agent-sessions:resume-is-an-explicit-native-operation` and `agent-sessions:a-reading-never-gates`
+- `agent-sessions:resume-is-an-explicit-native-operation`, `agent-sessions:a-resume-profile-states-its-mode`, and `agent-sessions:a-reading-never-gates`
 - `agent-sessions:a-runtime-secret-stays-out-of-the-reading` and `agent-sessions:adapter-runtime-state-is-private`
 
 ## The inspect operation
