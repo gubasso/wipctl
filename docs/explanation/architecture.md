@@ -31,7 +31,7 @@ The canonical YAML subset is what makes this library implementable without a ful
 
 ## The checker
 
-The cross-file rule catalog, implemented against the record library, emitting location-and-message diagnostics in the three classes. It is internal. It is reached through validation, the writers' preflights, the reconciliation, and the scaffold's self-check, and never as a separately supported command.
+The cross-file rule catalog, implemented against the record library, emitting location-and-message diagnostics in the two classes, failure and warning. It is internal. It is reached through validation, the writers' preflights, the reconciliation, and the scaffold's self-check, and never as a separately supported command.
 
 ## The writers and the transaction layer
 

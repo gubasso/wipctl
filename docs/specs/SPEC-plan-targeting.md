@@ -120,6 +120,10 @@ takes --plan     every verb that resolves a record: the readers, the ten
 refuses --plan   init, man, help, version. Passing it is a usage error,
                  naming the verb and the reason, because the invocation
                  asks for a redirection the verb has nowhere to apply
+
+one form         fix --registry refuses --plan too. The slot repair is
+refuses it       machine-local and acts on the project underfoot, while
+                 every other form of fix takes the flag
 ```
 
 `init` is the one worth a sentence. It creates a plan for the project the caller is inside, so `wipctl --plan payments init` reads as an instruction to create a plan inside a plan. That is not a thing, and refusing it is better than choosing a meaning for it.

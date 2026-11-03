@@ -3,7 +3,7 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The four reconciliation cases](#the-four-reconciliation-cases)
+- [The five reconciliation cases](#the-five-reconciliation-cases)
 - [The batch run](#the-batch-run)
 - [When the transport cannot finish](#when-the-transport-cannot-finish)
 - [Requirements](#requirements)
@@ -214,7 +214,7 @@ The resolution verb MUST require an id naming an open conflict, and MUST treat a
 
 Verify: `cargo nextest run --test verb_contracts`
 
-## The four reconciliation cases
+## The five reconciliation cases
 
 | Case                                        | Outcome                                                                      |
 | ------------------------------------------- | ---------------------------------------------------------------------------- |

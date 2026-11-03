@@ -2,6 +2,7 @@
 
 Each term links to the page that owns its full definition. A term defined here in one line is defined there in full. This page never carries a rule of its own.
 
+- age: from an entry's first entry into `doing` to its last event when closed, or to now while open, read from the journal. [specs/SPEC-metrics.md](./specs/SPEC-metrics.md)
 - attachment registry: the data directory's `projects/` tree. A plan is attached exactly when one slot holds its repository. [specs/SPEC-attachment.md](./specs/SPEC-attachment.md)
 - blocked: a derived condition, never a lane and never a field. An entry is dependency-blocked through `needs` and question-blocked through a `Blocks:` line. [explanation/lanes-and-ranking.md](./explanation/lanes-and-ranking.md)
 - burned id: an id held by a tombstone, for the life of the record. The mint refuses it, and a claimant is a validation failure. [specs/SPEC-ids.md](./specs/SPEC-ids.md)
@@ -12,10 +13,10 @@ Each term links to the page that owns its full definition. A term defined here i
 - closure: this record and every peer it reaches, transitively. It is the set the checker proves the dependency graph over. [explanation/plans-and-peers.md](./explanation/plans-and-peers.md)
 - cold reading: a watch observation whose `Read` date is older than its resolved cadence. [specs/SPEC-watches.md](./specs/SPEC-watches.md)
 - current story: the head of the computed order for `doing.yml`, or for `todo.yml` when `doing` is empty. [specs/SPEC-reporting.md](./specs/SPEC-reporting.md)
-- cycle time: first entry into `doing` until close, read from the journal. [specs/SPEC-metrics.md](./specs/SPEC-metrics.md)
 - declared set: every row of this record's peer table, and of each of theirs, transitively. It is the set the attachment walk fills. [specs/SPEC-peers.md](./specs/SPEC-peers.md)
 - drain: the act that lands pending fragments into lane files. [specs/SPEC-drain.md](./specs/SPEC-drain.md)
 - drift: a fact a fragment states that the record has since outgrown. It is reported, never repaired. [specs/SPEC-pending-fragment.md](./specs/SPEC-pending-fragment.md)
+- dwell: the summed time an entry spent in `review`, counting an open interval through now. [specs/SPEC-metrics.md](./specs/SPEC-metrics.md)
 - eligible: every id in `needs` is closed and no open question or open blocking watch blocks the entry. [explanation/lanes-and-ranking.md](./explanation/lanes-and-ranking.md)
 - epic: an end state no single story delivers. It is one document plus an `epic` field on entries. [explanation/epics.md](./explanation/epics.md)
 - external source: a system outside the plan repository holding items the project's work answers, declared once in the plan configuration's `sources` section under a local alias. [specs/SPEC-external-sources.md](./specs/SPEC-external-sources.md)
@@ -49,8 +50,7 @@ Each term links to the page that owns its full definition. A term defined here i
 - refused option: a second approach to a story's goal, recorded in the story with the reason it lost. [specs/SPEC-documents.md](./specs/SPEC-documents.md)
 - rename: the operation that changes a title, an id, or both while holding them in agreement. It rewrites every reference and burns the old id, except where it frees nothing. [specs/SPEC-rename.md](./specs/SPEC-rename.md)
 - resolve: recording a person's decision on a conflict the replication verb reported. [specs/SPEC-sync.md](./specs/SPEC-sync.md)
-- rework rounds: entries into `doing` beyond the first. [specs/SPEC-metrics.md](./specs/SPEC-metrics.md)
-- review dwell: time between entry into and exit from `review`. [specs/SPEC-metrics.md](./specs/SPEC-metrics.md)
+- rework: entries into `doing` beyond the first. [specs/SPEC-metrics.md](./specs/SPEC-metrics.md)
 - slugify: the one function that turns a title into its id's slug. It lowercases, removes apostrophes, turns every other non-alphanumeric run into a single hyphen, and trims the ends. [specs/SPEC-ids.md](./specs/SPEC-ids.md)
 - source alias: the local name a plan repository gives one external source. It is chosen by this plan, so two plans can use one alias for different systems. [specs/SPEC-external-sources.md](./specs/SPEC-external-sources.md)
 - source reference: one token, `<alias>#<key>`, naming an item in a declared external source. It is stated, searchable, and never verified. [specs/SPEC-external-sources.md](./specs/SPEC-external-sources.md)
@@ -59,6 +59,7 @@ Each term links to the page that owns its full definition. A term defined here i
 - session capability: one of `inspect`, `contact`, and `resume`, declared by the presence of that command in an adapter table. It is technical availability and never authorization. [specs/SPEC-agent-sessions.md](./specs/SPEC-agent-sessions.md)
 - session reading: one dated observation of a session, whose state is `active`, `ended`, or `unknown`. It is resolved on use, stored nowhere, and gates nothing. [specs/SPEC-agent-sessions.md](./specs/SPEC-agent-sessions.md)
 - slot name: the local slug stored only as a directory name for one plan on one machine. [specs/SPEC-slot-naming.md](./specs/SPEC-slot-naming.md)
+- slot drift: a slot name that differs from its project's derived slug. It is a healthy state, reported and never repaired by a reader. [specs/SPEC-slot-naming.md](./specs/SPEC-slot-naming.md)
 - spike: a work type whose outcome is a decision or a measurement. It exits through a recorded decision, a story revision, or a closed measurement. [explanation/stories-and-estimation.md](./explanation/stories-and-estimation.md)
 - stale: an in-flight entry whose age is past the `stale_after` threshold the plan configuration declares. The ordinary stale view shows the row unless this machine suppresses its reminder. With no threshold declared, no row is stale. [specs/SPEC-metrics.md](./specs/SPEC-metrics.md)
 - start: the atomic take. It reads the head of `todo`, moves it to `doing`, and prints it, in one transaction. `next` tells you, and `start` takes it. [specs/SPEC-transitions.md](./specs/SPEC-transitions.md)

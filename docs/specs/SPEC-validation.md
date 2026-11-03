@@ -3,7 +3,7 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The three diagnostic classes](#the-three-diagnostic-classes)
+- [The two diagnostic classes](#the-two-diagnostic-classes)
 - [The closure the checker reads](#the-closure-the-checker-reads)
 - [Requirements](#requirements)
   - [`validation:every-check-has-one-owner` — Every check has one owner](#validationevery-check-has-one-owner--every-check-has-one-owner)
@@ -225,7 +225,7 @@ Where the shipped schema directory is missing, the implementation MUST fail rath
 
 Verify: `cargo nextest run --test validation`
 
-## The three diagnostic classes
+## The two diagnostic classes
 
 | Class   | Meaning                                                                | Exit     |
 | ------- | ---------------------------------------------------------------------- | -------- |

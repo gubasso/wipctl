@@ -3,7 +3,7 @@
 <!--TOC-->
 
 - [Purpose](#purpose)
-- [The four locations](#the-four-locations)
+- [The host file and the four base directories](#the-host-file-and-the-four-base-directories)
 - [The zone](#the-zone)
 - [Requirements](#requirements)
   - [`zone-layout:the-record-lives-under-the-data-directory` — The record lives under the data directory](#zone-layoutthe-record-lives-under-the-data-directory--the-record-lives-under-the-data-directory)
@@ -146,7 +146,7 @@ The schemas, the scaffold payload, and the worked example MUST stay under the in
 
 Verify: `cargo nextest run --test journey`
 
-## The four locations
+## The host file and the four base directories
 
 ```text
 host repo:
