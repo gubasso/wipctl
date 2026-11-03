@@ -8,7 +8,13 @@
     "node_modules",
     "**/*-lock.json",
     "**/package-lock.json",
-    "**/*.jsonl"
+    "**/*.jsonl",
+    // rk writes the landing record and sdd installs .spec-driven-docs/, so both
+    // follow their tool's form. Source: the dev-environment rule of
+    // nix-secrets (home/apps/claude-session/rules/dev-environment.md).
+    ".release-kit/manifest.json",
+    ".spec-driven-docs/**",
+    "docs/.markdownlint-cli2.jsonc"
   ],
   "plugins": ["https://plugins.dprint.dev/json-0.23.0.wasm"]
 }

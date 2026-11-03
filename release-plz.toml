@@ -18,52 +18,9 @@ git_release_enable = false
 # change that adds a lib target other crates depend on.
 semver_check = false
 
-# The changelog is a generated artifact, and this repository's own prose gates
-# judge it like any other markdown: AGENTS.md bans bold and italics, and dprint
-# unwraps every soft-wrapped paragraph to one physical line. release-plz's
-# default template emits neither shape — it writes `*(scope)*` and
-# `[**breaking**]`, and wraps its header across two lines — so every generated
-# changelog would fail `lint` on the bot's own release request.
-#
-# The fix belongs here rather than in the gates: change the configuration and
-# regenerate, never edit the generated file, and never widen a gate to admit a
-# tool's default. The template below states the same facts without emphasis.
-# The scope is an identifier, so it takes inline code, which is what AGENTS.md
-# asks for; a breaking change says so in words.
-#
-# The whitespace control is load-bearing. Tera emits a newline for the tag
-# line itself, so a plain `{% for %}` after the version heading writes a
-# second blank line, and dprint collapses it. `{%- for` trims that newline,
-# and the blank line after the group heading is written literally. Verified
-# by generating an entry and confirming dprint leaves it byte-identical.
-#
-# A breaking entry also renders its `BREAKING CHANGE:` footer, because AGENTS.md
-# requires a changelog entry that names what breaks and what an adopter does
-# next, and the commit title alone carries neither. The footer is multi-line in
-# the commit and one physical line here, so the template replaces each newline
-# with a space before writing it. Without that replacement the footer's second
-# line leaves the list item and becomes a paragraph.
-#
-# The footer comparison is the guard on a message that carries the breaking
-# marker and no footer: `breaking_description` then falls back to the subject,
-# and the entry reads "Subject. subject". The `breaking-change-carries-a-footer`
-# hook is what prevents that message, so this clause only ever fires where the
-# hook was bypassed. It is kept because a template that repeats itself in a
-# published entry is worse than one that says less.
-[changelog]
-header = """# Changelog
-
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-"""
-body = """
-{% if version %}## [{{ version | trim_start_matches(pat="v") }}]{% if release_link %}({{ release_link }}){% endif %} - {{ timestamp | date(format="%Y-%m-%d") }}
-{% else %}## [Unreleased]
-{% endif %}
-{%- for group, commits in commits | group_by(attribute="group") %}
-### {{ group | upper_first }}
-
-{% for commit in commits %}- {% if commit.breaking %}breaking, {% endif %}{% if commit.scope %}`{{ commit.scope }}`: {% endif %}{{ commit.message | upper_first }}{% if commit.breaking and commit.breaking_description and commit.breaking_description != commit.message %}. {{ commit.breaking_description | replace(from="\n", to=" ") | trim }}{% endif %}
-{% endfor %}{% endfor %}"""
-trim = true
+# No changelog section. release-plz writes CHANGELOG.md in its own form, and
+# the checks that rewrite or judge Markdown exclude it instead. A project
+# configures a generator only as its tool documents, never to satisfy one of
+# its own checks. Source: the dev-environment rule of nix-secrets
+# (home/apps/claude-session/rules/dev-environment.md). A breaking change
+# carries its adopter guidance in the release request and the commit body.
