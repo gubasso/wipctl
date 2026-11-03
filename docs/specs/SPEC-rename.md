@@ -51,7 +51,7 @@ Verify: `cargo nextest run --test verb_contracts`
 
 ### `rename:the-write-set-covers-every-reference` — The write set covers every reference
 
-A rename MUST rewrite every artifact and every reference that names the old id, as [the rename write set](#the-write-set) lists, in one transaction.
+A rename MUST rewrite every artifact and every reference that names the old id, as [the rename write set](../reference/verb-mechanics.md#the-rename-write-set) lists, in one transaction.
 
 #### Scenario: A dependency in another lane names the entry
 

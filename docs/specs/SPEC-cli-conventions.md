@@ -82,7 +82,7 @@ Verify: `cargo nextest run --test verb_contracts`
 
 ### `cli-conventions:the-verb-names-are-fixed` — The verb names are fixed
 
-The implementation MUST use the verb names and the usage grammar that [the verb surface](#the-verb-surface) states, for every capability it ships.
+The implementation MUST use the verb names and the usage grammar that [the verb surface](../reference/command-surface.md#the-verb-surface) states, for every capability it ships.
 
 #### Scenario: An implementation renames a verb it finds clearer
 

@@ -16,7 +16,7 @@
   - [`epics:no-verb-reports-a-staleness-verdict` — No verb reports a staleness verdict](#epicsno-verb-reports-a-staleness-verdict--no-verb-reports-a-staleness-verdict)
   - [`epics:the-resolution-is-derived-every-call` — The resolution is derived on every call](#epicsthe-resolution-is-derived-every-call--the-resolution-is-derived-on-every-call)
   - [`epics:the-cache-is-authoritative-for-nothing` — The cache is authoritative for nothing](#epicsthe-cache-is-authoritative-for-nothing--the-cache-is-authoritative-for-nothing)
-- [The point arithmetic](#the-point-arithmetic)
+- [The point arithmetic](../reference/measures.md#the-point-arithmetic)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -29,7 +29,7 @@ Resolving one epic into its execution plan, and rolling every epic up into one r
 
 ### `epics:the-arithmetic-has-one-implementation` — The arithmetic has one implementation
 
-One implementation MUST compute the point arithmetic that [the measures](#the-point-arithmetic) list, for every tier.
+One implementation MUST compute the point arithmetic that [the measures](../reference/measures.md#the-point-arithmetic) list, for every tier.
 
 #### Scenario: A number appears in two views
 

@@ -67,7 +67,7 @@ Verify: `cargo nextest run --test ids`
 
 ### `ids:an-id-follows-one-grammar` — An id follows one grammar
 
-Every id MUST match `[a-z0-9]+(-[a-z0-9]+)*`, a question id MUST carry that grammar behind the fixed prefix `Q-`, and the slug function MUST apply, in order, the four steps that [the grammar](#grammar-and-slugification) lists.
+Every id MUST match `[a-z0-9]+(-[a-z0-9]+)*`, a question id MUST carry that grammar behind the fixed prefix `Q-`, and the slug function MUST apply, in order, the four steps that [the grammar](../reference/identifiers-and-tokens.md#grammar-and-slugification) lists.
 
 #### Scenario: A title carries an apostrophe
 

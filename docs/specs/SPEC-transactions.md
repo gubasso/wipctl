@@ -16,7 +16,7 @@
   - [`transactions:the-lock-is-not-a-record` — The lock is not a record](#transactionsthe-lock-is-not-a-record--the-lock-is-not-a-record)
   - [`transactions:a-reader-never-takes-the-lock` — A reader never takes the lock](#transactionsa-reader-never-takes-the-lock--a-reader-never-takes-the-lock)
   - [`transactions:push-is-not-part-of-the-transaction` — Push is not part of the transaction](#transactionspush-is-not-part-of-the-transaction--push-is-not-part-of-the-transaction)
-- [The commit grammar](#the-commit-grammar)
+- [The commit grammar](../reference/plan-record-files.md#the-commit-grammar)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -65,7 +65,7 @@ Verify: `cargo nextest run --test writer_guarantees`
 
 ### `transactions:the-commit-grammar-is-the-tools` — The commit grammar is the tool's
 
-The implementation MUST write each commit message in the fixed `plan:` grammar that [the commit grammar](#the-commit-grammar) lists, and MUST NOT take the message from the project.
+The implementation MUST write each commit message in the fixed `plan:` grammar that [the commit grammar](../reference/plan-record-files.md#the-commit-grammar) lists, and MUST NOT take the message from the project.
 
 #### Scenario: A project has its own commit convention
 

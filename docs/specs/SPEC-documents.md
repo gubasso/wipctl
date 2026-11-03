@@ -21,7 +21,7 @@
   - [`documents:a-promised-path-is-exempt-and-never-stubbed` — A promised path is exempt and never stubbed](#documentsa-promised-path-is-exempt-and-never-stubbed--a-promised-path-is-exempt-and-never-stubbed)
   - [`documents:a-rule-delta-is-typed-and-single` — A rule delta is typed and single](#documentsa-rule-delta-is-typed-and-single--a-rule-delta-is-typed-and-single)
   - [`documents:an-artifact-lives-beside-the-document` — An artifact lives beside the document](#documentsan-artifact-lives-beside-the-document--an-artifact-lives-beside-the-document)
-- [The three heading sequences](#the-three-heading-sequences)
+- [The three heading sequences](../reference/plan-documents.md#the-three-heading-sequences)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -46,7 +46,7 @@ Verify: `cargo nextest run --test validation`
 
 ### `documents:every-heading-is-present-in-order` — Every heading is present, in order
 
-Every document MUST carry its shape's headings, in the order that [the three heading sequences](#the-three-heading-sequences) list, and MUST NOT add another.
+Every document MUST carry its shape's headings, in the order that [the three heading sequences](../reference/plan-documents.md#the-three-heading-sequences) list, and MUST NOT add another.
 
 #### Scenario: A story gains a closing section
 
