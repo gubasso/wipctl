@@ -39,6 +39,7 @@ exclude = [
   "/uninstall.sh",
   "/install-common.sh",
   "/AGENTS.md",
+  "/GLOSSARY.md",
   "/CLAUDE.md",
   "/.gitignore",
   # Pins this repository's devshell, and would only surprise someone building the
