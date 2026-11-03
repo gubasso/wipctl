@@ -11,10 +11,10 @@
       url = "github:gubasso/release-kit/v0.4.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # `sdd`, the documentation gate, pinned at a release tag. `nix flake update
-    # spec-driven-docs` moves the lock; the tag in this URL is the version.
+    # `sdd`, the documentation gate, pinned at a release tag. `sdd self-depend
+    # sync` moves the tag and the lock together, and `.envrc` runs it on entry.
     spec-driven-docs = {
-      url = "github:gubasso/spec-driven-docs/v0.10.2";
+      url = "github:gubasso/spec-driven-docs/v0.14.4";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
