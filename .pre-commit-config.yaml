@@ -92,7 +92,8 @@ repos:
   #   .release-kit/manifest.json               rk
   #   .github/workflows/release.yml            cargo-dist
   #   Cargo.lock, flake.lock                   cargo, nix
-  #   .spec-driven-docs/                       sdd, which verifies it byte
+  #   .spec-driven-docs/, docs/.markdownlint-cli2.jsonc
+  #                                            sdd, which verifies them byte
   #                                            for byte
   # Each tool excludes them in its own configuration: dprint.json,
   # dprint.markdown.json, .markdownlint-cli2.jsonc, _typos.toml, and
@@ -105,9 +106,9 @@ repos:
     hooks:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
-        exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml)$|^\.spec-driven-docs/|(^|/)(Cargo|flake)\.lock$'
+        exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml|docs/\.markdownlint-cli2\.jsonc)$|^\.spec-driven-docs/|(^|/)(Cargo|flake)\.lock$'
       - id: end-of-file-fixer
-        exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml)$|^\.spec-driven-docs/|(^|/)(Cargo|flake)\.lock$'
+        exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml|docs/\.markdownlint-cli2\.jsonc)$|^\.spec-driven-docs/|(^|/)(Cargo|flake)\.lock$'
       - id: check-added-large-files
         args: ['--maxkb=16384']
       - id: check-case-conflict

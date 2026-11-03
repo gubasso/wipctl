@@ -3,6 +3,7 @@
     "^(CHANGELOG|SECURITY)\\.md$",
     "^\\.release-kit/manifest\\.json$",
     "^\\.spec-driven-docs/",
+    "^docs/\\.markdownlint-cli2\\.jsonc$",
     "^\\.github/workflows/(pr-title|release-plz|release)\\.yml$",
     "(^|/)Cargo\\.lock$",
     "(^|/)flake\\.lock$"
