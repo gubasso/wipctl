@@ -98,6 +98,8 @@ When a project slug is needed, the implementation MUST use the first available s
 
 Verify: `cargo nextest run --test attachment`
 
+[NEEDS CLARIFICATION: which declared remote supplies the forge name and namespace where several answer: an explicit configuration key, or skipping the first step? Until it is settled, the ladder does not select `origin` by default.]
+
 ### `slot-naming:a-derived-slug-decides-only-at-mint-time` — A derived slug decides only at mint time
 
 When a slot is minted, the implementation MUST use the derived slug as its candidate and use later derivations only for display and drift detection.

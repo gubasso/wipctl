@@ -14,7 +14,7 @@ An id that carries an alias prefix is read in the peer that alias names. It gate
 
 ## The ranking procedure
 
-The record uses one ranking procedure:
+The record uses one ranking procedure. It applies product constraints, then project preferences, then one internal tie-break. A constraint protects a valid plan. A preference expresses which valid entry a project wants first. A tie-break makes the result deterministic without expressing preference. The procedure applies these stages in order:
 
 1. Close date places closed entries from oldest to newest.
 2. Eligibility places startable work first.
@@ -22,7 +22,9 @@ The record uses one ranking procedure:
 4. The plan's declared preferences order entries that satisfy the same constraints.
 5. The full id resolves any remaining tie.
 
-Close date, eligibility, dependency order, and the final tie-break are fixed product behavior. They are not project preferences, so the configuration does not expose them. A project can choose only whether delay cost or points applies first, omit either preference, or state that it has none.
+Close date, eligibility, dependency order, and the final tie-break are fixed product behavior. They are not project preferences, so the configuration does not expose them. A project can choose only whether delay cost or points applies first, omit either preference, or state that it has none. One record-wide procedure avoids four more chains to configure. The closed lane is the only lane with a distinct key, and the close-date comparison is equal everywhere else.
+
+Smaller work first shortens the average wait. The three-point cap bounds what a larger entry can wait behind because larger work splits along its judgments.
 
 The scaffold writes:
 
@@ -31,11 +33,36 @@ The scaffold writes:
 preferences = ["delay-cost", "points-ascending"]
 ```
 
-The declaration lives in `.wipctl/plan.toml` because a commit and `sync` replicate it to every worker. An operator changes the preferences by editing that file and committing it. The plan repository's hooks validate the change before it lands.
-
-Delay cost states when waiting harms an entry. `immediate` sorts before ordinary work. `deferred` sorts after ordinary work. Ordinary work omits the field. Delay cost creates no dependency, changes no eligibility result, and enters no measure.
+The declaration lives in `.wipctl/plan.toml` because a commit and `sync` replicate it to every worker. Every worker then derives one order from one declaration. The host repository is per project checkout, the state directory is machine-local, and the cache is disposable, so none can carry a plan's order. An operator changes the preferences by editing that file and committing it. The plan repository's hooks validate the change before it lands.
 
 The two work lanes admit only entries whose dependencies are closed and whose questions are answered. The procedure still computes their order. A gap left by a reopening is not a defect because file sequence carries no rank.
+
+## Delay cost
+
+Delay cost states when waiting harms an entry. `immediate` means waiting causes material harm now. `deferred` means the harm appears later, remains uncertain, or is negligible now. An absent field means the ordinary cost expected of planned work.
+
+The field records only an exception to ordinary work. The reader places absence between `immediate` and `deferred` without adding a value to the entry. A comparison position for absence is not a read-time default.
+
+Delay cost is the only field a person states for ordering alone. It creates no dependency edge, changes no eligibility result, and enters no measure because it is not an event.
+
+Delay cost carries one ordering fact and no associated planning practice:
+
+- Fixed date is absent because it needs a date on an open entry, which would be a second stored ordering input.
+- Capacity allocation is absent because it is a planning practice, while the record states intent rather than policing it.
+- No rule limits entries with immediate delay cost. Multiple entries remain legal, and a workflow verb warns at exit 0 and changes nothing.
+- Delay cost marks a row. It creates no swimlane or sixth lane.
+
+## A watch on work in flight
+
+A watch is legal on work already in flight. A question means the project does not know what to build, so the entry leaves the work lane. A watch means the project knows what to build and the outside world moved after work started. Sending that entry back to the scheduled lane would falsely say it never started and its clock never ran. The watch keeps that blocked row visible where it carries the most signal.
+
+## A watch and its reading
+
+The `Read` line's sentence records a dated observation rather than a remote field. It can say that an item was open because the date keeps that statement true as an observation about that day.
+
+The two project thresholds stay separate. `days` measures this project's own work going quiet, while `watch_days` measures an outside item going unread. A release cut monthly and a ticket triaged daily can also use different `Every` periods.
+
+Clearing a watch creates no separate event store. The section enters and leaves `watches.md` through ordinary commits, so `git log` on that file records when the block appeared and lifted, with its author and date. A future blocked-duration measure can fold from that history without storing or computing the measure here.
 
 ## Reading the order back
 

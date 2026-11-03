@@ -108,6 +108,8 @@ The plan configuration MUST carry `plan_id` as exactly 32 lowercase hexadecimal 
 
 Verify: `cargo nextest run --test schemas`
 
+[NEEDS CLARIFICATION: does a plan repository carry a human name of its own, where today a plan cloned outside a host or peer table can derive one only from its directory?]
+
 ### `configuration:an-unknown-key-is-rejected` — An unknown key is rejected
 
 The implementation MUST reject an unknown key at every level of either file.

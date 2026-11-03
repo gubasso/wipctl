@@ -8,6 +8,8 @@ A peer is another project's plan repository, named by this plan and attached on 
 
 Once attached, a peer is a plan. It is validated in full, its tombstones are read, its lanes are read, and any verb that resolves a record can be pointed at it. There is one idea of a plan in this method, and a peer is an instance of it. Connected plans are one plan with several roots.
 
+A slot holds one plan, whether it arrived as this machine's own project or as a peer another plan named. Once filled, nothing distinguishes the two.
+
 An entry depends on a peer's entry through the field it already has.
 
 ```yaml
@@ -18,7 +20,9 @@ An entry depends on a peer's entry through the field it already has.
   needs: [session-token-parsing, "payments#secure-session-storage"]
 ```
 
-Both ids mean one thing: closed before this entry is eligible. The first is looked up in this record. The second is looked up in the peer's. Eligibility, the graph, and the acyclicity proof treat them identically, because they are the same edge. [../specs/SPEC-lane-file.md](../specs/SPEC-lane-file.md) states the field and its two forms.
+Both ids mean one thing: closed before this entry is eligible. The first is looked up in this record. The second is looked up in the peer's. Eligibility, the graph, and the acyclicity proof treat them identically, because they are the same edge. [../specs/SPEC-lane-file.md](../specs/SPEC-lane-file.md) states the field and its two forms. A dependency on a peer's whole epic is written as a dependency on that epic's last entry, which is what it means.
+
+The separator is `#`. A comment marker in this format must be separated from what precedes it, so `payments#secure-session-storage` is one plain scalar and is never a comment. The quoting rule, `lane-file:a-prefixed-dependency-is-quoted`, is a choice about how the record reads, not a rescue from a parse error. One function splits a prefixed id, once, on the first separator. A second splitter is how the two halves come to disagree.
 
 ## Why a plan carries two identities
 
@@ -42,7 +46,11 @@ payments                                     alias      chosen by THIS plan
 https://git.example.org/acme/payments.git    url        a hint; replaceable
 ```
 
-Two plans can both call a peer `payments` and mean different things. The alias resolves only in its file. The plan id is immutable, while the url remains replaceable.
+Two plans can both call a peer `payments` and mean different things. The alias resolves only in its file. The plan id is immutable, while the url remains replaceable. An alias is local to the plan that declares it, so an alias means nothing outside the file that holds it.
+
+A committed file is read by everyone who clones this plan, so a credential in it is a leak whatever the tool prints.
+
+Two operations of the peer writer carry the weight. `add` makes the uid a machine's problem rather than a person's, which is what lets the design afford an opaque identity at all. `alias` makes the alias genuinely local, because a project renames a peer to whatever its own readers understand.
 
 The well-known systems that solve this problem separate the same three names. Bazel shipped without the alias layer, hit name clashes in diamond dependencies, and retrofitted repository mapping. Nix binds a local input name to a flake reference. Go declares the module path in the module itself. Each is a citation for further reading, and this page is complete without following any of them.
 
@@ -65,9 +73,66 @@ and making its answer depend on the network and the hour
 
 The refusal is loud on purpose. A check that runs on one machine and quietly does not run on another is worse than a check that fails. The first teaches a reader that a green result means something it does not.
 
-Attaching is what makes the answer possible, and it is generous. `wipctl attach --peers` walks the whole declared set, transitively, and fills every slot. Checking is a proof, so it demands only the peers a dependency actually reaches. [../specs/SPEC-peers.md](../specs/SPEC-peers.md) names both sets and says why they differ.
+Attaching is what makes the answer possible, and it is generous. `wipctl attach --peers` walks the whole declared set, transitively, and fills every slot. Checking is a proof, so it demands only the peers a dependency actually reaches. [Two sets, named once](#two-sets-named-once) names both sets and says why they differ.
 
 Go and Nix state the same property in the same order: fetch the graph, then answer about it.
+
+## The closure the checker reads
+
+Two consequences follow, and each is a thing a reader otherwise finds the hard way. Adding one prefixed dependency can make a run start failing on a machine where it passed a minute ago. The new id moved a peer into the read set. Attachment is also transitive through checking, not only through the walk. Reading a peer means checking it, so that peer's read set joins this one.
+
+## Two sets, named once
+
+```text
+the declared set   every row of this plan's peers section, plus every row
+                   of each of their peers sections, transitively. This is
+                   what the peer attachment walk fills.
+
+the read set       every peer a prefixed needs id in this record reaches,
+                   plus the peers those peers' own prefixed ids reach,
+                   transitively. This is what validation requires attached.
+```
+
+The read set is a subset of the declared set. The difference is exactly the rows nothing references. Those rows are legal, the walk fills them, and validation reports them stale rather than demanding them. A machine that attached less than everything then gets a short list rather than a wall.
+
+## Filling a slot
+
+The walk that fills a peer's slot has five steps, which [verb mechanics](../reference/verb-mechanics.md#filling-the-slots) lists. The sequence has five steps because each one prevents a distinct failure.
+
+The reason is the lock's own contract. A writer holds the lock from the deciding read to the commit, and hold times are subsecond. A clone over a network is neither bounded nor subsecond. Cloning straight into the slot is the other way to get this wrong. A reader resolving that uid then sees a directory that is not yet a verified plan. Re-reading the table under the lock is what makes two concurrent additions of one plan a refusal rather than a duplicate row.
+
+The walk fills rows no entry references, because a row this plan declared is a plan this plan meant to work with. The walk fetches so that no check ever fetches. What it fills is a superset of what validation demands, and the peers domain names both sets.
+
+## What the table is not
+
+- The table is not a registry. Nothing allocates an alias or approves an identity. Two plans that name one peer write independent rows.
+- The table is not authoritative about the peer. The peer's own `.wipctl/plan.toml` is, and the walk refuses a clone that disagrees with the row.
+- The table is not a cache. Reading a peer is a read of that peer's slot, and no peer state is stored here.
+
+## The peer view and the health report
+
+`peers` is a reader in the family of `epics` and `initiatives`, and a view belongs beside the views. The health report names whether each declared peer is attached and stops there. A report that repeats a view is a second copy of it.
+
+A prefixed dependency that resolves to no entry has no message in the peer view, because validation answers it. A fourth, vaguer message in the peer view gives one condition two answers, and the vaguer one is the one a reader meets first.
+
+## The plan flag
+
+The plan flag reaches one hop, because the closure is what the checker proves over and an alias names only what its own table declares. `init` is the one verb worth a sentence. It creates a plan for the project the caller is inside, so `wipctl --plan payments init` reads as an instruction to create a plan inside a plan. That is not a thing, and refusing it is better than choosing a meaning for it.
+
+## Parity, and what it costs
+
+A peer is a plan, so every verb that resolves a record accepts the flag, writers included. `wipctl --plan payments board` reads that plan's board. `wipctl --plan payments move <id> doing` moves an entry in that plan, holds that plan's writer lock, and commits to that plan's trunk.
+
+Write access is the operator's business. The tool refuses nothing on the basis of who owns the peer, because it has no permission model and no pillar allows one. A push the forge rejects is reported by replication in the relayed-transport class, which is where a permission failure surfaces.
+
+The cost is worth stating. A verb that writes can now write into another team's record from a shell that happens to be in this project. That is what parity means. The mitigation is that the alias is already in a committed table, not that the tool second-guesses the operator.
+
+## What it does not change
+
+- Resolution for a bare invocation. Without the flag, everything resolves as it did.
+- Whether a verb is multi-plan. The flag selects one plan, so the batch mode stays the one the replication domain defines.
+- How far a name reaches. The flag resolves through this plan's own table, so it can only name a plan this record declared itself.
+- Whether a plan exists. An alias whose slot is empty is the ordinary unattached-peer failure, naming the walk that fills it.
 
 ## What the trade gives up, and what it keeps
 

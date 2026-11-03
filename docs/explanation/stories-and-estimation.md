@@ -21,6 +21,12 @@ A point is one unit of irreducible human judgment: a decision a test cannot sett
 - `3`: two judgments, or one that is hard to reverse, such as a schema or a security control.
 - `4` is not a value. Work above three splits along the judgments its acceptance section already names.
 
+## Three shapes of document
+
+A story, an epic, and an initiative each carry a fixed heading sequence, which [plan documents](../reference/plan-documents.md#the-three-heading-sequences) lists. Five story headings are deliberately absent above the story. Negotiable scope needs a point budget no epic has. Acceptance, tasks, traps, and a refused option bind the one work session a story owns, and no session implements an epic or an initiative. The closing condition runs the other way: a story closes on its acceptance, and the tiers above it state an observable end state instead.
+
+Three story sections read as near neighbours and are not. Negotiable scope is an outcome the story can cut. A rabbit hole is a trap inside the chosen approach. A refused option is a second approach to the same goal, with the reason it lost. A refusal that is significant and hard to reverse is a decision record instead.
+
 ## Core and cuts
 
 `Core` is never cut. `In scope` is the ordered negotiable remainder, cut from the bottom when the work runs long. Correctness, tests, review, and security never appear in the negotiable list, because they are never negotiable. Cutting planned remainder needs no revision entry. Changing the agreement does.
@@ -28,3 +34,13 @@ A point is one unit of irreducible human judgment: a decision a test cannot sett
 ## Velocity is a budget, not a score
 
 Velocity is the sum of points of entries closed as done inside one window, derived on every read. A cut entry counts nothing. A reshaped entry counts through its successor. The number budgets how much judgment one window can absorb. It measures nobody. The method deliberately does not specify planning against velocity, and it does not specify calibrating the scale between teams.
+
+## The touch list
+
+Every lane entry predicts the paths its work changes, at most 12. That bound limits the coordination surface a reader compares. It is not a complexity measure, and it changes no point value. A story predicting more than 12 changed paths splits along its independently reviewable outcomes, or narrows its stated scope, before it enters a lane.
+
+## The relation to the amended paths
+
+A story document's `Amends` section is already a gated, file-precise list of paths the work changes. A free-standing touch list would be a second store of that fact, which the charter refuses. The two are not the same list: `Amends` is an obligation and a subset, and the other files the work changes are what can collide and are recorded nowhere else.
+
+The resolution is containment rather than independence. Every path in a story's `Amends` section appears in that entry's touch list. One rule decides it, and the two lists can never disagree.
