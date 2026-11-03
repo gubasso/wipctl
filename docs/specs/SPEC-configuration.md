@@ -25,8 +25,6 @@
   - [`configuration:a-peer-row-resolves-to-one-canonical-plan` — A peer row resolves to one canonical plan](#configurationa-peer-row-resolves-to-one-canonical-plan--a-peer-row-resolves-to-one-canonical-plan)
   - [`configuration:there-is-no-commit-configuration` — There is no commit configuration](#configurationthere-is-no-commit-configuration--there-is-no-commit-configuration)
   - [`configuration:the-schema-owns-types-and-the-checker-owns-agreement` — The schema owns types and the checker owns agreement](#configurationthe-schema-owns-types-and-the-checker-owns-agreement--the-schema-owns-types-and-the-checker-owns-agreement)
-- [Configuration shape](#configuration-shape)
-- [Open question](#open-question)
 
 <!--TOC-->
 
@@ -289,26 +287,3 @@ The plan configuration's schema MUST own its types and constraints, and the cros
 - THEN the schema half reports the malformed value and the cross-file half reports the missing identity, each in its own class
 
 Verify: `cargo nextest run --test validation`
-
-## Configuration shape
-
-```toml
-# .wipctl/project.toml
-project_id = "a1b2c3d4e5f60718293a4b5c6d7e8f90"
-
-# .wipctl/plan.toml
-project_id = "a1b2c3d4e5f60718293a4b5c6d7e8f90"
-plan_id = "9f2c41a08b7d4e63a15c8f02d7e4b619"
-superseded_plan_ids = ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"]
-
-[ranking]
-preferences = ["delay-cost", "points-ascending"]
-```
-
-Both identities are 128 random bits written as exactly 32 lowercase hexadecimal characters. Each is minted once, immutable, opaque, and parsed by nothing.
-
-The plan file also holds its window and its optional `peers`, `sources`, and `session_adapters` tables. The superseded list keeps discarded plan identities resolvable.
-
-## Open question
-
-A plan cloned outside a host or peer table can derive a name only from its directory. Whether a plan repository carries a human name of its own remains open. No optional name key is added.

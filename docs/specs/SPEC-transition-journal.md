@@ -15,7 +15,6 @@
   - [`transition-journal:reopening-strips-the-close` — Reopening strips the close](#transition-journalreopening-strips-the-close--reopening-strips-the-close)
   - [`transition-journal:a-tombstone-is-a-terminal-journal` — A tombstone is a terminal journal](#transition-journala-tombstone-is-a-terminal-journal--a-tombstone-is-a-terminal-journal)
   - [`transition-journal:the-journal-records-no-reason` — The journal records no reason](#transition-journalthe-journal-records-no-reason--the-journal-records-no-reason)
-- [Format](#format)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -157,18 +156,6 @@ The journal MUST NOT carry a who, a why, or a reason column.
 - THEN three columns is the whole of it. Nothing proves the verb was used rather than the file edited, which the lane-agreement gate catches
 
 Verify: `cargo nextest run --test validation`
-
-## Format
-
-One append-only stream per entry, one event per line, exactly three non-empty tab-separated fields.
-
-```text
-2026-08-14T09:52:31Z	todo	doing
-2026-08-15T16:03:10Z	doing	review
-2026-08-16T11:20:44Z	review	closed
-```
-
-Field one is the instant, field two is the lane left, and field three is the lane entered or a terminal token.
 
 ## Unenforced rules
 

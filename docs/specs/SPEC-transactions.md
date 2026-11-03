@@ -16,7 +16,6 @@
   - [`transactions:the-lock-is-not-a-record` — The lock is not a record](#transactionsthe-lock-is-not-a-record--the-lock-is-not-a-record)
   - [`transactions:a-reader-never-takes-the-lock` — A reader never takes the lock](#transactionsa-reader-never-takes-the-lock--a-reader-never-takes-the-lock)
   - [`transactions:push-is-not-part-of-the-transaction` — Push is not part of the transaction](#transactionspush-is-not-part-of-the-transaction--push-is-not-part-of-the-transaction)
-- [The commit grammar](../reference/plan-record-files.md#the-commit-grammar)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -170,19 +169,6 @@ The implementation MUST NOT push as part of a mutation's transaction.
 - THEN the commit lands locally and replication stays its own verb. A write that needs a network fails on a train
 
 Verify: `cargo nextest run --test writer_guarantees`
-
-## The commit grammar
-
-```text
-plan: capture <id>
-plan: move <id> from <from> to <to>
-plan: close <id> as <outcome>
-plan: land <n> fragments
-plan: rename <old> to <new>
-plan: delete <id>
-plan: reconcile <n> changes
-plan: resolve <id> keeping <side>
-```
 
 ## Unenforced rules
 

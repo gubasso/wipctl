@@ -14,7 +14,6 @@
   - [`rename:a-collision-recovery-rephrases` — A collision recovery rephrases](#renamea-collision-recovery-rephrases--a-collision-recovery-rephrases)
   - [`rename:a-rename-is-narrated-in-revisions` — A rename is narrated in revisions](#renamea-rename-is-narrated-in-revisions--a-rename-is-narrated-in-revisions)
   - [`rename:a-refused-rename-writes-nothing` — A refused rename writes nothing](#renamea-refused-rename-writes-nothing--a-refused-rename-writes-nothing)
-- [The write set](#the-write-set)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -144,25 +143,6 @@ A rename MUST run every check before the first byte, MUST commit once, and MUST 
 - THEN no file changed, because a rename that half-applies leaves references pointing at two names
 
 Verify: `cargo nextest run --test writer_guarantees`
-
-## The write set
-
-```text
-the lane entry's id, when an entry is renamed
-the story document and its title line
-the story's sibling directory, when one exists
-the epic or initiative document, when one is renamed
-the question's heading, when a question is renamed
-the journal, history travelling with the entry
-the pending fragment, when the entry is still a fragment
-every dependency entry naming the old id, in every lane
-every successor field naming the old id
-every blocking line naming the old id
-every epic field naming the old id, when an epic is renamed
-every initiative section naming the old id, when an initiative is renamed
-```
-
-A question has no lane entry, no journal, and no fragment, so its rename touches its heading and its inbound references alone.
 
 ## Unenforced rules
 

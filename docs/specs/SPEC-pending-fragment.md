@@ -13,7 +13,6 @@
   - [`pending-fragment:a-claimed-document-is-not-an-orphan` — A claimed document is not an orphan](#pending-fragmenta-claimed-document-is-not-an-orphan--a-claimed-document-is-not-an-orphan)
   - [`pending-fragment:a-fragment-id-is-not-a-duplicate` — A fragment id is not a duplicate](#pending-fragmenta-fragment-id-is-not-a-duplicate--a-fragment-id-is-not-a-duplicate)
   - [`pending-fragment:the-drain-reports-drift-and-repairs-none` — The drain reports drift and repairs none](#pending-fragmentthe-drain-reports-drift-and-repairs-none--the-drain-reports-drift-and-repairs-none)
-- [File shape](#file-shape)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -131,25 +130,6 @@ When the drain finds drift, it MUST report the drift and MUST NOT repair it.
 - THEN the fragment lands and the report names the closed dependency without changing the dependency list
 
 Verify: `cargo nextest run --test verb_contracts`
-
-## File shape
-
-```yaml
-lane: backlog
-captured: "2026-08-14T09:41:07Z"
-entry:
-  id: rate-limit-the-search-endpoint
-  type: story
-  points: 2
-  summary: "Callers of the search endpoint are limited per token, and the limit is announced in the response headers rather than discovered by being cut off."
-  needs: ["payments#secure-session-storage"]
-  touches: [src/http/limit.rs]
-  epic: session-hardening
-```
-
-A fragment's `needs` accepts the same two forms a lane entry's does, and the double-quoting rule applies here too.
-
-A fragment's `touches` mirrors the lane entry's field and carries the same bound, and it is optional here for the reason points and summary are. Capture writes what it knows, and the fragment is committed as captured. The drain refuses every field a lane entry requires, so a fragment reaching the drain without its prediction is refused by name, and `pending-fragment:a-fragment-requires-only-id-and-type` is unchanged. A fragment carries no session claim, because a claim belongs to a work lane and a fragment claims a planning one.
 
 ## Unenforced rules
 

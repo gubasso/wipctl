@@ -20,7 +20,6 @@
   - [`repair:the-repair-never-names-a-plan-or-a-dependency` — The repair never names a plan or a dependency](#repairthe-repair-never-names-a-plan-or-a-dependency--the-repair-never-names-a-plan-or-a-dependency)
   - [`repair:the-slot-report-writes-nothing` — The slot report writes nothing](#repairthe-slot-report-writes-nothing--the-slot-report-writes-nothing)
   - [`repair:the-repair-removes-an-orphaned-suppression` — The repair removes an orphaned suppression](#repairthe-repair-removes-an-orphaned-suppression--the-repair-removes-an-orphaned-suppression)
-- [The slot repair](#the-slot-repair)
 
 <!--TOC-->
 
@@ -221,29 +220,3 @@ When the repair finds a suppression whose id names no entry, the implementation 
 - THEN it removes and reports the suppression, because local state has no reminder left to hide
 
 Verify: `cargo nextest run --test writer_guarantees`
-
-## The slot repair
-
-```text
-wipctl fix --registry [<name>]
-```
-
-Without a name, the repair derives the project slug and escalates it until free. With a name, it uses that name and refuses an occupied destination.
-
-The repair takes the locks for the current and new slot names in lexical order. It then moves three filesystem parts in order:
-
-```text
-1. move the slot
-2. move the state directory
-3. remove the old cache directory
-```
-
-Each boundary is resumable. A later run finds the moved slot, then completes any state move and cache removal left under the old name.
-
-The repair writes no project file because a peer slot has no host repository. It commits and replicates nothing. It accepts the project underfoot and refuses the plan targeting flag.
-
-```text
-wipctl: slot renamed: payments -> payments-ben
-wipctl: state moved:  <state dir>/projects/payments-ben
-wipctl: cache removed: <cache dir>/projects/payments
-```

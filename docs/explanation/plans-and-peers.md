@@ -48,7 +48,7 @@ https://git.example.org/acme/payments.git    url        a hint; replaceable
 
 Two plans can both call a peer `payments` and mean different things. The alias resolves only in its file. The plan id is immutable, while the url remains replaceable. An alias is local to the plan that declares it, so an alias means nothing outside the file that holds it.
 
-A committed file is read by everyone who clones this plan, so a credential in it is a leak whatever the tool prints.
+A committed file is read by everyone who clones this plan, so a credential in it is a leak whatever the tool prints. A bare account name in the userinfo is allowed, because it names an account. A colon there is where a password goes, so a url carrying one is refused rather than redacted. The percent sign is refused there too, because `%3A` carries the same colon past a check that reads the url as written.
 
 Two operations of the peer writer carry the weight. `add` makes the uid a machine's problem rather than a person's, which is what lets the design afford an opaque identity at all. `alias` makes the alias genuinely local, because a project renames a peer to whatever its own readers understand.
 

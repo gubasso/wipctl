@@ -20,8 +20,6 @@
   - [`cli-conventions:an-absent-verb-is-declared` — An absent verb is declared](#cli-conventionsan-absent-verb-is-declared--an-absent-verb-is-declared)
   - [`cli-conventions:the-version-is-one-bare-string` — The version is one bare string](#cli-conventionsthe-version-is-one-bare-string--the-version-is-one-bare-string)
   - [`cli-conventions:completion-derives-its-candidates` — Completion derives its candidates](#cli-conventionscompletion-derives-its-candidates--completion-derives-its-candidates)
-- [Exit codes](#exit-codes)
-- [The verb surface](#the-verb-surface)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -225,69 +223,6 @@ Completion MUST derive its candidates at completion time, from the usage output,
 - THEN it offers nothing, because falling back to filenames offers candidates that are not ids
 
 Verify: `cargo nextest run --test completion`
-
-## Exit codes
-
-```text
-0  the command did what was asked
-1  a check the command performs did not hold
-2  the invocation itself was wrong
-3  the writer lock could not be acquired within the bounded wait
-```
-
-## The verb surface
-
-The command is `wipctl`. These are its verbs and their usage. A verb's own domain states what it does. This table states what it is called and what it accepts.
-
-```text
-wipctl [--plan <alias>] <verb> [...]
-
-wipctl init [--root DIR] [--window-start YYYY-MM-DD] [--print-hooks] [--dry-run]
-wipctl attach <plan-repo-url>
-wipctl attach --create
-wipctl attach --mint-uid
-wipctl attach --peers
-wipctl new <type> "<title>" [--id <id>] [--epic <id>] [--points <n>] [--lane <backlog|todo>]
-wipctl land [--report]
-wipctl move <id> --to <lane> [--outcome <o>] [--succeeded-by <id>] [--closed <date>] [--session <ref>] [--dry-run]
-wipctl start [--session <ref>]
-wipctl delete <id> [--dry-run]
-wipctl rename <id> "<new title>" [--id <new-id>]
-wipctl rename <id> --id <new-id>
-wipctl fix [--slots | --registry [<name>]]
-wipctl sync [--all] [--json]
-wipctl resolve <id> --keep <here|remote>
-wipctl validate
-wipctl doctor
-wipctl next [--why]
-wipctl ids
-wipctl board [--why]
-wipctl dashboard
-wipctl graph [--unblocks <id>]
-wipctl flow [--lane <lane>]
-wipctl stale [--all]
-wipctl stale --hide <id> (--for <duration> | --forever)
-wipctl stale --show <id>
-wipctl velocity
-wipctl epic [--json] [--write] [<epic-id>]
-wipctl epics [--json]
-wipctl initiative [--json] [<initiative-id>]
-wipctl initiatives [--json]
-wipctl peer add <url> [--as <alias>]
-wipctl peer alias <alias> <new-alias>
-wipctl peer url <alias> (--add <url> | --remove <url> | --set <url>...)
-wipctl peer remove <alias>
-wipctl peers [--json]
-wipctl man [<verb>]
-wipctl help
-wipctl version
-```
-
-Every verb except `help`, `version`, and `man` is a workflow verb. A workflow verb operates the record. The other three operate the program and resolve nothing, so they cannot inspect staleness.
-
-Ten workflow verbs write the record: `new`, `land`, `move`, `start`, `delete`, `rename`, `fix`, `sync`, `resolve`, and `peer`. Closing is not a verb of its own. It is `move --to closed` with an outcome.
-
-`attach` takes exactly one of four forms: a plan location, `--create`, `--mint-uid`, or `--peers`. The identity-minting form commits `plan_id` and `project_id` to the plan trunk, then prints the project file line. It does not write the host. The `peer` operation is its first positional argument, so the surface gains no subcommands.
 
 ## Unenforced rules
 

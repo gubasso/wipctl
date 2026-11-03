@@ -17,7 +17,6 @@
   - [`rendering:the-dependency-drawing-is-a-ladder` — The dependency drawing is a ladder](#renderingthe-dependency-drawing-is-a-ladder--the-dependency-drawing-is-a-ladder)
   - [`rendering:a-composite-view-has-two-layouts` — A composite view has two layouts](#renderinga-composite-view-has-two-layouts--a-composite-view-has-two-layouts)
   - [`rendering:an-optional-renderer-degrades-one-thing` — An optional renderer degrades one thing](#renderingan-optional-renderer-degrades-one-thing--an-optional-renderer-degrades-one-thing)
-- [Glyph tiers](#glyph-tiers)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -183,17 +182,6 @@ Where the implementation adopts an optional rendering tool, that tool MUST be pi
 - THEN one line names the degradation and the rest of the view is unchanged
 
 Verify: `cargo nextest run --test rendering`
-
-## Glyph tiers
-
-| Tier             | Use                                                                                                            |
-| ---------------- | -------------------------------------------------------------------------------------------------------------- |
-| ASCII            | the universal fallback, selected by the plain flag                                                             |
-| Block Elements   | the default drawing tier; every glyph is display-width 1                                                       |
-| Box Drawing      | junctions for the ladder graph, from the four direction bits                                                   |
-| Braille patterns | a density tier, weakest in font coverage, announced as braille by screen readers; no baseline view requires it |
-
-A cross-plan marker is drawn from the default tier, and its plain-flag form comes from the ASCII tier, like every other badge. It carries one fact, which is that a dependency of this row reaches another plan, so one width-1 glyph is the whole of it.
 
 ## Unenforced rules
 

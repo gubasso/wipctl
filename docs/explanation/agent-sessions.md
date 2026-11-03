@@ -8,4 +8,4 @@ An adapter table takes `inspect`, `contact`, and `resume`, and the configuration
 
 ## Why idle is not a state
 
-A reading's state is `active`, `ended`, or `unknown`, and `active` means present evidence that the session can continue, not that it executes at this instant. Adding `idle` beside the present meaning of `active` makes the two values overlap. A provider's own vocabulary, idle, executing, or streaming, stays in the reading's opaque activity, so the state stays portable across session systems.
+A reading's state is `active`, `ended`, or `unknown`, and `active` means present evidence that the session can continue, not that it executes at this instant. Adding `idle` beside the present meaning of `active` makes the two values overlap. A provider distinction such as idle, executing, streaming, compacting, or waiting stays in the optional opaque activity until a later domain establishes a portable second field. The state then stays portable across session systems.

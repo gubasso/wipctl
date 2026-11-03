@@ -21,7 +21,6 @@
   - [`documents:a-promised-path-is-exempt-and-never-stubbed` — A promised path is exempt and never stubbed](#documentsa-promised-path-is-exempt-and-never-stubbed--a-promised-path-is-exempt-and-never-stubbed)
   - [`documents:a-rule-delta-is-typed-and-single` — A rule delta is typed and single](#documentsa-rule-delta-is-typed-and-single--a-rule-delta-is-typed-and-single)
   - [`documents:an-artifact-lives-beside-the-document` — An artifact lives beside the document](#documentsan-artifact-lives-beside-the-document--an-artifact-lives-beside-the-document)
-- [The three heading sequences](../reference/plan-documents.md#the-three-heading-sequences)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -235,30 +234,6 @@ Where a story carries non-narrative artifacts, they MUST live in a sibling direc
 - THEN the document narrates and the sibling directory holds, because prose is the wrong container for a dataset
 
 Verify: `cargo nextest run --test validation`
-
-## The three heading sequences
-
-| Story            | Epic           | Initiative     |
-| ---------------- | -------------- | -------------- |
-| —                | `Initiative`   | —              |
-| `Goal`           | `Goal`         | `Goal`         |
-| `Example`        | `Example`      | `Example`      |
-| `Core`           | `Core`         | `Core`         |
-| `In scope`       | —              | —              |
-| `Out of scope`   | `Out of scope` | `Out of scope` |
-| `Reads`          | `Reads`        | `Reads`        |
-| `Amends`         | `Amends`       | `Amends`       |
-| `Sources`        | `Sources`      | `Sources`      |
-| `Acceptance`     | —              | —              |
-| —                | `Done when`    | `Done when`    |
-| `Tasks`          | —              | —              |
-| `Rabbit holes`   | —              | —              |
-| `Refused option` | —              | —              |
-| `Revisions`      | `Revisions`    | `Revisions`    |
-
-Five story headings are deliberately absent above the story. Negotiable scope needs a point budget no epic has. Acceptance, tasks, traps, and a refused option bind the one work session a story owns, and no session implements an epic or an initiative. The closing condition runs the other way: a story closes on its acceptance, and the tiers above it state an observable end state instead.
-
-Three story sections read as near neighbours and are not. Negotiable scope is an outcome the story can cut. A rabbit hole is a trap inside the chosen approach. A refused option is a second approach to the same goal, with the reason it lost. A refusal that is significant and hard to reverse is a decision record instead.
 
 ## Unenforced rules
 

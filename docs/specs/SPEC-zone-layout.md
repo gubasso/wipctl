@@ -14,8 +14,6 @@
   - [`zone-layout:the-plan-trunk-is-one-branch` — The plan trunk is one branch](#zone-layoutthe-plan-trunk-is-one-branch--the-plan-trunk-is-one-branch)
   - [`zone-layout:plan-history-is-append-only` — Plan history is append-only](#zone-layoutplan-history-is-append-only--plan-history-is-append-only)
   - [`zone-layout:the-shipped-payload-is-never-copied-in` — The shipped payload is never copied into a zone](#zone-layoutthe-shipped-payload-is-never-copied-in--the-shipped-payload-is-never-copied-into-a-zone)
-- [The host file and the four base directories](#the-host-file-and-the-four-base-directories)
-- [The zone](#the-zone)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -145,61 +143,6 @@ The schemas, the scaffold payload, and the worked example MUST stay under the in
 - THEN the copy is a second source of truth drifting from the version the gate runs
 
 Verify: `cargo nextest run --test journey`
-
-## The host file and the four base directories
-
-```text
-host repo:
-  .wipctl/project.toml          identity only; committed; travels with every clone
-
-$XDG_DATA_HOME/wipctl/
-  projects/<slot name>/plan-repo/   the plan zone, its own repository, trunk only
-
-$XDG_STATE_HOME/wipctl/
-  projects/<slot name>/             replication bookkeeping, diagnostics
-    suppressions.toml               stale reminders hidden on this machine
-
-$XDG_CACHE_HOME/wipctl/
-  projects/<slot name>/             derived views; disposable; no verb reads it back
-
-$XDG_RUNTIME_DIR/wipctl/
-  <slot name>.lock                  writer lock; transaction-scoped; never in the record
-
-fallback, where XDG_RUNTIME_DIR is unset or empty:
-  /tmp/wipctl-<uid>/                 created mode 0700
-```
-
-The base-directory specification gives no default for the runtime directory, and unset is ordinary in cron jobs, containers, and remote sessions with no session manager. Those are exactly where agents run, so the fallback is stated rather than left open.
-
-A suppression belongs in state because it changes one machine's reminders. The plan configuration would replicate the silence to every clone. A lane entry has fixed fields and holds no durable local fact. The cache is disposable, and no verb reads it back.
-
-The transaction lock covers the plan record. A suppression file is local state outside that record, so its writers do not take the record lock.
-
-```text
-XDG_DATA_HOME    $HOME/.local/share
-XDG_STATE_HOME   $HOME/.local/state
-XDG_CACHE_HOME   $HOME/.cache
-```
-
-## The zone
-
-```text
-plan-repo/
-  .wipctl/plan.toml             the plan's whole configuration: both
-                                identities, the cadence, the peers it
-                                names, and the sources it references
-  README.md                     orientation for a reader arriving at the zone
-  AGENTS.md                     the method, self-sufficient, written by the scaffold
-  charter.md                    what the project is for, pillars, no-gos, cadence
-  open-questions.md             questions that block named entries
-  watches.md                    outside items that block named entries; earned
-  lanes/                        backlog, todo, doing, review, closed
-  stories/<id>.md               one document per story, optional sibling directory
-  epics/<id>.md                 one document per epic; earned, not scaffolded
-  initiatives/<id>.md           one document per initiative; earned the same way
-  journal/<id>.tsv              one transition stream per entry; created on first move
-  pending/<id>.yml              one fragment per captured entry; created on demand
-```
 
 ## Unenforced rules
 

@@ -17,8 +17,6 @@
   - [`ids:a-counter-is-forbidden-across-machines` — A counter is forbidden across machines](#idsa-counter-is-forbidden-across-machines--a-counter-is-forbidden-across-machines)
   - [`ids:a-freed-id-is-burned` — A freed id is burned](#idsa-freed-id-is-burned--a-freed-id-is-burned)
   - [`ids:a-burned-id-is-refused-at-the-mint` — A burned id is refused at the mint](#idsa-burned-id-is-refused-at-the-mint--a-burned-id-is-refused-at-the-mint)
-- [Grammar and slugification](#grammar-and-slugification)
-- [An id and a prefixed id](#an-id-and-a-prefixed-id)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -184,42 +182,6 @@ An entry, epic, initiative, or fragment MUST NOT claim an id a tombstone holds, 
 - THEN it refuses naming the tombstone and its date. The tombstone occupies the id-named path, so releasing the slug loses the fact of the deletion
 
 Verify: `cargo nextest run --test ids`
-
-## Grammar and slugification
-
-```text
-[a-z0-9]+(-[a-z0-9]+)*
-```
-
-A question id carries the same grammar behind the fixed prefix `Q-`.
-
-```text
-1. lowercase
-2. apostrophes are removed rather than hyphenated      don't -> dont
-3. every other run of characters outside a-z0-9 becomes a single hyphen
-4. leading and trailing hyphens are trimmed
-```
-
-```text
-id  ==  slugify(title)                     the ordinary case
-id  ==  slugify(title) + "-" + <postfix>   where the slug alone was taken
-```
-
-## An id and a prefixed id
-
-A dependency can name an entry in another plan, so two shapes appear where one used to.
-
-```text
-an id             one token; never parsed; names one thing in one record
-
-a prefixed id     an alias, a separator, and an id; split exactly once on
-                  the first separator; the alias half goes to the peer
-                  table and the id half is carried whole
-```
-
-Exactly one function in an implementation performs that split. Nothing else in the code splits a dependency value. A second splitter is how the two halves come to disagree.
-
-After the split, the id half is an ordinary id under the ordinary rule. So the opacity rule below survives the addition: it is the id that is never parsed, and a prefixed id is a pair that was never one id.
 
 ## Unenforced rules
 

@@ -9,11 +9,6 @@
   - [`plan-targeting:the-dispatch-matrix-is-derived` — The dispatch matrix is derived](#plan-targetingthe-dispatch-matrix-is-derived--the-dispatch-matrix-is-derived)
   - [`plan-targeting:the-target-owns-the-lock-and-the-commit` — The target owns the lock and the commit](#plan-targetingthe-target-owns-the-lock-and-the-commit--the-target-owns-the-lock-and-the-commit)
   - [`plan-targeting:the-flag-names-one-plan` — The flag names one plan](#plan-targetingthe-flag-names-one-plan--the-flag-names-one-plan)
-- [The flag](#the-flag)
-- [The third resolution path](#the-third-resolution-path)
-- [The dispatch matrix](#the-dispatch-matrix)
-- [Parity, and what it costs](#parity-and-what-it-costs)
-- [What it does not change](#what-it-does-not-change)
 - [Diagnostics](#diagnostics)
 
 <!--TOC-->
@@ -83,67 +78,6 @@ The flag MUST name one plan, and combining it with a batch flag MUST be a usage 
 - THEN it is refused, because one flag names a target and the other names a batch, so together they say nothing
 
 Verify: `cargo nextest run --test verb_contracts`
-
-## The flag
-
-```text
-wipctl [--plan <alias>] <verb> [...]
-```
-
-`--plan` is a global flag, parsed before the verb, in the group the command surface already defines. It takes an alias from this plan's own peer table. Given one, the verb acts on the plan that alias names, and every other rule of that verb is unchanged.
-
-It reaches one hop, and the page says so plainly. An alias is local to the plan that declares it, so an alias means nothing outside the file that holds it. If `alpha` declares `beta` and `beta` declares `gamma`, then `gamma` has no name in `alpha`. Running `wipctl --plan gamma <verb>` from `alpha` is a usage error, because the table has no such row.
-
-The closure is what the checker proves over. The flag selects from one table. A verb that must act on `gamma` is run from a shell inside it. The other route is for `alpha` to declare it and give it a name of its own.
-
-## The third resolution path
-
-```text
-no --plan     walk upward to .wipctl/project.toml, read project_id,
-              and find the slot whose plan file declares it
-
---plan <a>    resolve this project's plan as above, read its peers
-              section, resolve <a> to plan_id, and find the slot whose
-              plan file declares that identity
-```
-
-The second path still starts with the first, because the table that binds the alias lives in this plan. A caller outside any project has no table to read, so the flag there is the ordinary no-configuration usage error.
-
-## The dispatch matrix
-
-`init` never walks, and the manual, the usage output, and the version resolve nothing. A flag that redirects resolution has nothing to say to such a verb, so the page states the matrix rather than the word every.
-
-```text
-takes --plan     every verb that resolves a record: the readers, the ten
-                 writers, peer, peers, doctor, and validate
-
-refuses --plan   init, man, help, version. Passing it is a usage error,
-                 naming the verb and the reason, because the invocation
-                 asks for a redirection the verb has nowhere to apply
-
-one form         fix --registry refuses --plan too. The slot repair is
-refuses it       machine-local and acts on the project underfoot, while
-                 every other form of fix takes the flag
-```
-
-`init` is the one worth a sentence. It creates a plan for the project the caller is inside, so `wipctl --plan payments init` reads as an instruction to create a plan inside a plan. That is not a thing, and refusing it is better than choosing a meaning for it.
-
-The matrix is derived the same way the verb list is, from the build. A verb added later joins one side of it by existing rather than by being remembered.
-
-## Parity, and what it costs
-
-A peer is a plan, so every verb that resolves a record accepts the flag, writers included. `wipctl --plan payments board` reads that plan's board. `wipctl --plan payments move <id> doing` moves an entry in that plan, holds that plan's writer lock, and commits to that plan's trunk.
-
-Write access is the operator's business. The tool refuses nothing on the basis of who owns the peer, because it has no permission model and no pillar allows one. A push the forge rejects is reported by replication in the relayed-transport class, which is where a permission failure surfaces.
-
-The cost is worth stating. A verb that writes can now write into another team's record from a shell that happens to be in this project. That is what parity means. The mitigation is that the alias is already in a committed table, not that the tool second-guesses the operator.
-
-## What it does not change
-
-- Resolution for a bare invocation. Without the flag, everything resolves as it did.
-- Whether a verb is multi-plan. The flag selects one plan, so the batch mode stays the one the replication domain defines.
-- How far a name reaches. The flag resolves through this plan's own table, so it can only name a plan this record declared itself.
-- Whether a plan exists. An alias whose slot is empty is the ordinary unattached-peer failure, naming the walk that fills it.
 
 ## Diagnostics
 

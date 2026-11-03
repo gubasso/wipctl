@@ -23,8 +23,6 @@
   - [`metrics:only-a-delivered-close-counts` — Only a delivered close counts](#metricsonly-a-delivered-close-counts--only-a-delivered-close-counts)
   - [`metrics:an-empty-window-renders-at-zero` — An empty window renders at zero](#metricsan-empty-window-renders-at-zero--an-empty-window-renders-at-zero)
   - [`metrics:a-changed-cadence-restarts-the-series` — A changed cadence restarts the series](#metricsa-changed-cadence-restarts-the-series--a-changed-cadence-restarts-the-series)
-- [The three flow measures](#the-three-flow-measures)
-- [Suppressions](#suppressions)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -276,38 +274,6 @@ Where the window anchor or length changes, the implementation MUST restart the w
 - THEN it starts again from the anchor, because a window redefined mid-series compares two different things
 
 Verify: `cargo nextest run --test metrics`
-
-## The three flow measures
-
-| Measure | Definition                                                                                           |
-| ------- | ---------------------------------------------------------------------------------------------------- |
-| age     | from the first entry into the in-flight lane to the entry's last event when closed, otherwise to now |
-| dwell   | the summed intervals spent in the review lane, counting an open interval through now                 |
-| rework  | entries into the in-flight lane beyond the first                                                     |
-
-A duration is displayed in whole days, floored.
-
-## Suppressions
-
-The suppression file lives at `$XDG_STATE_HOME/wipctl/projects/<slot name>/suppressions.toml`. Each `[[suppression]]` table carries an entry `id` and exactly one end condition.
-
-```toml
-[[suppression]]
-id = "the-stale-alarm"
-until = "2026-10-09T12:00:00Z"
-
-[[suppression]]
-id = "keep-the-live-story"
-forever = true
-```
-
-`wipctl stale --hide <id> --for <duration>` records an expiry in the transition journal's stated UTC textual form. `wipctl stale --hide <id> --forever` records a permanent suppression. `wipctl stale --show <id>` removes either form.
-
-The hide form has no default duration. A hide request with neither end condition is a usage error that names both flags. An id that names no entry is a usage error.
-
-Only the hide and show forms write the file. Read paths leave it unchanged. They ignore and report a suppression whose id names no entry.
-
-The file is local state, not a plan record or a machine output. It owes no schema. The metrics cases own its shape and behavior.
 
 ## Unenforced rules
 

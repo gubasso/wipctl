@@ -16,7 +16,6 @@
   - [`epics:no-verb-reports-a-staleness-verdict` — No verb reports a staleness verdict](#epicsno-verb-reports-a-staleness-verdict--no-verb-reports-a-staleness-verdict)
   - [`epics:the-resolution-is-derived-every-call` — The resolution is derived on every call](#epicsthe-resolution-is-derived-every-call--the-resolution-is-derived-on-every-call)
   - [`epics:the-cache-is-authoritative-for-nothing` — The cache is authoritative for nothing](#epicsthe-cache-is-authoritative-for-nothing--the-cache-is-authoritative-for-nothing)
-- [The point arithmetic](../reference/measures.md#the-point-arithmetic)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -172,15 +171,6 @@ Where the resolution is written to the cache, a missing, stale, or corrupt cache
 - THEN every verb answers the same, because the cache is rewritten on each call and read back by nothing
 
 Verify: `cargo nextest run --test epics`
-
-## The point arithmetic
-
-| Outcome    | Contribution                                                      |
-| ---------- | ----------------------------------------------------------------- |
-| `done`     | delivers its own points                                           |
-| `cut`      | contributes nothing and stays in the total                        |
-| `reshaped` | delivers its own points exactly when its successor closed as done |
-| reopened   | counts as open                                                    |
 
 ## Unenforced rules
 

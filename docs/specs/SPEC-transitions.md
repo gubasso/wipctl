@@ -18,7 +18,6 @@
   - [`transitions:taking-work-is-atomic` — Taking work is atomic](#transitionstaking-work-is-atomic--taking-work-is-atomic)
   - [`transitions:taking-prints-what-the-preview-would` — Taking prints what the preview would](#transitionstaking-prints-what-the-preview-would--taking-prints-what-the-preview-would)
   - [`transitions:nothing-startable-terminates-the-loop` — Nothing startable terminates the loop](#transitionsnothing-startable-terminates-the-loop--nothing-startable-terminates-the-loop)
-- [The move preflight, in order](../reference/verb-mechanics.md#the-move-preflight-in-order)
 - [Unenforced rules](#unenforced-rules)
 
 <!--TOC-->
@@ -200,16 +199,6 @@ Where nothing is startable, the take verb MUST fail naming why, and MUST NOT tak
 - THEN it fails naming the reason so the loop terminates, and entries already in flight do not stop it
 
 Verify: `cargo nextest run --test verb_contracts`
-
-## The move preflight, in order
-
-1. The record already validates.
-2. The destination is a real lane.
-3. The id is in some lane.
-4. The entry is not already in the destination.
-5. The closing flags are consistent. An outcome is required by and only by a move to the closed lane. A successor is required by and only by a reshaped outcome.
-6. An entry entering a work lane has every dependency closed and no blocking question. A dependency that names a peer is read in that peer's record, and step 6 needed no widening to reach it: a peer's entry is an entry and its lane is a lane.
-7. A supplied session reference names a work lane as its destination. A move to a planning or closed lane carries none, which holds a session claim to the discipline step 5 holds a closing flag to.
 
 ## Unenforced rules
 
