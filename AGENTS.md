@@ -46,6 +46,8 @@ Everything needed to understand, build, or gate this project lives in it. An out
 
 This repository owes its own toolchain a hook, a test case, a pinned environment, and dogfooding. `docs/specs/SPEC-quality-gates.md` specifies all four. Every shipped artifact carries those obligations in the same change that ships it.
 
+The commit stage and the push stage of the hooks together run every check CI runs, per `quality-gates:the-local-stages-hold-every-ci-check`. The push stage holds the costly checks: the integration tests, the builds, and the networked checks. It repeats none of the commit stage. A new check is a new hook at one of the two stages, never a new CI job. `README.md` lists the checks that only CI can run, with the reason for each.
+
 Report a documentation change by ownership: which source of truth changed, and which links were added.
 
 <!-- BEGIN release-kit -->

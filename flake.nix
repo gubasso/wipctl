@@ -19,10 +19,11 @@
     };
   };
 
-  # Two outputs. The development shell pins the toolchain every gate runs on;
+  # Three outputs. The development shell pins the toolchain every gate runs on;
   # the gates themselves live in `.pre-commit-config.yaml` and the `justfile`.
   # The package builds the crate from its committed lock, which is what
-  # `nix run github:gubasso/wipctl/vX.Y.Z` and the `nix-build` CI job resolve.
+  # `nix run github:gubasso/wipctl/vX.Y.Z` resolves. The checks build that same
+  # package, so `nix flake check` at the push stage proves it builds.
   outputs =
     {
       nixpkgs,
@@ -111,6 +112,7 @@
 
             # Release path to crates.io.
             pkgs.release-plz
+            pkgs.cargo-release # scripts/release cargo-release-dry
             pkgs.cargo-dist # invoked as `dist`
             # `rk` from this flake, at the pinned tag. One provider: a host
             # install of release-kit beside this would serve a second version.
@@ -137,6 +139,10 @@
       # owns it.
       packages = forAllSystems (pkgs: {
         default = pkgs.callPackage ./nix/package.nix { };
+      });
+
+      checks = forAllSystems (pkgs: {
+        package = pkgs.callPackage ./nix/package.nix { };
       });
     };
 }

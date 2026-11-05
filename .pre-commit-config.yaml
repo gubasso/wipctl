@@ -1,16 +1,16 @@
-# All three hook types are installed, because the gates here must hold at both
-# the commit and the push stage: a companion tool or a `--no-verify` that skips
-# the commit hooks still meets the gate before anything is published
-# (docs/specs/SPEC-quality-gates.md, "Stage coverage").
+# All three hook types are installed. The commit stage and the push stage
+# together run every check CI runs, and CI runs those two stages and nothing
+# beside them (quality-gates:the-local-stages-hold-every-ci-check).
 default_install_hook_types: [pre-commit, commit-msg, pre-push]
 
 # A hook that names no `stages` inherits this, so the cheap tree-wide checks
-# — formatting, lints, editorconfig, spelling, markdown, secrets — run at BOTH
-# pre-commit and pre-push, which is what makes the push stage a real gate
-# rather than a smaller one. Without this line the default is every stage,
-# which would also drag them into commit-msg, where they are handed the message
-# file and match nothing. `committed` opts back into commit-msg explicitly.
-default_stages: [pre-commit, pre-push]
+# (formatting, lints, editorconfig, spelling, markdown, secrets) run once, at
+# the commit stage. The push stage holds only the costly checks, the tests,
+# builds, and networked checks a hook names `pre-push` for, and repeats none of
+# the commit stage. Without this line the default is every stage, which would
+# also drag the checks into commit-msg, where they are handed the message file
+# and match nothing. `committed` opts back into commit-msg explicitly.
+default_stages: [pre-commit]
 
 repos:
 # BEGIN release-kit
@@ -103,25 +103,34 @@ repos:
   # no-emphasis, and the two link-form rules have no configuration, so each
   # takes its own exclude. The reading hooks keep them: the parsers and the
   # secret scans. The sdd gates run with `always_run` and read no filenames.
+  #
+  # Five of these ids set `stages: [pre-commit, pre-push, manual]` in their own
+  # manifest, and a manifest `stages` wins over `default_stages`. Each of the
+  # five names the commit stage here, so the push stage repeats none of them.
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
         exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml|docs/\.markdownlint-cli2\.jsonc)$|^\.spec-driven-docs/|(^|/)(Cargo|flake)\.lock$'
+        stages: [pre-commit]
       - id: end-of-file-fixer
         exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml|docs/\.markdownlint-cli2\.jsonc)$|^\.spec-driven-docs/|(^|/)(Cargo|flake)\.lock$'
+        stages: [pre-commit]
       - id: check-added-large-files
         args: ['--maxkb=16384']
+        stages: [pre-commit]
       - id: check-case-conflict
       - id: check-merge-conflict
         args: ['--assume-in-merge']
       - id: check-shebang-scripts-are-executable
+        stages: [pre-commit]
       - id: check-symlinks
       - id: check-toml
       - id: check-yaml
       - id: check-xml
       - id: destroyed-symlinks
+        stages: [pre-commit]
       - id: detect-private-key
       # - id: no-commit-to-branch
 
@@ -263,14 +272,14 @@ repos:
   #                  nextest — covered by the separate `cargo test --doc`
   #                  hook below.
   #
-  # Tier-to-hook mapping (matches 08-testing-strategy.md § CI essentials):
+  # Tier-to-hook mapping:
   #   - pre-commit: unit only            (sub-second budget)
-  #   - pre-push:   unit + integration   (single-digit-seconds budget)
-  #   - CI:         everything + E2E     (live in .github/workflows)
+  #   - pre-push:   integration          (single-digit-seconds budget)
+  #   - CI:         the same two stages, and nothing beside them
   #
-  # The unit hook is therefore wired to BOTH `pre-commit` and `pre-push`
-  # stages: it's nearly free and guards against committed-but-not-tested
-  # changes (rebases, amends) reaching the remote.
+  # Each tier runs at one stage only, so the push stage repeats no unit test
+  # (quality-gates:the-local-stages-hold-every-ci-check). CI runs both stages,
+  # which is what catches a commit that skipped its hooks.
   #
   # `--no-tests=warn` is load-bearing on a young crate. Since nextest 0.9.85 the
   # default is `fail`: a run matching zero tests exits 4 (NO_TESTS_RUN), so a
@@ -281,7 +290,7 @@ repos:
   # `.config/nextest.toml` key for this: it is a CLI flag (or NEXTEST_NO_TESTS).
   #
   # Requires:
-  #   - `cargo nextest` on PATH (cargo install --locked cargo-nextest)
+  #   - `cargo nextest` from the devShell (`flake.nix`)
   #   - the sibling `.config/nextest.toml` at the repo root, defining the
   #     `pre-commit` and `pre-push` profiles.
   - repo: local
@@ -292,13 +301,38 @@ repos:
         language: system
         types: [rust]
         pass_filenames: false
-        stages: [pre-commit, pre-push]
+        stages: [pre-commit]
 
       - id: cargo-nextest-integration
         name: cargo nextest (integration tests)
         entry: cargo nextest run --profile pre-push --all-features --no-tests=warn
         language: system
         types_or: [rust, toml]
+        pass_filenames: false
+        stages: [pre-push]
+
+      # The release profile sets `lto`, `codegen-units`, and `strip`
+      # (Cargo.toml), so a defect can break it and leave the debug build that
+      # the tests use green. Pre-push, because it is a full optimized build.
+      - id: cargo-build-release
+        name: cargo build (release profile)
+        entry: cargo build --release --all-features
+        language: system
+        types_or: [rust, toml]
+        pass_filenames: false
+        stages: [pre-push]
+
+      # The release automation verifies the package before it publishes: it
+      # packages the crate and builds the packaged copy (release-plz.toml).
+      # This runs the same check with the devShell `cargo`, so a file the
+      # package drops, or a build that fails only from the packaged copy, fails
+      # here and not at release time. It reads the registry index, so it is a
+      # networked check and runs at pre-push.
+      - id: publish-dry
+        name: cargo publish --dry-run (the package builds)
+        entry: scripts/publish-dry --allow-dirty
+        language: system
+        files: '^(Cargo\.(toml|lock)|src/.*|README\.md|CHANGELOG\.md|LICENSE-.*|scripts/publish-dry)$'
         pass_filenames: false
         stages: [pre-push]
 
@@ -421,7 +455,7 @@ repos:
         always_run: true
         pass_filenames: true
 
-  # --- Secret scanning (both stages) ---
+  # --- Secret scanning (commit stage) ---
   #
   # `ripsecrets-system` is upstream's own sanctioned system variant: same
   # entry, same args, same selectors as the default id, differing only in
@@ -431,8 +465,8 @@ repos:
   # out of sync on a future bump. nixpkgs `ripsecrets` is 0.1.11, matching the
   # rev this repo was already pinned to.
   #
-  # Upstream sets no `stages`, so this inherits `default_stages` and scans at
-  # both commit and push. That is deliberate for a secret scanner.
+  # Upstream sets no `stages`, so this inherits `default_stages` and scans
+  # what each commit adds. gitleaks below scans the history at the push stage.
   - repo: https://github.com/sirwart/ripsecrets
     rev: v0.1.11
     hooks:
@@ -536,7 +570,9 @@ repos:
   # nixpkgs-standard formatter) rewrites in place; statix and deadnix are
   # report-only gates — fix by hand or allowlist. statix walks the tree itself,
   # so its scope/ignore lives in the sibling `./statix.toml`. `nix flake check`
-  # evaluates the flake and is scoped to Nix changes, at the pre-push stage.
+  # evaluates the flake and builds its `checks` output, which is the package
+  # of `nix/package.nix`. It runs at the pre-push stage, on a change to any
+  # input of that build.
   - repo: local
     hooks:
       - id: nixfmt
@@ -559,10 +595,10 @@ repos:
         types: [nix]
         stages: [pre-commit]
       - id: nix-flake-check
-        name: nix flake check (eval)
+        name: nix flake check (builds the package)
         entry: nix flake check
         language: system
-        files: '\.nix$'
+        files: '(\.(nix|rs|toml|lock)$|^(scripts|tests)/)'
         pass_filenames: false
         stages: [pre-push]
 
@@ -580,9 +616,10 @@ repos:
   # is picked up without editing this hook. `files` decides when the gate runs;
   # the script decides what it reads.
   #
-  # Both stages, per quality-gates:the-record-gates-run-at-both-stages: a
-  # commit made with the commit hooks skipped still meets the gate before
-  # anything is published.
+  # The commit stage alone, per
+  # quality-gates:the-local-stages-hold-every-ci-check: CI runs the same stage,
+  # so a commit made with the commit hooks skipped still meets the gate before
+  # it merges.
   #
   # `language: system`; check-jsonschema comes from the devShell, which is the
   # single provider.
@@ -595,7 +632,6 @@ repos:
         language: system
         files: '^(docs/specs/SPEC-[^/]+/.*\.schema\.json|tests/fixtures/.*|scripts/check-schemas)$'
         pass_filenames: false
-        stages: [pre-commit, pre-push]
 
   # --- Prose rules no linter can express (local; before the formatter) ---
   #

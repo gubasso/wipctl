@@ -27,15 +27,23 @@ direnv allow   # loads the devShell on entering the directory
 nix develop    # or enter it ad hoc
 ```
 
-Checks live in the pre-commit hooks and the `justfile`, and nowhere else. CI runs those same entry points:
+Checks live in the pre-commit hooks and the `justfile`, and nowhere else. Every tool they call comes from the devShell. Run each one through it:
 
 ```bash
-just check   # the full gate set
-just test    # the test suite
-just lint    # formatting and lints
+nix develop --command just lint        # the commit stage
+nix develop --command just lint-push   # the push stage
+nix develop --command just check-all   # both stages, the run that equals CI
 ```
 
-Install the hooks once with `pre-commit install` inside the devShell. They run at commit and at push. [docs/specs/SPEC-quality-gates.md](./docs/specs/SPEC-quality-gates.md) states what this repository owes every artifact it ships, and it binds any change that adds one.
+In a shell that direnv loaded, run the same recipes directly, or with `direnv exec . just <recipe>` from outside.
+
+Install the hooks once with `pre-commit install` inside the devShell. The commit stage runs the cheap checks: formatting, lints, spelling, the documentation gates, the unit tests, and the secret scan. The push stage runs the costly ones: the integration tests, the release build, the package build, the package verification, and the dependency, history, and networked checks. The push stage repeats none of the commit stage. CI runs the two stages and nothing beside them, so a push that passed its hooks passes CI. [docs/specs/SPEC-quality-gates.md](./docs/specs/SPEC-quality-gates.md) states what this repository owes every artifact it ships, and it binds any change that adds one.
+
+Three workflows run outside the two stages:
+
+- `pr-title.yml` checks the title and the body of a pull request. Both exist only at the forge, so no hook can read them. The commit-msg hooks hold the same rules for each local commit message.
+- `release-plz.yml` verifies the package before it publishes, and the `publish-dry` hook runs the same check at the push stage with the devShell `cargo`. The workflow itself still takes its Rust toolchain and its `release-plz` binary from GitHub Actions, not from the devShell. This exception is temporary. It ends when release-kit renders `release-plz.yml` to run through the dev environment of the project, and this repository records its answer for that environment and takes that release.
+- `release.yml` builds the release artifacts and runs no check of the code. The `dist-generate-check` hook holds it equal to `dist-workspace.toml`.
 
 ## Documentation
 
