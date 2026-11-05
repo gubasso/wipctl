@@ -6,8 +6,10 @@
 # being entered a second time per recipe.
 #
 # The gates themselves live in `.pre-commit-config.yaml` and the `justfile`;
-# nothing here re-implements a check. Adding a gate means adding a hook, not
-# editing this file.
+# nothing here re-implements a check. CI runs the commit stage and the push
+# stage and nothing beside them, so a push that passed its hooks passes CI
+# (quality-gates:the-local-stages-hold-every-ci-check). Adding a gate means
+# adding a hook, not editing this file.
 #
 # Hardening upgrade: pin each action to a full commit SHA and let Dependabot
 # raise the bumps. Left on major tags because unattended SHA pins rot.
@@ -65,8 +67,9 @@ jobs:
           SKIP: no-commit-to-branch,rk-worktree-location
         run: nix develop --command just dev='' lint
 
-  # Push-stage gate: dependency advisories and license policy
-  # (docs/specs/SPEC-quality-gates.md, "Stage coverage" — both stages gate).
+  # Push-stage gate: the integration tests, the release build, the package
+  # build and verification, and the dependency, history, and networked checks
+  # — whatever `.pre-commit-config.yaml` runs at the pre-push stage.
   lint-push:
     runs-on: ubuntu-latest
     steps:
@@ -94,60 +97,6 @@ jobs:
           SKIP: no-commit-to-branch,rk-worktree-location
         run: nix develop --command just dev='' lint-push
 
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - name: Install Nix
-        uses: cachix/install-nix-action@v31
-        with:
-          extra_nix_config: |
-            experimental-features = nix-command flakes
-      - name: Cache cargo
-        uses: actions/cache@v6
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: cargo-test-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
-      - name: Test
-        run: nix develop --command just dev='' test
-
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - name: Install Nix
-        uses: cachix/install-nix-action@v31
-        with:
-          extra_nix_config: |
-            experimental-features = nix-command flakes
-      - name: Cache cargo
-        uses: actions/cache@v6
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: cargo-build-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
-      - name: Build
-        run: nix develop --command just dev='' build-release
-
-  # Proves the packaging capability `nix/package.nix` seeds. `nix flake check`
-  # builds only the `checks` output, so the package is built by name.
-  nix-build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - name: Install Nix
-        uses: cachix/install-nix-action@v31
-        with:
-          extra_nix_config: |
-            experimental-features = nix-command flakes
-      - name: Build the package
-        run: nix build .#default --print-build-logs
-
   # The one check the trunk's protection requires. `rk setup step protect-trunk`
   # takes exactly one project check name beside `pr-title`, so a workflow with
   # several jobs needs one job that stands for all of them. Without it only the
@@ -160,7 +109,7 @@ jobs:
   # Running always and asserting each result reports a real failure instead.
   gate:
     if: always()
-    needs: [lint, lint-push, test, build, nix-build]
+    needs: [lint, lint-push]
     runs-on: ubuntu-latest
     steps:
       - name: every job succeeded

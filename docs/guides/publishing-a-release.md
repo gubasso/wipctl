@@ -47,20 +47,19 @@ The auth check lives inside `scripts/publish` and nowhere else. It confirms that
 
 ## Readiness checks
 
-`./scripts/publish-dry` runs the registry dry run and prints the exact file list the package ships. Neither needs authentication, so it is safe to run at any point.
+`./scripts/publish-dry` runs the registry dry run and prints the exact file list the package ships. Neither needs authentication, so it is safe to run at any point. The `publish-dry` hook runs it at the push stage with the devshell `cargo`, which is the same check the release automation runs before it publishes. Run it by hand with `nix develop --command just publish-dry`.
 
 Read that file list. The package carries build inputs, `README.md`, the license files, and the changelog, and nothing else. The `exclude` denylist in `Cargo.toml` keeps documentation, CI, task running, and development tooling out of it. A denylist is used rather than an allowlist for two reasons. An allowlist silently drops future source files. Under an SPDX license expression, the readme and license files are not included automatically. Re-read the file list whenever a new top-level artifact appears in the repository.
 
 ## Local release helpers
 
-`./scripts/release` drives a release by hand. None of its subcommands publish.
+`./scripts/release` drives a release by hand. None of its subcommands publish. Every tool it calls comes from the devshell, so run it there: `nix develop --command just release <subcommand>`.
 
 - `release-plz-update`: apply the version bump and changelog locally.
 - `release-plz-pr`: open or refresh the release pull request.
 - `cargo-release-dry <level>`: dry-run a bump at the given level.
-- `semver-check`: check public API compatibility.
 
-`wipctl` ships a binary and exposes no library API, so the API compatibility check has nothing to inspect. The command surface is the compatibility surface instead, and [the spec zone](../README.md) defines it. A breaking change to a verb, a flag, or an exit code is a breaking release, whatever the API check reports.
+`wipctl` ships a binary and exposes no library API, so no API compatibility check runs: it would have nothing to inspect. The command surface is the compatibility surface instead, and [the spec zone](../README.md) defines it. A breaking change to a verb, a flag, or an exit code is a breaking release, whatever the API check reports.
 
 ## Binary artifacts
 

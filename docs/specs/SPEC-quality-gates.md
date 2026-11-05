@@ -16,6 +16,7 @@
   - [`quality-gates:the-journey-runs-against-an-installation` — The journey runs against an installation](#quality-gatesthe-journey-runs-against-an-installation--the-journey-runs-against-an-installation)
   - [`quality-gates:a-rendering-verb-is-gated-on-pipe-safety` — A rendering verb is gated on pipe safety](#quality-gatesa-rendering-verb-is-gated-on-pipe-safety--a-rendering-verb-is-gated-on-pipe-safety)
   - [`quality-gates:the-record-gates-run-at-both-stages` — The record gates run at both stages](#quality-gatesthe-record-gates-run-at-both-stages--the-record-gates-run-at-both-stages)
+  - [`quality-gates:the-local-stages-hold-every-ci-check` — The local stages hold every CI check](#quality-gatesthe-local-stages-hold-every-ci-check--the-local-stages-hold-every-ci-check)
   - [`quality-gates:the-published-artifact-carries-its-licence` — The published artifact carries its licence](#quality-gatesthe-published-artifact-carries-its-licence--the-published-artifact-carries-its-licence)
   - [`quality-gates:the-repository-is-self-contained` — The repository is self-contained](#quality-gatesthe-repository-is-self-contained--the-repository-is-self-contained)
   - [`quality-gates:an-implementation-conforms-by-every-gate` — An implementation conforms by every gate](#quality-gatesan-implementation-conforms-by-every-gate--an-implementation-conforms-by-every-gate)
@@ -173,6 +174,20 @@ The record gates MUST run at both the commit stage and the push stage of the pla
 
 Verify: `cargo nextest run --test scaffold`
 
+### `quality-gates:the-local-stages-hold-every-ci-check` — The local stages hold every CI check
+
+When an implementation runs a check in CI, its commit stage or its push stage MUST run that check, the push stage MUST NOT repeat a check of the commit stage, and the implementation MUST list each check that only CI can run with its reason.
+
+#### Scenario: CI builds what no hook builds
+
+- GIVEN a CI job that builds the release profile, and no hook that builds it
+- WHEN a change that breaks only that build passes every hook and is pushed
+- THEN CI fails after a green push, so the build moves into the push stage and the job leaves CI
+
+A check reads the code and fails on a defect. A job that only reports, or only releases, runs no check. The costly checks, meaning the integration tests, the builds, and the networked checks, belong at the push stage. The record gates of the plan repository are outside this rule, because a plan repository has no CI.
+
+Verify: reviewer confirms that every CI job runs the commit stage or the push stage, that no hook runs at both stages, and that the contributor guide lists each CI-only check with its reason
+
 ### `quality-gates:the-published-artifact-carries-its-licence` — The published artifact carries its licence
 
 When an implementation publishes an artifact, it MUST carry every licence text its expression names, and MUST NOT carry a development-only directory.
@@ -213,8 +228,9 @@ Verify: `cargo nextest run`
 
 ## Unenforced rules
 
-| Rule                                             | Why no command decides it                                                                                                   |
-| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| `quality-gates:the-repository-is-self-contained` | The clone-on-a-bare-machine test judges whether a link carries a claim or supports one, which is a reading and not a match. |
+| Rule                                                 | Why no command decides it                                                                                                   |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `quality-gates:the-repository-is-self-contained`     | The clone-on-a-bare-machine test judges whether a link carries a claim or supports one, which is a reading and not a match. |
+| `quality-gates:the-local-stages-hold-every-ci-check` | Whether a CI job is a check, a report, or release mechanics is a reading of what the job does, and not a match.             |
 
 The project's own plan record is outside the self-containment rule. It is coordination state: nothing in it is needed to understand, build, or gate the implementation, and `quality-gates:the-project-plans-with-its-own-method` is what binds it.

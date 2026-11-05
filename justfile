@@ -13,7 +13,8 @@ default:
 lint:
 	{{dev}} pre-commit run --all-files --show-diff-on-failure
 
-# Run the push-stage gate (dependency advisories and license policy).
+# Run the push-stage gate: the integration tests, the release build, the package
+# build and verification, and the dependency, history, and networked checks.
 lint-push:
 	{{dev}} pre-commit run --hook-stage pre-push --all-files --show-diff-on-failure
 
