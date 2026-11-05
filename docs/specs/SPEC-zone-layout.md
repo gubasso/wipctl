@@ -14,7 +14,7 @@
   - [`zone-layout:the-plan-trunk-is-one-branch` — The plan trunk is one branch](#zone-layoutthe-plan-trunk-is-one-branch--the-plan-trunk-is-one-branch)
   - [`zone-layout:plan-history-is-append-only` — Plan history is append-only](#zone-layoutplan-history-is-append-only--plan-history-is-append-only)
   - [`zone-layout:the-shipped-payload-is-never-copied-in` — The shipped payload is never copied into a zone](#zone-layoutthe-shipped-payload-is-never-copied-in--the-shipped-payload-is-never-copied-into-a-zone)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -82,7 +82,7 @@ The implementation MUST NOT store derived state in the zone.
 - WHEN the record already holds the dependencies and the questions
 - THEN the flag is refused, because every view is computed on every read and a stored copy drifts
 
-Verify: `cargo nextest run --test validation`
+Verify: `cargo nextest run --test validation`, and a reviewer confirms that no proposed field stores derived state
 
 ### `zone-layout:an-earned-directory-appears-when-earned` — An earned directory appears when earned
 
@@ -130,6 +130,8 @@ The implementation MUST NOT force-push the plan repository.
 - WHEN they want it gone
 - THEN a new commit reverses it, because rewriting the line other machines already replicated loses their work
 
+Hooks are early gates and are bypassable by construction, so correctness lives in the tool's transactions. Hosted branch protection backstops publication where the operator hosts a remote.
+
 Verify: `cargo nextest run --test journey`
 
 ### `zone-layout:the-shipped-payload-is-never-copied-in` — The shipped payload is never copied into a zone
@@ -144,10 +146,8 @@ The schemas, the scaffold payload, and the worked example MUST stay under the in
 
 Verify: `cargo nextest run --test journey`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                        | Why no command decides it                                                           |
-| ------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `zone-layout:derived-state-is-never-stored` | Whether a proposed field is derived or stated is a reading of what the field means. |
-
-Hooks are early gates and are bypassable by construction, so correctness lives in the tool's transactions. Hosted branch protection backstops publication where the operator hosts a remote.
+| Rule                                        | Reviewer confirms                                                                                                                  |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `zone-layout:derived-state-is-never-stored` | no proposed field stores derived state, because whether a proposed field is derived or stated is a reading of what the field means |

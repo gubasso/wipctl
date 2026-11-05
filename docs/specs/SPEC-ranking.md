@@ -17,7 +17,7 @@
   - [`ranking:a-work-lane-entry-is-unblocked` — A work-lane entry is unblocked](#rankinga-work-lane-entry-is-unblocked--a-work-lane-entry-is-unblocked)
   - [`ranking:membership-is-never-an-edge` — Membership is never an edge](#rankingmembership-is-never-an-edge--membership-is-never-an-edge)
   - [`ranking:the-closed-lane-orders-by-date` — The closed lane orders by close date](#rankingthe-closed-lane-orders-by-date--the-closed-lane-orders-by-close-date)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -37,7 +37,7 @@ The implementation MUST derive eligibility from an entry's dependencies, blockin
 - WHEN the three edges already answer it
 - THEN the flag is refused, because a stored copy of a derived fact drifts on the first edit to any edge
 
-Verify: `cargo nextest run --test ranking`
+Verify: `cargo nextest run --test ranking`, and a reviewer confirms that no proposed field restates a derived fact
 
 ### `ranking:an-order-is-computed-and-never-stored` — An order is computed and never stored
 
@@ -96,6 +96,8 @@ The ranking procedure MUST order every pair of entries in one lane so that no tw
 - GIVEN two entries with the same constraints, close date, delay cost, and points
 - WHEN the procedure reaches its final tie-break
 - THEN one id sorts first, so the preview and take verbs read one defined head
+
+A landed record's ranking is settled by a person. The procedure applies stated facts and breaks only otherwise indistinguishable ties.
 
 Verify: `cargo nextest run --test ranking`
 
@@ -183,10 +185,8 @@ The ranking procedure MUST compare closed entries by close date ascending before
 
 Verify: `cargo nextest run --test ranking`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                              | Why no command decides it                                                              |
-| ------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `ranking:eligibility-is-derived-from-three-edges` | Whether a proposed field restates a derived fact is a reading of what the field means. |
-
-A landed record's ranking is settled by a person. The procedure applies stated facts and breaks only otherwise indistinguishable ties.
+| Rule                                              | Reviewer confirms                                                                                                                        |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `ranking:eligibility-is-derived-from-three-edges` | no proposed field restates a derived fact, because whether a proposed field restates a derived fact is a reading of what the field means |

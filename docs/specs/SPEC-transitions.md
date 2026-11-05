@@ -18,7 +18,7 @@
   - [`transitions:taking-work-is-atomic` — Taking work is atomic](#transitionstaking-work-is-atomic--taking-work-is-atomic)
   - [`transitions:taking-prints-what-the-preview-would` — Taking prints what the preview would](#transitionstaking-prints-what-the-preview-would--taking-prints-what-the-preview-would)
   - [`transitions:nothing-startable-terminates-the-loop` — Nothing startable terminates the loop](#transitionsnothing-startable-terminates-the-loop--nothing-startable-terminates-the-loop)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -38,7 +38,7 @@ A lane change MUST go through the move verb, and MUST NOT be made by editing a l
 - WHEN validation runs
 - THEN the lane-agreement gate fails, because an edit changes where an entry sits and records no when
 
-Verify: `cargo nextest run --test validation`
+Verify: `cargo nextest run --test validation`, and a reviewer confirms that the verb made each lane change
 
 ### `transitions:the-preflight-runs-entire-and-in-order` — The preflight runs entire and in order
 
@@ -174,6 +174,8 @@ The take verb MUST read the head, preflight, write, validate, and commit inside 
 - WHEN both proceed
 - THEN they get two different entries, because the second reads a lane whose head the first already removed
 
+The preview verb tells a reader what is next and the take verb takes it. With several agents pulling from one lane, every agent running the preview sees the same head, and all but one lose the race. The take verb exists to remove that case. The two verbs are twins and each names the other.
+
 Verify: `cargo nextest run --test writer_guarantees`
 
 ### `transitions:taking-prints-what-the-preview-would` — Taking prints what the preview would
@@ -200,10 +202,8 @@ Where nothing is startable, the take verb MUST fail naming why, and MUST NOT tak
 
 Verify: `cargo nextest run --test verb_contracts`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                    | Why no command decides it                                                                  |
-| --------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `transitions:a-lane-change-is-the-verb` | The gate catches a hand edit through lane agreement, but nothing proves the verb was used. |
-
-The preview verb tells a reader what is next and the take verb takes it. With several agents pulling from one lane, every agent running the preview sees the same head, and all but one lose the race. The take verb exists to remove that case. The two verbs are twins and each names the other.
+| Rule                                    | Reviewer confirms                                                                                                                 |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `transitions:a-lane-change-is-the-verb` | the verb made each lane change, because the gate catches a hand edit through lane agreement, but nothing proves the verb was used |

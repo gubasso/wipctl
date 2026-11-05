@@ -19,7 +19,7 @@
   - [`lane-file:a-reshaped-close-names-its-successor` — A reshaped close names its successor](#lane-filea-reshaped-close-names-its-successor--a-reshaped-close-names-its-successor)
   - [`lane-file:the-yaml-subset-is-narrow` — The accepted YAML subset is narrow](#lane-filethe-yaml-subset-is-narrow--the-accepted-yaml-subset-is-narrow)
   - [`lane-file:the-closed-lane-is-not-a-terminus` — The closed lane is not a terminus](#lane-filethe-closed-lane-is-not-a-terminus--the-closed-lane-is-not-a-terminus)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -63,7 +63,7 @@ An entry MUST carry a point value of `1`, `2`, or `3`, and larger work MUST spli
 - WHEN the author reaches for a fourth point
 - THEN there is no such value, and the acceptance criteria already name the split that bounds its wait
 
-Verify: `cargo nextest run --test schemas`
+Verify: `cargo nextest run --test schemas`, and a reviewer confirms that each value names the judgments of its work
 
 ### `lane-file:delay-cost-records-an-exception` — Delay cost records an exception
 
@@ -99,7 +99,7 @@ An entry's summary MUST be one double-quoted line of 60 to 400 characters with n
 - WHEN the bound is applied
 - THEN it is cut back to a restatement for a reader scanning the lane. The note field says how the entry is handled, and the summary says what the work is
 
-Verify: `cargo nextest run --test schemas`
+Verify: `cargo nextest run --test schemas`, and a reviewer confirms that the line still describes its story
 
 ### `lane-file:needs-is-the-only-sequencing-fact` — Dependencies are the only stored sequencing constraint
 
@@ -209,9 +209,9 @@ An entry MAY leave the closed lane, and a gap left by a departure MUST NOT be tr
 
 Verify: `cargo nextest run --test validation`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                          | Why no command decides it                                                                     |
-| --------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `lane-file:the-points-scale-counts-judgments` | Whether a value names its judgments is a reading of the work, not a match against the number. |
-| `lane-file:a-summary-is-one-bounded-line`     | The bound is gated; whether the line still describes its story is not.                        |
+| Rule                                          | Reviewer confirms                                                                                                                                |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `lane-file:the-points-scale-counts-judgments` | each value names the judgments of its work, because whether a value names its judgments is a reading of the work, not a match against the number |
+| `lane-file:a-summary-is-one-bounded-line`     | the line still describes its story, because the bound is gated and that description is not                                                       |

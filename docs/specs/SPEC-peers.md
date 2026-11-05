@@ -11,7 +11,7 @@
   - [`peers:the-table-is-earned` — The table is earned, never scaffolded](#peersthe-table-is-earned--the-table-is-earned-never-scaffolded)
   - [`peers:a-url-is-used-as-written` — A url is used as written](#peersa-url-is-used-as-written--a-url-is-used-as-written)
   - [`peers:no-check-opens-a-url` — No check opens a url](#peersno-check-opens-a-url--no-check-opens-a-url)
-- [Diagnostics](#diagnostics)
+  - [`peers:a-table-fault-writes-its-listed-message` — A table fault writes its listed message](#peersa-table-fault-writes-its-listed-message--a-table-fault-writes-its-listed-message)
 
 <!--TOC-->
 
@@ -105,48 +105,14 @@ A check MUST answer from the table and from the slots on this machine, and MUST 
 
 Verify: `cargo nextest run --test validation`
 
-## Diagnostics
+### `peers:a-table-fault-writes-its-listed-message` — A table fault writes its listed message
 
-Each failure names its resolution. The validation domain owns the check catalog, and this page owns the message text for the table's own shape.
+When a check of the peers table's own shape fails, the implementation MUST write the message text and exit with the code that [the peer table messages](../reference/diagnostics.md#peer-table-messages) show. The validation domain owns the check catalog, and that list is the one statement of the message text.
 
-```text
-a peer row with no plan_id                                                exit 1
-  wipctl: peer 'payments' declares no plan_id
-  wipctl: a peer is identified by its plan_id, not by its url; read the
-          identity from that plan's plan file and add it to the peers
-          section
+#### Scenario: A url carries credentials
 
-a peer row with an empty url list                                         exit 1
-  wipctl: peer 'payments' declares no url
-  wipctl: a peer nobody can locate is not a peer; add at least one
-          location with 'wipctl peer url payments --add <url>'
+- GIVEN a peer row whose url carries a user name and a token
+- WHEN validation runs
+- THEN the message shows the url with `<redacted>` in place of the credentials and exits 1, because a committed file is read by everyone who clones the plan
 
-a row naming this plan                                                    exit 1
-  wipctl: peer 'mirror' names this plan
-  wipctl:   plan_id 9f2c41a08b7d4e63a15c8f02d7e4b619 is this plan's own
-  wipctl: a peer is another plan; a dependency inside this record is a
-          bare needs id, so remove the row
-
-a url carrying credentials                                                exit 1
-  wipctl: peer 'payments' declares a url with credentials in it
-  wipctl:   https://<redacted>@git.example.org/acme/payments-plan.git
-  wipctl: a committed file is read by everyone who clones this plan;
-          remove the credentials from the url and let the transport get
-          them from the machine
-
-a url with an unaccepted scheme                                           exit 1
-  wipctl: peer 'payments' declares a url wipctl will not open
-  wipctl:   ext::sh -c 'anything'
-  wipctl: a peer url carries one of the schemes the specification accepts;
-          correct the row, and the url is not attempted meanwhile
-
-two rows claiming one plan_id                                             exit 1
-  wipctl: peers 'payments' and 'billing' name one plan
-  wipctl:   plan_id 9f2c41a08b7d4e63a15c8f02d7e4b619
-  wipctl: one plan gets one alias; drop the row you do not use
-
-the view runs against a plan with no table                                exit 0
-  wipctl: this plan names no peers
-  wipctl: a peer is declared in the peers section of .wipctl/plan.toml;
-          see 'wipctl help peers'
-```
+Verify: `cargo nextest run --test validation`

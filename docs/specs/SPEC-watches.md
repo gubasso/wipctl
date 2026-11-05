@@ -17,8 +17,7 @@
   - [`watches:a-cadence-is-optional-at-both-levels` — A cadence is optional at both levels](#watchesa-cadence-is-optional-at-both-levels--a-cadence-is-optional-at-both-levels)
   - [`watches:a-cold-reading-is-announced-and-never-gates` — A cold reading is announced and never gates](#watchesa-cold-reading-is-announced-and-never-gates--a-cold-reading-is-announced-and-never-gates)
   - [`watches:the-view-reports-a-watch-and-decides-nothing` — The view reports a watch and decides nothing](#watchesthe-view-reports-a-watch-and-decides-nothing--the-view-reports-a-watch-and-decides-nothing)
-- [Unenforced rules](#unenforced-rules)
-- [Page budget](#page-budget)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -58,7 +57,7 @@ Every watch section MUST carry a `Watch` line containing one declared source ref
 - WHEN validation runs
 - THEN it fails naming the alias because the record cannot resolve the item
 
-Verify: `cargo nextest run --test validation`
+Verify: `cargo nextest run --test validation`, and a reviewer confirms that the phrase names the actor who clears the block
 
 ### `watches:a-watch-states-a-testable-exit` — A watch states a testable exit
 
@@ -192,14 +191,10 @@ When the source view renders, it MUST report each reference-form watch as `still
 
 Verify: `cargo nextest run --test verb_contracts`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                      | Why no command decides it                                                                             |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `watches:a-watch-names-what-clears-it`    | A count gates the phrase, but only a reader can decide whether it names the actor who clears a block. |
-| `watches:a-watch-states-a-testable-exit`  | Whether a sentence states a condition a person can test is a reading rather than a text match.        |
-| `watches:a-cleared-watch-leaves-the-file` | The record contains no remote fact that lets a command decide whether the exit condition is met.      |
-
-## Page budget
-
-The page budget reserves room for thirteen requirement blocks within the 300-line cap. The reading cadence is the split boundary if the page approaches that cap. This page spends two of the five prohibition lines and reserves three.
+| Rule                                      | Reviewer confirms                                                                                                                                                            |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `watches:a-watch-names-what-clears-it`    | the phrase names the actor who clears the block, because a count gates the phrase, but only a reader can decide whether it names that actor                                  |
+| `watches:a-watch-states-a-testable-exit`  | every `Until` line can answer yes or no from evidence available today, because whether a sentence states a condition a person can test is a reading rather than a text match |
+| `watches:a-cleared-watch-leaves-the-file` | a cleared watch is deleted instead of marked, because the record contains no remote fact that lets a command decide whether the exit condition is met                        |

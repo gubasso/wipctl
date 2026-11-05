@@ -17,7 +17,7 @@
   - [`scaffold:the-hook-set-is-printable-and-checked` — The hook set is printable and checked](#scaffoldthe-hook-set-is-printable-and-checked--the-hook-set-is-printable-and-checked)
   - [`scaffold:the-host-pointer-names-a-command-and-not-a-path` — The host pointer names a command and not a path](#scaffoldthe-host-pointer-names-a-command-and-not-a-path--the-host-pointer-names-a-command-and-not-a-path)
   - [`scaffold:the-host-pointer-is-placed-where-the-operator-says` — The host pointer is placed where the operator says](#scaffoldthe-host-pointer-is-placed-where-the-operator-says--the-host-pointer-is-placed-where-the-operator-says)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -48,6 +48,8 @@ A payload member MUST NOT name a documentation method or the tooling that instal
 - GIVEN a payload page showing an `Amends` item against a host that keeps requirement-level specifications
 - WHEN the check runs
 - THEN the generic convention passes and a product name fails. A payload naming one teaches every scaffolded project to adopt it
+
+Naming a document class the host keeps or does not keep is the same fault as naming a method, at a smaller scale. A specification and a decision record are two such classes. This project's own specification states such a class only as one option among alternatives.
 
 Verify: `cargo nextest run --test agnosticism`
 
@@ -202,13 +204,11 @@ When the scaffold asks for a host instruction file, it MUST accept the operator'
 - WHEN the operator names that file
 - THEN the scaffold prints the marked block and leaves the host unchanged, because only the operator owns placement in that file
 
-Verify: `cargo nextest run --test journey`
+Verify: `cargo nextest run --test journey`, and a reviewer confirms that the path names the host's instruction file
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                                          | Why no command decides it                                                                |
-| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `scaffold:the-travelling-document-is-self-sufficient`         | Whether a subject is taught from zero is a reading of the prose, not a match against it. |
-| `scaffold:the-host-pointer-is-placed-where-the-operator-says` | Whether a path names the host's instruction file depends on the operator's answer.       |
-
-Naming a document class the host keeps or does not keep is the same fault as naming a method, at a smaller scale. A specification and a decision record are two such classes. This project's own specification states such a class only as one option among alternatives.
+| Rule                                                          | Reviewer confirms                                                                                                                                       |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `scaffold:the-travelling-document-is-self-sufficient`         | the landed document covers each subject the list names, because whether a subject is taught from zero is a reading of the prose, not a match against it |
+| `scaffold:the-host-pointer-is-placed-where-the-operator-says` | the path names the host's instruction file, because whether it does depends on the operator's answer                                                    |

@@ -23,7 +23,7 @@
   - [`metrics:only-a-delivered-close-counts` — Only a delivered close counts](#metricsonly-a-delivered-close-counts--only-a-delivered-close-counts)
   - [`metrics:an-empty-window-renders-at-zero` — An empty window renders at zero](#metricsan-empty-window-renders-at-zero--an-empty-window-renders-at-zero)
   - [`metrics:a-changed-cadence-restarts-the-series` — A changed cadence restarts the series](#metricsa-changed-cadence-restarts-the-series--a-changed-cadence-restarts-the-series)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -42,6 +42,8 @@ Every flow measure MUST be folded from the transition journal, and MUST NOT be r
 - GIVEN a checkout with truncated history
 - WHEN the measures run
 - THEN they match the full clone's numbers, because the journal is the source and history only witnesses it
+
+The measures are the three flow numbers and delivery per window. Forecasting, averaging, and counting anything but points are outside this domain.
 
 Verify: `cargo nextest run --test metrics`
 
@@ -115,7 +117,7 @@ The measures MUST be read-only and local, and MUST leave the record and the exit
 - WHEN it is weighed
 - THEN it is refused, because a measure that gates turns a report into a rule nobody agreed to
 
-Verify: `cargo nextest run --test metrics`
+Verify: `cargo nextest run --test metrics`, and a reviewer confirms that no proposed consumer of a measure gates on it
 
 ### `metrics:a-lane-without-a-measure-is-a-usage-error` — A lane without a measure is a usage error
 
@@ -275,11 +277,9 @@ Where the window anchor or length changes, the implementation MUST restart the w
 
 Verify: `cargo nextest run --test metrics`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                                       | Why no command decides it                                                                    |
-| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `metrics:a-measure-is-the-same-on-any-clone`               | Whether a proposed consumer of a measure gates on it is a reading of what the consumer does. |
-| `metrics:a-marked-row-is-never-acted-on-without-an-answer` | Whether an action follows a person's answer is a reading of the interaction.                 |
-
-The measures are the three flow numbers and delivery per window. Forecasting, averaging, and counting anything but points are outside this domain.
+| Rule                                                       | Reviewer confirms                                                                                                                                           |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `metrics:a-measure-is-the-same-on-any-clone`               | no proposed consumer of a measure gates on it, because whether a proposed consumer gates on a measure is a reading of what the consumer does                |
+| `metrics:a-marked-row-is-never-acted-on-without-an-answer` | the agent protocol requires a person's answer before any record change, because whether an action follows a person's answer is a reading of the interaction |

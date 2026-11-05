@@ -16,7 +16,7 @@
   - [`transactions:the-lock-is-not-a-record` — The lock is not a record](#transactionsthe-lock-is-not-a-record--the-lock-is-not-a-record)
   - [`transactions:a-reader-never-takes-the-lock` — A reader never takes the lock](#transactionsa-reader-never-takes-the-lock--a-reader-never-takes-the-lock)
   - [`transactions:push-is-not-part-of-the-transaction` — Push is not part of the transaction](#transactionspush-is-not-part-of-the-transaction--push-is-not-part-of-the-transaction)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -144,7 +144,7 @@ The lock MUST live outside the plan repository, MUST be absent from a clone, and
 - WHEN it is read for that answer
 - THEN it answers nothing, because it protects a transaction and not a session, and there is no durable queue and no promise of fairness
 
-Verify: `cargo nextest run --test writer_guarantees`
+Verify: `cargo nextest run --test writer_guarantees`, and a reviewer confirms that no proposed lock field answers a question about the plan
 
 ### `transactions:a-reader-never-takes-the-lock` — A reader never takes the lock
 
@@ -170,8 +170,8 @@ The implementation MUST NOT push as part of a mutation's transaction.
 
 Verify: `cargo nextest run --test writer_guarantees`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                    | Why no command decides it                                                                             |
-| --------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `transactions:the-lock-is-not-a-record` | Whether a proposed lock field answers a question about the plan is a reading of what the field means. |
+| Rule                                    | Reviewer confirms                                                                                                       |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `transactions:the-lock-is-not-a-record` | no proposed lock field answers a question about the plan, because whether one does is a reading of what the field means |

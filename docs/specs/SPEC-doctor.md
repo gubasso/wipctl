@@ -12,7 +12,6 @@
   - [`doctor:the-report-covers-the-plan-machinery` — The report covers the plan machinery](#doctorthe-report-covers-the-plan-machinery--the-report-covers-the-plan-machinery)
   - [`doctor:a-new-optional-tool-lands-whole` — A new optional tool lands whole](#doctora-new-optional-tool-lands-whole--a-new-optional-tool-lands-whole)
   - [`doctor:a-drifted-slot-is-healthy` — A drifted slot is healthy](#doctora-drifted-slot-is-healthy--a-drifted-slot-is-healthy)
-- [Slot diagnostics](#slot-diagnostics)
 
 <!--TOC-->
 
@@ -110,7 +109,7 @@ Verify: `cargo nextest run --test verb_contracts`
 
 ### `doctor:a-drifted-slot-is-healthy` — A drifted slot is healthy
 
-Where a slot name differs from its derived project slug, the report MUST name both values and exit zero.
+Where a slot name differs from its derived project slug, the report MUST name both values, write the message that [the slot report messages](../reference/diagnostics.md#slot-report-messages) show, and exit zero.
 
 #### Scenario: A project is renamed
 
@@ -119,14 +118,3 @@ Where a slot name differs from its derived project slug, the report MUST name bo
 - THEN it says that the record is intact and the slot keeps its minted name
 
 Verify: `cargo nextest run --test verb_contracts`
-
-## Slot diagnostics
-
-```text
-a slot name that no longer matches its project                    exit 0
-  wipctl: slot 'payments' holds a project whose name derives as
-          'payments-ben'
-  wipctl: the slot keeps the name it was given, and nothing is wrong
-          with the record; run 'wipctl fix --registry' when you want the
-          tree to read the new name
-```

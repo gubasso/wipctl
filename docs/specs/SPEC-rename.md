@@ -14,7 +14,7 @@
   - [`rename:a-collision-recovery-rephrases` — A collision recovery rephrases](#renamea-collision-recovery-rephrases--a-collision-recovery-rephrases)
   - [`rename:a-rename-is-narrated-in-revisions` — A rename is narrated in revisions](#renamea-rename-is-narrated-in-revisions--a-rename-is-narrated-in-revisions)
   - [`rename:a-refused-rename-writes-nothing` — A refused rename writes nothing](#renamea-refused-rename-writes-nothing--a-refused-rename-writes-nothing)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -57,6 +57,8 @@ A rename MUST rewrite every artifact and every reference that names the old id, 
 - GIVEN an entry referenced from a planning lane and a blocking line
 - WHEN the rename runs
 - THEN both are rewritten, because a rename leaving one reference behind creates the dangling id it exists to prevent
+
+The report emits one line per rewritten path and offers no machine format, so it owes no schema.
 
 Verify: `cargo nextest run --test verb_contracts`
 
@@ -118,6 +120,8 @@ A rename resolving a collision MUST take an id carrying no qualifying postfix, a
 - WHEN a postfixed id is passed
 - THEN it is refused. This rename frees the base without burning it, so the committed result carries a postfix qualifying nothing
 
+Rephrasing is what a collision asks for anyway: two captures that slug identically wanted different names.
+
 Verify: `cargo nextest run --test sync`
 
 ### `rename:a-rename-is-narrated-in-revisions` — A rename is narrated in revisions
@@ -130,7 +134,7 @@ A rename MUST be recorded as a dated revision line naming the old id, in the sha
 - WHEN it is renamed
 - THEN it owes no line, because its rename is carried by the heading itself and by the plan trunk commit
 
-Verify: `cargo nextest run --test verb_contracts`
+Verify: `cargo nextest run --test verb_contracts`, and a reviewer confirms that the revision line explains the rename to a later reader
 
 ### `rename:a-refused-rename-writes-nothing` — A refused rename writes nothing
 
@@ -144,10 +148,8 @@ A rename MUST run every check before the first byte, MUST commit once, and MUST 
 
 Verify: `cargo nextest run --test writer_guarantees`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                       | Why no command decides it                                                         |
-| ------------------------------------------ | --------------------------------------------------------------------------------- |
-| `rename:a-rename-is-narrated-in-revisions` | Whether the line explains the rename to a later reader is a reading of the prose. |
-
-Rephrasing is what a collision asks for anyway: two captures that slug identically wanted different names. The report emits one line per rewritten path and offers no machine format, so it owes no schema.
+| Rule                                       | Reviewer confirms                                                                                          |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| `rename:a-rename-is-narrated-in-revisions` | the revision line explains the rename to a later reader, because whether it does is a reading of the prose |

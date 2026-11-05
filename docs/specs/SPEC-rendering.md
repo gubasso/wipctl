@@ -17,7 +17,7 @@
   - [`rendering:the-dependency-drawing-is-a-ladder` — The dependency drawing is a ladder](#renderingthe-dependency-drawing-is-a-ladder--the-dependency-drawing-is-a-ladder)
   - [`rendering:a-composite-view-has-two-layouts` — A composite view has two layouts](#renderinga-composite-view-has-two-layouts--a-composite-view-has-two-layouts)
   - [`rendering:an-optional-renderer-degrades-one-thing` — An optional renderer degrades one thing](#renderingan-optional-renderer-degrades-one-thing--an-optional-renderer-degrades-one-thing)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -61,6 +61,8 @@ Colour MUST NOT carry data alone in a row-read panel, and a continuous panel tha
 - WHEN it renders
 - THEN the heading says so, while in every row-read panel the value lives in the glyph
 
+The half-block technique draws two data rows per text row, using foreground and background colour. It puts all meaning in colour, so it is reserved for continuous panels. The day nested graphs are wanted is the day a heavier renderer is reconsidered.
+
 Verify: `cargo nextest run --test rendering`
 
 ### `rendering:a-panel-opens-with-its-finding` — A panel opens with its finding
@@ -73,7 +75,7 @@ Every panel MUST open with its headline fact in prose.
 - WHEN the reader arrives
 - THEN the prose already stated it, because a log file and a screen reader receive the finding before the picture
 
-Verify: `cargo nextest run --test rendering`
+Verify: `cargo nextest run --test rendering`, and a reviewer confirms that each opening line states the finding and does not merely label the panel
 
 ### `rendering:a-column-label-is-ascii` — A column label is ASCII
 
@@ -183,10 +185,8 @@ Where the implementation adopts an optional rendering tool, that tool MUST be pi
 
 Verify: `cargo nextest run --test rendering`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                       | Why no command decides it                                                                        |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------ |
-| `rendering:a-panel-opens-with-its-finding` | Whether an opening line states the finding or merely labels the panel is a reading of the prose. |
-
-The half-block technique draws two data rows per text row, using foreground and background colour. It puts all meaning in colour, so it is reserved for continuous panels. The day nested graphs are wanted is the day a heavier renderer is reconsidered.
+| Rule                                       | Reviewer confirms                                                                                                             |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| `rendering:a-panel-opens-with-its-finding` | each opening line states the finding and does not merely label the panel, because which one it does is a reading of the prose |

@@ -19,7 +19,7 @@
   - [`review:a-peer-row-is-read-from-the-plan-it-names` — A peer row is read from the plan it names](#reviewa-peer-row-is-read-from-the-plan-it-names--a-peer-row-is-read-from-the-plan-it-names)
   - [`review:the-other-team-learns-they-are-depended-on` — The other team learns they are depended on](#reviewthe-other-team-learns-they-are-depended-on--the-other-team-learns-they-are-depended-on)
   - [`review:a-declared-delta-matches-the-diff` — A declared delta matches the diff](#reviewa-declared-delta-matches-the-diff--a-declared-delta-matches-the-diff)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -209,6 +209,24 @@ Where an entry declares a typed rule delta, the reviewer MUST confirm that the d
 
 Verify: reviewer compares each declared delta against the diff, and the diff against the declarations
 
-## Unenforced rules
+## Unenforced
 
-Every requirement in this domain is unenforced by design. Each one is here because a command cannot decide it. Its scenario states the shape of that judgment, so no second table is needed.
+Every requirement in this domain is unenforced by design. Each one is here because a command cannot decide it. Its scenario states the shape of that judgment, and its row names what the reviewer confirms.
+
+| Rule                                                   | Reviewer confirms                                                                         |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| `review:a-durable-fact-lives-in-its-owning-document`   | the entry states no durable fact its owning document holds                                |
+| `review:no-sentence-narrates-history`                  | the change adds no note narrating a past state                                            |
+| `review:a-reference-links-to-an-anchor`                | each reference states a claim and names an anchor                                         |
+| `review:the-acceptance-transfer-is-one-unit-of-review` | the close and its document amendments were reviewed together                              |
+| `review:a-code-reference-is-honest`                    | the branch and delivered fields name the work that landed                                 |
+| `review:a-source-reference-names-the-work-it-claims`   | each source reference names work the artifact delivers                                    |
+| `review:a-rename-is-one-reviewable-act`                | the rename moved every reference and recorded its revision                                |
+| `review:a-container-earns-its-document`                | each container states an end state no single member delivers                              |
+| `review:an-unpursued-container-is-retired`             | every container in the record is still being pursued                                      |
+| `review:a-reshaped-successor-serves-its-epic`          | each reshaped entry's successor carries the epic the work serves                          |
+| `review:a-drift-report-is-read-and-acted-on`           | each drift line in the landing report was acted on                                        |
+| `review:a-moved-host-document-carries-its-references`  | every reference to a moved document names its new home                                    |
+| `review:a-peer-row-is-read-from-the-plan-it-names`     | the plan identity came from the peer's configuration and the alias reads for this project |
+| `review:the-other-team-learns-they-are-depended-on`    | the owners of each newly depended-on plan were told                                       |
+| `review:a-declared-delta-matches-the-diff`             | each declared delta matches the diff, and the diff matches the declarations               |

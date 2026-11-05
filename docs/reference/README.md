@@ -3,7 +3,7 @@
 Exact values a reader looks up: formats, grammars, field lists, tables, and ordered steps. The specs in [../specs/](../specs/) state the rules, and each page names the rules that bind its content.
 
 - [command-surface.md](./command-surface.md): the exit codes, the usage of every verb, the peer writer, the plan flag and the dispatch matrix, and the dependency manifest.
-- [diagnostics.md](./diagnostics.md): the diagnostic classes, and the messages that relay another tool's output.
+- [diagnostics.md](./diagnostics.md): the diagnostic classes, the messages that relay another tool's output, and the faults and messages of each domain.
 - [identifiers-and-tokens.md](./identifiers-and-tokens.md): the id grammar, the slug function, the prefixed id, the session and source references, and how a graph node is written.
 - [machine-layout.md](./machine-layout.md): where wipctl keeps its files on one machine, slot names, slot states, and the suppression file.
 - [measures.md](./measures.md): the flow measures and the point arithmetic.

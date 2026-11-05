@@ -13,7 +13,7 @@
   - [`pending-fragment:a-claimed-document-is-not-an-orphan` — A claimed document is not an orphan](#pending-fragmenta-claimed-document-is-not-an-orphan--a-claimed-document-is-not-an-orphan)
   - [`pending-fragment:a-fragment-id-is-not-a-duplicate` — A fragment id is not a duplicate](#pending-fragmenta-fragment-id-is-not-a-duplicate--a-fragment-id-is-not-a-duplicate)
   - [`pending-fragment:the-drain-reports-drift-and-repairs-none` — The drain reports drift and repairs none](#pending-fragmentthe-drain-reports-drift-and-repairs-none--the-drain-reports-drift-and-repairs-none)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -57,7 +57,7 @@ A fragment's entry MUST require an id and a type alone, and the drain MUST refus
 - WHEN it is committed
 - THEN the schema accepts it and the drain refuses it. A schema requiring them rejects every capture at its own commit
 
-Verify: `cargo nextest run --test schemas`
+Verify: `cargo nextest run --test schemas`, and a reviewer confirms that the fragment schema's restatement of the entry fields agrees with the lane schema
 
 ### `pending-fragment:a-closing-field-never-appears` — A closing field never appears
 
@@ -129,12 +129,12 @@ When the drain finds drift, it MUST report the drift and MUST NOT repair it.
 - WHEN the drain runs
 - THEN the fragment lands and the report names the closed dependency without changing the dependency list
 
+Drift is a dependency fact a fragment states that the record then outgrows. A dependency can close while the fragment waits, and the drain reports that change without editing it.
+
 Verify: `cargo nextest run --test verb_contracts`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                                    | Why no command decides it                                                                                                   |
-| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `pending-fragment:a-fragment-requires-only-id-and-type` | Keeping the fragment schema's restatement of the entry fields in agreement with the lane schema is a review responsibility. |
-
-Drift is a dependency fact a fragment states that the record then outgrows. A dependency can close while the fragment waits, and the drain reports that change without editing it.
+| Rule                                                    | Reviewer confirms                                                                                                                                  |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pending-fragment:a-fragment-requires-only-id-and-type` | the fragment schema's restatement of the entry fields agrees with the lane schema, because keeping the two in agreement is a review responsibility |

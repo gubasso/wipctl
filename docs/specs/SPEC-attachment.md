@@ -19,7 +19,7 @@
   - [`attachment:a-clone-must-agree-on-identity` — A clone must agree on identity](#attachmenta-clone-must-agree-on-identity--a-clone-must-agree-on-identity)
   - [`attachment:attaching-is-idempotent` — Attaching is idempotent](#attachmentattaching-is-idempotent--attaching-is-idempotent)
   - [`attachment:attach-touches-neither-host-nor-remote` — Attach touches neither host nor remote](#attachmentattach-touches-neither-host-nor-remote--attach-touches-neither-host-nor-remote)
-- [Diagnostics](#diagnostics)
+  - [`attachment:a-resolution-fault-takes-its-listed-exit` — A resolution fault takes its listed exit code](#attachmenta-resolution-fault-takes-its-listed-exit--a-resolution-fault-takes-its-listed-exit-code)
 
 <!--TOC-->
 
@@ -209,25 +209,14 @@ The attach verb MUST NOT write into the host repository and MUST NOT push.
 
 Verify: `cargo nextest run --test attachment`
 
-## Diagnostics
+### `attachment:a-resolution-fault-takes-its-listed-exit` — A resolution fault takes its listed exit code
 
-Each resolution failure names its own resolution.
+When resolution meets a fault that [the attachment resolution faults](../reference/diagnostics.md#attachment-resolution-faults) list, the implementation MUST exit with the code that the list gives it, and MUST name the resolution that the list names.
 
-- No `.wipctl/project.toml` on the upward walk. Exit 2, naming the scaffold at the project root.
-- A `.wipctl` directory on the walk with no `project.toml` in it. Exit 2, naming that directory. The walk reports and stops rather than passing over it. Passing over it attaches the operator to a project further up the tree.
-- The project is not attached on this machine. Exit 1, naming both attach forms.
-- The attached plan repository is gone from disk. Exit 1, naming re-attachment.
-- The two configuration files disagree. Exit 1, naming the host value, the plan value, and the choice between re-attaching and correcting whichever file is wrong.
-- The scaffold finds an existing project file. Exit 1, reporting the id it found and naming attach for a machine that lacks the plan.
-- A clone that is not a plan repository. Exit 1, naming the create form as the way to start one.
-- A clone carrying no `plan_id`. Exit 1, naming the upgrade form that gives a record which predates the key an identity of its own.
-- A clone whose uid is already in a slot. Exit 1, naming the slot that holds the plan and the location offered. The message says that one plan gets one slot. A copy meant to be a plan of its own needs an identity of its own, which no verb mints yet.
+#### Scenario: A project directory holds no project file
 
-```text
-two slots claim one project                                       exit 1
-  wipctl: two slots hold a plan declaring this project
-  wipctl:   payments      plan 9f2c41a08b7d4e63a15c8f02d7e4b619
-  wipctl:   payments-old  plan 4c81d0e7f39a4b25861d7c04e9a2f358
-  wipctl: one project has one plan; detach the copy, and keep the plan
-          whose plan_id the peers around you name
-```
+- GIVEN a `.wipctl` directory on the upward walk with no `project.toml` in it
+- WHEN a verb resolves the project
+- THEN it exits 2, names that directory, and stops, because passing over it attaches the operator to a project further up the tree
+
+Verify: `cargo nextest run --test verb_contracts`

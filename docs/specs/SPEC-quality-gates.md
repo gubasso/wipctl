@@ -20,7 +20,7 @@
   - [`quality-gates:the-published-artifact-carries-its-licence` — The published artifact carries its licence](#quality-gatesthe-published-artifact-carries-its-licence--the-published-artifact-carries-its-licence)
   - [`quality-gates:the-repository-is-self-contained` — The repository is self-contained](#quality-gatesthe-repository-is-self-contained--the-repository-is-self-contained)
   - [`quality-gates:an-implementation-conforms-by-every-gate` — An implementation conforms by every gate](#quality-gatesan-implementation-conforms-by-every-gate--an-implementation-conforms-by-every-gate)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -212,6 +212,8 @@ The implementation repository MUST hold everything needed to understand, build, 
 - WHEN the page links there instead of stating it
 - THEN the rule changes when that project edits it, and a reader without access cannot learn what binds them
 
+The project's own plan record is outside the self-containment rule. It is coordination state: nothing in it is needed to understand, build, or gate the implementation, and `quality-gates:the-project-plans-with-its-own-method` is what binds it.
+
 Verify: reviewer clones the repository on a machine with nothing else and confirms that it explains itself, builds, and gates
 
 ### `quality-gates:an-implementation-conforms-by-every-gate` — An implementation conforms by every gate
@@ -226,11 +228,9 @@ An implementation MUST pass every requirement in this domain before it claims co
 
 Verify: `cargo nextest run`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                                 | Why no command decides it                                                                                                   |
-| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `quality-gates:the-repository-is-self-contained`     | The clone-on-a-bare-machine test judges whether a link carries a claim or supports one, which is a reading and not a match. |
-| `quality-gates:the-local-stages-hold-every-ci-check` | Whether a CI job is a check, a report, or release mechanics is a reading of what the job does, and not a match.             |
-
-The project's own plan record is outside the self-containment rule. It is coordination state: nothing in it is needed to understand, build, or gate the implementation, and `quality-gates:the-project-plans-with-its-own-method` is what binds it.
+| Rule                                                 | Reviewer confirms                                                                                                                                                                                                                                                             |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `quality-gates:the-repository-is-self-contained`     | a clone on a machine with nothing else explains itself, builds, and gates, because that test judges whether a link carries a claim or supports one, which is a reading and not a match                                                                                        |
+| `quality-gates:the-local-stages-hold-every-ci-check` | every CI job runs the commit stage or the push stage, no hook runs at both stages, and the contributor guide lists each CI-only check with its reason, because whether a CI job is a check, a report, or release mechanics is a reading of what the job does, and not a match |

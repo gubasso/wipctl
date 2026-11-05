@@ -20,7 +20,7 @@
   - [`sync:a-person-decides-a-conflict` — A person decides a conflict](#synca-person-decides-a-conflict--a-person-decides-a-conflict)
   - [`sync:the-discarded-event-never-enters-the-journal` — The discarded event never enters the journal](#syncthe-discarded-event-never-enters-the-journal--the-discarded-event-never-enters-the-journal)
   - [`sync:a-resolution-names-an-open-conflict` — A resolution names an open conflict](#synca-resolution-names-an-open-conflict--a-resolution-names-an-open-conflict)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -99,6 +99,8 @@ The implementation MUST reconcile the local and remote histories semantically, a
 - GIVEN two disjoint sets of changes
 - WHEN reconciliation runs
 - THEN both are combined, because the record's shape says they cannot conflict and a line-based merge cannot see that
+
+A collision recovery renames the losing capture under a rephrased title. That rename moves the capture's document and fragment together, which keeps the pair intact. It is the one rename that leaves no tombstone.
 
 Verify: `cargo nextest run --test sync`
 
@@ -198,7 +200,7 @@ A semantic conflict MUST be decided by a person and recorded by the resolution v
 - WHEN the resolution commits
 - THEN the next replication pushes the result, because a machine cannot know which of two transitions happened
 
-Verify: `cargo nextest run --test sync`
+Verify: `cargo nextest run --test sync`, and a reviewer confirms that the kept side is the one that actually happened
 
 ### `sync:the-discarded-event-never-enters-the-journal` — The discarded event never enters the journal
 
@@ -224,10 +226,8 @@ The resolution verb MUST require an id naming an open conflict, and MUST treat a
 
 Verify: `cargo nextest run --test verb_contracts`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                               | Why no command decides it                                                                          |
-| ---------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `sync:a-person-decides-a-conflict` | Whether the kept side is the one that actually happened is the judgment the verb exists to record. |
-
-A collision recovery renames the losing capture under a rephrased title. That rename moves the capture's document and fragment together, which keeps the pair intact. It is the one rename that leaves no tombstone.
+| Rule                               | Reviewer confirms                                                                                        |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `sync:a-person-decides-a-conflict` | the kept side is the one that actually happened, because that judgment is what the verb exists to record |
