@@ -16,7 +16,7 @@
   - [`epics:no-verb-reports-a-staleness-verdict` — No verb reports a staleness verdict](#epicsno-verb-reports-a-staleness-verdict--no-verb-reports-a-staleness-verdict)
   - [`epics:the-resolution-is-derived-every-call` — The resolution is derived on every call](#epicsthe-resolution-is-derived-every-call--the-resolution-is-derived-on-every-call)
   - [`epics:the-cache-is-authoritative-for-nothing` — The cache is authoritative for nothing](#epicsthe-cache-is-authoritative-for-nothing--the-cache-is-authoritative-for-nothing)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -122,6 +122,8 @@ A bare invocation of the resolution verb MUST list the epic ids and MUST NOT fal
 - WHEN it runs
 - THEN it lists the ids, because that asks which epics exist rather than how they are going, and each verb's usage names the other
 
+An unknown id is a usage error naming the directory searched and the listing that shows what exists. It is a bad invocation and not a failed check.
+
 Verify: `cargo nextest run --test verb_contracts`
 
 ### `epics:an-unjoined-epic-appears-at-zero` — An unjoined epic appears at zero
@@ -146,7 +148,7 @@ The implementation MUST NOT report a staleness verdict or retirement advice at a
 - WHEN the rollup renders
 - THEN it states that nothing remains open. Whether to retire the epic is a review question
 
-Verify: `cargo nextest run --test epics`
+Verify: `cargo nextest run --test epics`, and a reviewer confirms that each proposed field states a fact and not a verdict
 
 ### `epics:the-resolution-is-derived-every-call` — The resolution is derived on every call
 
@@ -172,10 +174,8 @@ Where the resolution is written to the cache, a missing, stale, or corrupt cache
 
 Verify: `cargo nextest run --test epics`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                        | Why no command decides it                                                        |
-| ------------------------------------------- | -------------------------------------------------------------------------------- |
-| `epics:no-verb-reports-a-staleness-verdict` | Whether a proposed field is a verdict or a fact is a reading of what it asserts. |
-
-An unknown id is a usage error naming the directory searched and the listing that shows what exists. It is a bad invocation and not a failed check.
+| Rule                                        | Reviewer confirms                                                                                                                            |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `epics:no-verb-reports-a-staleness-verdict` | each proposed field states a fact and not a verdict, because whether a proposed field is a verdict or a fact is a reading of what it asserts |

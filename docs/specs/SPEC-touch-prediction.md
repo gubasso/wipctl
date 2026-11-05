@@ -9,7 +9,7 @@
   - [`touch-prediction:a-touch-list-is-bounded-and-exact` — A touch list is bounded and exact](#touch-predictiona-touch-list-is-bounded-and-exact--a-touch-list-is-bounded-and-exact)
   - [`touch-prediction:a-prediction-never-sequences-and-never-ranks` — A prediction never sequences and never ranks](#touch-predictiona-prediction-never-sequences-and-never-ranks--a-prediction-never-sequences-and-never-ranks)
   - [`touch-prediction:a-touch-item-is-not-a-pattern` — A touch item is not a pattern](#touch-predictiona-touch-item-is-not-a-pattern--a-touch-item-is-not-a-pattern)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -43,7 +43,7 @@ The implementation MUST accept each touch path as opaque past its shape, and MUS
 - WHEN validation runs
 - THEN it passes, because the record cannot see the host's tree and a prediction that had to exist already could never name new work
 
-Verify: `cargo nextest run --test validation`
+Verify: `cargo nextest run --test validation`, and a reviewer confirms that each listed path is a file the work changes and not one it merely reads
 
 ### `touch-prediction:a-touch-list-is-bounded-and-exact` — A touch list is bounded and exact
 
@@ -81,8 +81,8 @@ Each touch item MUST be one exact path, and a broader surface MUST be stated as 
 
 Verify: `cargo nextest run --test schemas`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                                     | Why no command decides it                                                                           |
-| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `touch-prediction:a-touch-list-is-stated-never-verified` | Whether a listed path is a file the work changes or one it merely reads is a reading of the intent. |
+| Rule                                                     | Reviewer confirms                                                                                                           |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `touch-prediction:a-touch-list-is-stated-never-verified` | each listed path is a file the work changes and not one it merely reads, because which one it is is a reading of the intent |

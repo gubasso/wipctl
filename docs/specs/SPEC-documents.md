@@ -21,7 +21,7 @@
   - [`documents:a-promised-path-is-exempt-and-never-stubbed` — A promised path is exempt and never stubbed](#documentsa-promised-path-is-exempt-and-never-stubbed--a-promised-path-is-exempt-and-never-stubbed)
   - [`documents:a-rule-delta-is-typed-and-single` — A rule delta is typed and single](#documentsa-rule-delta-is-typed-and-single--a-rule-delta-is-typed-and-single)
   - [`documents:an-artifact-lives-beside-the-document` — An artifact lives beside the document](#documentsan-artifact-lives-beside-the-document--an-artifact-lives-beside-the-document)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -52,6 +52,8 @@ Every document MUST carry its shape's headings, in the order that [the three hea
 - GIVEN a story with an extra heading after acceptance
 - WHEN the shape gate runs
 - THEN it is refused, because the story closes on its acceptance and a second closing heading gives two answers
+
+The shape gate proves that every required heading is present and no extra one was added. It cannot prove that a section was filled in, and it cannot express the example fence, the title-line identity, or the initiative token's resolution. Those belong to the cross-file checker.
 
 Verify: `cargo nextest run --test documents`
 
@@ -235,12 +237,10 @@ Where a story carries non-narrative artifacts, they MUST live in a sibling direc
 
 Verify: `cargo nextest run --test validation`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                                  | Why no command decides it                                                        |
-| ----------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `documents:never-cut-work-is-not-negotiable-scope`    | Whether a listed item is never-cut work is a reading of the item.                |
-| `documents:a-changed-agreement-is-a-revision`         | No command can tell a cut the agreement allowed from a change to the agreement.  |
-| `documents:a-refused-option-names-the-reason-it-lost` | Whether a sentence states an approach and a reason is a reading of the sentence. |
-
-The shape gate proves that every required heading is present and no extra one was added. It cannot prove that a section was filled in, and it cannot express the example fence, the title-line identity, or the initiative token's resolution. Those belong to the cross-file checker.
+| Rule                                                  | Reviewer confirms                                                                                                                               |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `documents:never-cut-work-is-not-negotiable-scope`    | the negotiable list holds no never-cut work, because whether a listed item is never-cut work is a reading of the item                           |
+| `documents:a-changed-agreement-is-a-revision`         | each agreement change carries a dated revision line, because no command can tell a cut the agreement allowed from a change to the agreement     |
+| `documents:a-refused-option-names-the-reason-it-lost` | the section states one approach and the reason it lost, because whether a sentence states an approach and a reason is a reading of the sentence |

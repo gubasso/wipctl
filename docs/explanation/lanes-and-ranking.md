@@ -59,6 +59,8 @@ The two project thresholds stay separate. `days` measures this project's own wor
 
 Clearing a watch creates no separate event store. The section enters and leaves `watches.md` through ordinary commits, so `git log` on that file records when the block appeared and lifted, with its author and date. A future blocked-duration measure can fold from that history without storing or computing the measure here.
 
+The page budget of the watches spec reserves room for thirteen requirement blocks within the 300-line cap. The reading cadence is the split boundary if the page approaches that cap. That spec spends two of the five prohibition lines and reserves three.
+
 ## Reading the order back
 
 A computed order a reader cannot explain is an order they cannot challenge. `wipctl board` marks immediate delay cost with `^`, ordinary work with no glyph, and deferred delay cost with `.`. The marks survive a pipe and a colour-free terminal.

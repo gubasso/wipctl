@@ -14,7 +14,7 @@
   - [`messages:a-message-offers-no-undefined-flag` — A message offers no undefined flag](#messagesa-message-offers-no-undefined-flag--a-message-offers-no-undefined-flag)
   - [`messages:a-message-is-never-a-bare-code` — A message is never a bare code](#messagesa-message-is-never-a-bare-code--a-message-is-never-a-bare-code)
   - [`messages:the-text-is-stable-enough-to-match` — The text is stable enough to match](#messagesthe-text-is-stable-enough-to-match--the-text-is-stable-enough-to-match)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -165,8 +165,8 @@ The implementation MUST write message text for a person and MUST keep it stable 
 
 Verify: reviewer confirms a reworded message is treated as a contract change
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                          | Why no command decides it                                                                                    |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `messages:the-text-is-stable-enough-to-match` | Whether a rewording breaks a matcher depends on callers outside this project, which no command here can see. |
+| Rule                                          | Reviewer confirms                                                                                                                                                       |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `messages:the-text-is-stable-enough-to-match` | a reworded message is treated as a contract change, because whether a rewording breaks a matcher depends on callers outside this project, which no command here can see |

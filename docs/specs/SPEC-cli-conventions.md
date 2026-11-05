@@ -20,7 +20,7 @@
   - [`cli-conventions:an-absent-verb-is-declared` — An absent verb is declared](#cli-conventionsan-absent-verb-is-declared--an-absent-verb-is-declared)
   - [`cli-conventions:the-version-is-one-bare-string` — The version is one bare string](#cli-conventionsthe-version-is-one-bare-string--the-version-is-one-bare-string)
   - [`cli-conventions:completion-derives-its-candidates` — Completion derives its candidates](#cli-conventionscompletion-derives-its-candidates--completion-derives-its-candidates)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -76,7 +76,7 @@ A path printed for a consumer MUST be absolute, and a path in a mutation report 
 - WHEN the path is printed
 - THEN it is absolute, because the record no longer lives under the working directory
 
-Verify: `cargo nextest run --test verb_contracts`
+Verify: `cargo nextest run --test verb_contracts`, and a reviewer confirms that the case covers every path printed for a consumer to open
 
 ### `cli-conventions:the-verb-names-are-fixed` — The verb names are fixed
 
@@ -224,8 +224,8 @@ Completion MUST derive its candidates at completion time, from the usage output,
 
 Verify: `cargo nextest run --test completion`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                          | Why no command decides it                                                                                        |
-| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `cli-conventions:a-consumer-path-is-absolute` | Whether a printed path is for a consumer to open or part of a mutation report is a reading of the verb's intent. |
+| Rule                                          | Reviewer confirms                                                                                                                                                                  |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cli-conventions:a-consumer-path-is-absolute` | the case covers every path printed for a consumer to open, because whether a printed path is for a consumer to open or part of a mutation report is a reading of the verb's intent |

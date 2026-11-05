@@ -15,7 +15,7 @@
   - [`transition-journal:reopening-strips-the-close` — Reopening strips the close](#transition-journalreopening-strips-the-close--reopening-strips-the-close)
   - [`transition-journal:a-tombstone-is-a-terminal-journal` — A tombstone is a terminal journal](#transition-journala-tombstone-is-a-terminal-journal--a-tombstone-is-a-terminal-journal)
   - [`transition-journal:the-journal-records-no-reason` — The journal records no reason](#transition-journalthe-journal-records-no-reason--the-journal-records-no-reason)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -35,7 +35,7 @@ The program MUST record every transition as an event in the record, and MUST NOT
 - WHEN flow is measured
 - THEN the journal still answers. History can be rewritten, and requiring a version-control practice exceeds the single assumption about the host
 
-Verify: `cargo nextest run --test validation`
+Verify: `cargo nextest run --test validation`, and a reviewer confirms that the program wrote each event, and no author appended one by hand
 
 ### `transition-journal:an-event-is-three-non-empty-fields` — An event is three non-empty fields
 
@@ -46,6 +46,8 @@ Every journal line MUST carry exactly three non-empty tab-separated fields, and 
 - GIVEN a line with an empty second field
 - WHEN validation runs
 - THEN it fails, because the three-column format is the whole grammar and a blank column states nothing
+
+The journal carries no schema on purpose. Validating a three-column stream with a schema toolchain needs the very parsing the format avoids. Its rules live in the cross-file checker.
 
 Verify: `cargo nextest run --test validation`
 
@@ -157,10 +159,8 @@ The journal MUST NOT carry a who, a why, or a reason column.
 
 Verify: `cargo nextest run --test validation`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                                 | Why no command decides it                                                           |
-| ---------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `transition-journal:the-program-records-transitions` | No command can tell an event the program wrote from one an author appended by hand. |
-
-The journal carries no schema on purpose. Validating a three-column stream with a schema toolchain needs the very parsing the format avoids. Its rules live in the cross-file checker.
+| Rule                                                 | Reviewer confirms                                                                                                                                            |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `transition-journal:the-program-records-transitions` | the program wrote each event, and no author appended one by hand, because no command can tell an event the program wrote from one an author appended by hand |

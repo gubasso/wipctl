@@ -21,7 +21,7 @@
   - [`reporting:a-degraded-panel-degrades-only-itself` — A degraded panel degrades only itself](#reportinga-degraded-panel-degrades-only-itself--a-degraded-panel-degrades-only-itself)
   - [`reporting:membership-is-not-drawn-as-an-edge` — Membership is not drawn as an edge](#reportingmembership-is-not-drawn-as-an-edge--membership-is-not-drawn-as-an-edge)
   - [`reporting:the-id-stream-judges-nothing` — The id stream judges nothing](#reportingthe-id-stream-judges-nothing--the-id-stream-judges-nothing)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -169,6 +169,8 @@ The preview verb MUST print the head of the in-flight lane, or of the scheduled 
 - WHEN the preview runs
 - THEN it warns and prints the line anyway because the fixed eligibility constraint sorts eligible entries first
 
+Under concurrent agents the preview's line is advisory by construction. Two agents that both run it legitimately see the same head. The one that acts second learns so at the move, or avoids the race entirely by taking work instead.
+
 Verify: `cargo nextest run --test reporting`
 
 ### `reporting:a-defect-warns-and-the-line-prints` — A defect warns and the line prints
@@ -219,7 +221,7 @@ The composite view MUST call the verbs that own each panel and MUST compute noth
 - WHEN both render
 - THEN they agree, because the composite view is pure composition
 
-Verify: `cargo nextest run --test reporting`
+Verify: `cargo nextest run --test reporting`, and a reviewer confirms that each panel calls the owning verb and recomputes no number
 
 ### `reporting:a-degraded-panel-degrades-only-itself` — A degraded panel degrades only itself
 
@@ -257,10 +259,8 @@ The id stream MUST print every id, one per line, in record order, and MUST repor
 
 Verify: `cargo nextest run --test reporting`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                            | Why no command decides it                                                                    |
-| ----------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `reporting:the-composite-view-computes-nothing` | Whether a panel recomputed a number or called the owning verb is a reading of the code path. |
-
-Under concurrent agents the preview's line is advisory by construction. Two agents that both run it legitimately see the same head. The one that acts second learns so at the move, or avoids the race entirely by taking work instead.
+| Rule                                            | Reviewer confirms                                                                                                                                              |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `reporting:the-composite-view-computes-nothing` | each panel calls the owning verb and recomputes no number, because whether a panel recomputed a number or called the owning verb is a reading of the code path |

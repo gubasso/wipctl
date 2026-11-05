@@ -54,7 +54,7 @@ The author MUST use one public name for one concept across specifications, schem
 
 Verify: reviewer searches for synonyms of each introduced or changed public term and confirms that every current surface uses its canonical name
 
-## Unenforced rules
+## Unenforced
 
 | Rule                                               | Reviewer confirms                                                                              |
 | -------------------------------------------------- | ---------------------------------------------------------------------------------------------- |

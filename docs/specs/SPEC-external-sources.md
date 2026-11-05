@@ -17,7 +17,7 @@
   - [`external-sources:a-missing-source-command-degrades-loudly` — A missing source command degrades loudly](#external-sourcesa-missing-source-command-degrades-loudly--a-missing-source-command-degrades-loudly)
   - [`external-sources:the-view-cache-is-authoritative-for-nothing` — The view cache is authoritative for nothing](#external-sourcesthe-view-cache-is-authoritative-for-nothing--the-view-cache-is-authoritative-for-nothing)
   - [`external-sources:the-report-distinguishes-empty-from-unread` — The report distinguishes empty from unread](#external-sourcesthe-report-distinguishes-empty-from-unread--the-report-distinguishes-empty-from-unread)
-- [Diagnostics](#diagnostics)
+  - [`external-sources:a-fault-takes-its-listed-class` — A fault takes its listed class](#external-sourcesa-fault-takes-its-listed-class--a-fault-takes-its-listed-class)
 
 <!--TOC-->
 
@@ -193,12 +193,14 @@ Verify: `cargo nextest run --test schemas`
 
 The shape is `sources-report.schema.json`, beside this page. The obligation to ship that schema and a case validating real output against it belongs to `cli-conventions:a-machine-format-is-verb-local`, and is not restated here.
 
-## Diagnostics
+### `external-sources:a-fault-takes-its-listed-class` — A fault takes its listed class
 
-Each fault names its own resolution.
+When the implementation meets a fault that [the external source faults](../reference/diagnostics.md#external-source-faults) list, it MUST report that fault with the class, the exit code, and the resolution that the list gives it.
 
-- A source reference naming an undeclared alias. This is a failure, exit 1. The message names the alias, the document, and the `sources` section, and offers the two resolutions: declare the alias, or correct the reference.
-- A malformed reference token. This is a failure, exit 1. The message shows the token and the `<alias>#<key>` shape it must carry.
-- A declared source that no reference reaches. This is a warning. It reaches the reader and never the exit code, because a source declared before its first reference is a legal first draft.
-- A list command that is absent, exits non-zero, or emits unreadable output. This is a degradation, not a failure. One line on the error stream names the alias, the command, and the reader's next step. The view still exits on what the other sources answered.
-- A view run where the `sources` section is absent. This is a usage error, exit 2. The message names the section and says that the project declares no source yet.
+#### Scenario: A declared source has no reference yet
+
+- GIVEN a declared source that no reference reaches
+- WHEN the view runs
+- THEN the reader sees a warning and the exit code does not change, because a source declared before its first reference is a legal first draft
+
+Verify: `cargo nextest run --test verb_contracts`

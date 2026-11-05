@@ -11,7 +11,7 @@
   - [`manual:narrative-prose-lives-with-its-definition` — Narrative prose lives with its command definition](#manualnarrative-prose-lives-with-its-definition--narrative-prose-lives-with-its-command-definition)
   - [`manual:the-manual-verb-serves-one-page` — The manual verb serves one page](#manualthe-manual-verb-serves-one-page--the-manual-verb-serves-one-page)
   - [`manual:the-three-verb-lists-are-equal` — The three verb lists are equal](#manualthe-three-verb-lists-are-equal--the-three-verb-lists-are-equal)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -54,6 +54,8 @@ The implementation MUST derive the manual from the command definitions the build
 - GIVEN a verb whose name changes in the build
 - WHEN the manual is produced
 - THEN the page follows the name, because the manual states this build rather than a second command surface
+
+The requirements of this domain name no tool. Which library derives the manual is an implementation choice, and it is recorded in the code and its decision records. No command holds that line here, because the agnosticism case denies documentation-method product names alone. A reviewer holds it.
 
 Verify: `cargo nextest run --test manual`
 
@@ -107,10 +109,8 @@ The implementation MUST keep three sets equal: the verbs this specification stat
 
 Verify: `cargo nextest run --test manual`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                               | Why no command decides it                                                                                                 |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `manual:narrative-prose-lives-with-its-definition` | Whether a passage is the derived body or narrative prose the author added is a reading of the text and not a match on it. |
-
-The requirements above name no tool. Which library derives the manual is an implementation choice, and it is recorded in the code and its decision records. No command holds that line here, because the agnosticism case denies documentation-method product names alone. A reviewer holds it.
+| Rule                                               | Reviewer confirms                                                                                                                                                                                                          |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `manual:narrative-prose-lives-with-its-definition` | every narrative passage the manual carries sits with the command definition it documents, because whether a passage is the derived body or narrative prose the author added is a reading of the text and not a match on it |

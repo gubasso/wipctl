@@ -17,7 +17,7 @@
   - [`ids:a-counter-is-forbidden-across-machines` — A counter is forbidden across machines](#idsa-counter-is-forbidden-across-machines--a-counter-is-forbidden-across-machines)
   - [`ids:a-freed-id-is-burned` — A freed id is burned](#idsa-freed-id-is-burned--a-freed-id-is-burned)
   - [`ids:a-burned-id-is-refused-at-the-mint` — A burned id is refused at the mint](#idsa-burned-id-is-refused-at-the-mint--a-burned-id-is-refused-at-the-mint)
-- [Unenforced rules](#unenforced-rules)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -133,7 +133,9 @@ The implementation MUST NOT append a qualifying postfix on the operator's behalf
 - WHEN they pass an explicit id
 - THEN it mints through the same checks, because a qualifying postfix is a naming judgment and no id is chosen by a machine
 
-Verify: `cargo nextest run --test ids`
+Rephrasing is the expected resolution for a collision: two titles that slug identically usually want different names anyway. A postfix answers a collision inside one record, and a rephrase answers one between two.
+
+Verify: `cargo nextest run --test ids`, and a reviewer confirms that each passed postfix distinguishes something for a reader
 
 ### `ids:a-postfix-qualifies-a-held-base` — A postfix qualifies a held base
 
@@ -183,11 +185,9 @@ An entry, epic, initiative, or fragment MUST NOT claim an id a tombstone holds, 
 
 Verify: `cargo nextest run --test ids`
 
-## Unenforced rules
+## Unenforced
 
-| Rule                                    | Why no command decides it                                                          |
-| --------------------------------------- | ---------------------------------------------------------------------------------- |
-| `ids:a-postfix-is-passed-never-guessed` | Whether a passed postfix distinguishes anything for a reader is a naming judgment. |
-| `ids:a-prefixed-id-is-split-once`       | No command tells one splitter from two that happen to agree today.                 |
-
-Rephrasing is the expected resolution for a collision: two titles that slug identically usually want different names anyway. A postfix answers a collision inside one record, and a rephrase answers one between two.
+| Rule                                    | Reviewer confirms                                                                                                    |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `ids:a-postfix-is-passed-never-guessed` | each passed postfix distinguishes something for a reader, because whether it does is a naming judgment               |
+| `ids:a-prefixed-id-is-split-once`       | one function splits a prefixed dependency, because no command tells one splitter from two that happen to agree today |

@@ -9,7 +9,7 @@
   - [`plan-targeting:the-dispatch-matrix-is-derived` — The dispatch matrix is derived](#plan-targetingthe-dispatch-matrix-is-derived--the-dispatch-matrix-is-derived)
   - [`plan-targeting:the-target-owns-the-lock-and-the-commit` — The target owns the lock and the commit](#plan-targetingthe-target-owns-the-lock-and-the-commit--the-target-owns-the-lock-and-the-commit)
   - [`plan-targeting:the-flag-names-one-plan` — The flag names one plan](#plan-targetingthe-flag-names-one-plan--the-flag-names-one-plan)
-- [Diagnostics](#diagnostics)
+  - [`plan-targeting:a-refusal-writes-its-listed-message` — A refusal writes its listed message](#plan-targetinga-refusal-writes-its-listed-message--a-refusal-writes-its-listed-message)
 
 <!--TOC-->
 
@@ -79,32 +79,14 @@ The flag MUST name one plan, and combining it with a batch flag MUST be a usage 
 
 Verify: `cargo nextest run --test verb_contracts`
 
-## Diagnostics
+### `plan-targeting:a-refusal-writes-its-listed-message` — A refusal writes its listed message
 
-```text
-an alias the table does not declare                                       exit 2
-  wipctl: unknown plan 'payments'
-  wipctl: --plan selects a peer this plan declares; run 'wipctl peers'
-          to see the aliases, or add it with 'wipctl peer add <url>'
+When the plan flag meets a condition that [the plan targeting messages](../reference/diagnostics.md#plan-targeting-messages) show, the implementation MUST write the message and exit with the code shown there.
 
-an alias a peer declares, but this plan does not                          exit 2
-  wipctl: unknown plan 'gamma'
-  wipctl: 'gamma' is declared by peer 'beta', not by this plan. An alias
-          is local to the plan that declares it, so --plan reads this
-          plan's peers section only. Declare it here with 'wipctl peer
-          add <url>', or run the verb from inside that plan.
+#### Scenario: An alias only a peer declares
 
---plan on a verb that resolves nothing                                    exit 2
-  wipctl: 'init' does not take --plan
-  wipctl: init creates the plan for the project you are in, so there is
-          nothing for --plan to redirect; run it from that project
+- GIVEN `--plan gamma`, where peer `beta` declares `gamma` and this plan does not
+- WHEN a verb runs
+- THEN it exits 2 and says that an alias is local to the plan that declares it, because a bare unknown-plan message reads as a typo
 
---plan with --all                                                         exit 2
-  wipctl: --plan and --all cannot be combined
-  wipctl: --plan names one plan and --all names every plan in the
-          closure; choose one
-
-the named plan is not attached                                            exit 1
-  wipctl: plan 'payments' is declared but not attached on this machine
-  wipctl: run 'wipctl attach --peers' to fill its slot
-```
+Verify: `cargo nextest run --test verb_contracts`

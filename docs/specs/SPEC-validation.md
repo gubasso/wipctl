@@ -20,8 +20,8 @@
   - [`validation:the-verb-takes-no-argument` — The validation verb takes no argument](#validationthe-verb-takes-no-argument--the-validation-verb-takes-no-argument)
   - [`validation:success-prints-the-census` — Success prints the census](#validationsuccess-prints-the-census--success-prints-the-census)
   - [`validation:a-broken-install-is-not-a-skip` — A broken install is not a skip](#validationa-broken-install-is-not-a-skip--a-broken-install-is-not-a-skip)
-- [Unenforced rules](#unenforced-rules)
-- [Diagnostics](#diagnostics)
+  - [`validation:the-resolver-writes-its-listed-message` — The resolver writes its listed message](#validationthe-resolver-writes-its-listed-message--the-resolver-writes-its-listed-message)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -41,7 +41,9 @@ Every check MUST have exactly one owner: the shape schema for one file's own str
 - WHEN it is placed
 - THEN the schema owns it, because a rule written twice is reported twice and drifts once
 
-Verify: `cargo nextest run --test validation`
+Five instance schemas gate what a project writes, and ten output schemas gate what verbs emit.
+
+Verify: `cargo nextest run --test validation`, and a reviewer confirms that each check belongs to its one owner, the shape schema for one file's own structure and the cross-file checker for a fact spanning two files
 
 ### `validation:the-read-set-is-attached-or-the-run-fails` — The read set is attached, or the run fails
 
@@ -161,6 +163,8 @@ Every diagnostic MUST be one location-and-message line on the diagnostic stream,
 - WHEN their editor opens it
 - THEN the path resolves, because a synthetic location is a path nobody's tooling can follow
 
+A verb relaying a record fact in its own voice carries the command prefix, which is the ordinary stream discipline.
+
 Verify: `cargo nextest run --test validation`
 
 ### `validation:there-is-no-diagnostic-code` — There is no diagnostic code
@@ -223,52 +227,20 @@ Where the shipped schema directory is missing, the implementation MUST fail rath
 
 Verify: `cargo nextest run --test validation`
 
-## Unenforced rules
+### `validation:the-resolver-writes-its-listed-message` — The resolver writes its listed message
 
-| Rule                                   | Why no command decides it                                         |
-| -------------------------------------- | ----------------------------------------------------------------- |
-| `validation:every-check-has-one-owner` | Whether a proposed rule spans two files is a reading of the rule. |
+When the resolver of a prefixed dependency meets a condition that [the peer dependency resolution messages](../reference/diagnostics.md#peer-dependency-resolution-messages) show, every verb MUST write the message shown there, and write that message alone. A failure exits with the code shown there, and a warning leaves the exit code to the other conditions of the run.
 
-Five instance schemas gate what a project writes, and ten output schemas gate what verbs emit. A verb relaying a record fact in its own voice carries the command prefix, which is the ordinary stream discipline.
+#### Scenario: Two verbs meet one renamed target
 
-## Diagnostics
+- GIVEN a dependency whose target the peer renamed
+- WHEN validation and a writer's preflight both meet it
+- THEN both write the one message that names the successor, because two messages for one condition teach a reader that the tool has two opinions
 
-One resolver turns a prefixed dependency into an entry, and these are its messages. No verb writes a second, softer message for one of these conditions. Two messages for one condition teach a reader that the tool has two opinions.
+Verify: `cargo nextest run --test validation`
 
-```text
-the target was deleted in the peer                                        exit 1
-  wipctl: needs payments#secure-session-storage: that entry was deleted
-          in the payments plan on 2026-08-30
-  wipctl: the id is burned there for the life of that record; drop the
-          dependency, or ask its owners what replaced the work
+## Unenforced
 
-the target was renamed in the peer                                        exit 1
-  wipctl: needs payments#secure-session-storage: that entry was renamed
-          in the payments plan on 2026-08-30
-  wipctl:   it is now  payments#session-identity-storage
-  wipctl: update the reference on profile-composition
-
-the target was never there                                                exit 1
-  wipctl: needs payments#secure-session-storage: no such entry and no
-          tombstone in the payments plan at 91a47c0d
-  wipctl: check the id, or the slot may be behind; run
-          'wipctl sync --all' and try again
-
-a peer in the read set is not attached                                    exit 1
-  wipctl: peer 'payments' is not attached on this machine
-  wipctl: run 'wipctl attach --peers' to clone every plan this one names
-
-a declared row nothing references                                         exit 0
-  wipctl: stale: no entry needs anything from peer 'platform'
-  wipctl: drop the row with 'wipctl peer remove platform', or leave it
-          for the work that will use it
-
-a peer row naming a settled identity                                      exit 0
-  wipctl: peer 'payments' names an identity that plan superseded
-  wipctl:   the row says   aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-  wipctl:   the plan says  22222222222222222222222222222222
-  wipctl: the row still resolves; update it when you next edit this
-          table, and nothing breaks if you do not
-```
-
-Three answers replace one guess. The third names the revision, because at that point the slot being behind is the likeliest explanation left.
+| Rule                                   | Reviewer confirms                                                                                                                                                                                                     |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `validation:every-check-has-one-owner` | each check belongs to its one owner, the shape schema for one file's own structure and the cross-file checker for a fact spanning two files, because whether a proposed rule spans two files is a reading of the rule |

@@ -17,7 +17,7 @@
   - [`peer-attachment:a-reference-follows-its-alias` — A reference follows its alias](#peer-attachmenta-reference-follows-its-alias--a-reference-follows-its-alias)
   - [`peer-attachment:a-row-in-use-is-not-removed` — A row in use is not removed](#peer-attachmenta-row-in-use-is-not-removed--a-row-in-use-is-not-removed)
   - [`peer-attachment:the-walk-writes-into-no-peer` — The walk writes into no peer](#peer-attachmentthe-walk-writes-into-no-peer--the-walk-writes-into-no-peer)
-- [Diagnostics](#diagnostics)
+  - [`peer-attachment:a-failure-writes-its-listed-message` — A failure writes its listed message](#peer-attachmenta-failure-writes-its-listed-message--a-failure-writes-its-listed-message)
 
 <!--TOC-->
 
@@ -183,39 +183,14 @@ The walk MUST NOT write into a peer's repository, MUST NOT push, and MUST NOT to
 
 Verify: `cargo nextest run --test attachment`
 
-## Diagnostics
+### `peer-attachment:a-failure-writes-its-listed-message` — A failure writes its listed message
 
-Each failure names its resolution. This page owns the message text for the writer and for the walk.
+When the peer writer or the attachment walk meets a condition that [the peer attachment messages](../reference/diagnostics.md#peer-attachment-messages) show, the implementation MUST write the message text and exit with the code shown there, which is the one statement of that text for the writer and for the walk.
 
-```text
-the last url would be removed                                             exit 1
-  wipctl: peer 'payments' is left with no url
-  wipctl: a row keeps at least one location; add the replacement first,
-          or drop the peer with 'wipctl peer remove payments'
+#### Scenario: The last url of a row would be removed
 
-a row still in use                                                        exit 1
-  wipctl: peer 'payments' cannot be removed: 2 entries still name it
-  wipctl:   profile-composition   needs payments#secure-session-storage
-  wipctl:   profile-export        needs payments#token-rotation
-  wipctl: clear the references first, or rename the alias instead of
-          removing the row
+- GIVEN a peer row with one url
+- WHEN the operator removes that url
+- THEN the writer exits 1 and names the two ways out, adding the replacement first or dropping the peer, because a row keeps at least one location
 
-the clone declares another plan_id                                        exit 1
-  wipctl: peer 'payments' cloned from
-          https://git.example.org/acme/payments-plan.git
-  wipctl:   the peers section expects 9f2c41a08b7d4e63a15c8f02d7e4b619
-  wipctl:   plan.toml declares 4c81d0e7f39a4b25861d7c04e9a2f358
-  wipctl: the url serves a different plan; fix the url or use an identity
-          that plan declares as canonical or superseded
-
-every url failed                                                          exit 1
-  wipctl: could not clone peer 'payments' from any of 2 urls
-  wipctl: <the transport's own error for each, relayed>
-  wipctl: check the urls and your access, then re-run
-          'wipctl attach --peers'
-
-the plan names no peers                                                   exit 0
-  wipctl: this plan names no peers
-  wipctl: a peer is declared in the peers section of .wipctl/plan.toml;
-          add one with 'wipctl peer add <url>'
-```
+Verify: `cargo nextest run --test verb_contracts`

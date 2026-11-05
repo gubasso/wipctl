@@ -20,8 +20,8 @@
   - [`agent-sessions:adapter-runtime-state-is-private` — Adapter runtime state is private](#agent-sessionsadapter-runtime-state-is-private--adapter-runtime-state-is-private)
   - [`agent-sessions:resume-is-an-explicit-native-operation` — Resume is an explicit native operation](#agent-sessionsresume-is-an-explicit-native-operation--resume-is-an-explicit-native-operation)
   - [`agent-sessions:a-resume-profile-states-its-mode` — A resume profile states its mode](#agent-sessionsa-resume-profile-states-its-mode--a-resume-profile-states-its-mode)
-- [Diagnostics](#diagnostics)
-- [Unenforced rules](#unenforced-rules)
+  - [`agent-sessions:a-fault-takes-its-listed-class` — A fault takes its listed class](#agent-sessionsa-fault-takes-its-listed-class--a-fault-takes-its-listed-class)
+- [Unenforced](#unenforced)
 
 <!--TOC-->
 
@@ -43,7 +43,7 @@ The record MUST store the session reference alone, and the plan configuration MU
 - WHEN two machines write that field for one entry
 - THEN the record becomes a runtime bus written through commits, and `sync:reconciliation-is-semantic-never-textual` reports a conflict over one entry that no person caused
 
-Verify: `cargo nextest run --test schemas`
+Verify: `cargo nextest run --test schemas`, and a reviewer confirms that each proposed field is a stable declaration and not volatile session state
 
 ### `agent-sessions:a-session-reference-is-one-token` — A session reference is one token
 
@@ -127,7 +127,7 @@ Where the invoking host authorizes the declared contact command, an agent MAY in
 - WHEN the agent contacts the peer holding an overlapping path
 - THEN the message is delivered without a second prompt, because a duplicated authority boundary obstructs coordination and decides nothing the host did not
 
-Verify: `cargo nextest run --test verb_contracts`
+Verify: `cargo nextest run --test verb_contracts`, and a reviewer confirms that the host authorized the declared command
 
 ### `agent-sessions:an-unresolved-session-is-unknown` — An unresolved session is unknown
 
@@ -225,20 +225,23 @@ Where a reference profile declares a resume command, the profile MUST state whet
 
 Verify: reviewer reads each profile in the session adapters reference that declares a resume command
 
-## Diagnostics
+### `agent-sessions:a-fault-takes-its-listed-class` — A fault takes its listed class
 
-Each fault names its own resolution.
+When the implementation meets a fault that [the agent session faults](../reference/diagnostics.md#agent-session-faults) list, it MUST report that fault with the class, the exit code, and the resolution that the list gives it.
 
-- A session reference naming an undeclared alias. This is a failure, exit 1. The message names the alias, the entry, and the `session_adapters` section, and it offers the two resolutions: declare the alias, or correct the reference.
-- A malformed reference token. This is a failure, exit 1. The message shows the token and the `<alias>#<key>` shape it must carry.
-- A declared inspect command that is absent, exits non-zero, times out, or emits an unreadable object. This is a degradation rather than a failure. The reading is unknown, one line on the error stream names the alias and the command, and the view still reports every other row.
-- A failed contact. This is a failure, exit 1. The message names the alias, the key, and that the message was not accepted, and it leaves the record unchanged.
+#### Scenario: A declared inspect command times out
 
-## Unenforced rules
+- GIVEN a declared inspect command that times out
+- WHEN the view runs
+- THEN the reading is unknown, one line names the alias and the command, and every other row is still reported, because the list classes that fault as a degradation and not a failure
 
-| Rule                                                   | Why no command decides it                                                                                   |
-| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| `agent-sessions:the-session-system-owns-its-own-state` | Whether a proposed field is volatile session state or a stable declaration is a reading of what it asserts. |
-| `agent-sessions:contact-needs-no-second-confirmation`  | Whether a host authorized the declared command is the host's answer, and this record cannot read it.        |
-| `agent-sessions:adapter-runtime-state-is-private`      | The adapter is the operator's executable, and no test of this project runs it.                              |
-| `agent-sessions:a-resume-profile-states-its-mode`      | Whether a profile states its mode and its warning is a reading of prose.                                    |
+Verify: `cargo nextest run --test verb_contracts`
+
+## Unenforced
+
+| Rule                                                   | Reviewer confirms                                                                                                                                        |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `agent-sessions:the-session-system-owns-its-own-state` | each proposed field is a stable declaration and not volatile session state, because whether it is one or the other is a reading of what it asserts       |
+| `agent-sessions:contact-needs-no-second-confirmation`  | the host authorized the declared command, because that authorization is the host's answer, and this record cannot read it                                |
+| `agent-sessions:adapter-runtime-state-is-private`      | how the adapter stores its runtime state keeps that state private, because the adapter is the operator's executable, and no test of this project runs it |
+| `agent-sessions:a-resume-profile-states-its-mode`      | each profile that declares a resume command states its mode and its warning, because whether a profile states them is a reading of prose                 |
