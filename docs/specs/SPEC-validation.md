@@ -43,7 +43,7 @@ Every check MUST have exactly one owner: the shape schema for one file's own str
 
 Five instance schemas gate what a project writes, and ten output schemas gate what verbs emit.
 
-Verify: `cargo nextest run --test validation`, and a reviewer confirms that no proposed check of one owner spans two files
+Verify: `cargo nextest run --test validation`, and a reviewer confirms that each check belongs to its one owner, the shape schema for one file's own structure and the cross-file checker for a fact spanning two files
 
 ### `validation:the-read-set-is-attached-or-the-run-fails` — The read set is attached, or the run fails
 
@@ -229,7 +229,7 @@ Verify: `cargo nextest run --test validation`
 
 ### `validation:the-resolver-writes-its-listed-message` — The resolver writes its listed message
 
-When the resolver of a prefixed dependency meets a condition that [the peer dependency resolution messages](../reference/diagnostics.md#peer-dependency-resolution-messages) show, every verb MUST write the message and exit with the code shown there, and write that message alone.
+When the resolver of a prefixed dependency meets a condition that [the peer dependency resolution messages](../reference/diagnostics.md#peer-dependency-resolution-messages) show, every verb MUST write the message shown there, and write that message alone. A failure exits with the code shown there, and a warning leaves the exit code to the other conditions of the run.
 
 #### Scenario: Two verbs meet one renamed target
 
@@ -241,6 +241,6 @@ Verify: `cargo nextest run --test validation`
 
 ## Unenforced
 
-| Rule                                   | Reviewer confirms                                                                                                        |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `validation:every-check-has-one-owner` | no proposed check of one owner spans two files, because whether a proposed rule spans two files is a reading of the rule |
+| Rule                                   | Reviewer confirms                                                                                                                                                                                                     |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `validation:every-check-has-one-owner` | each check belongs to its one owner, the shape schema for one file's own structure and the cross-file checker for a fact spanning two files, because whether a proposed rule spans two files is a reading of the rule |

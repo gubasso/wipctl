@@ -107,7 +107,7 @@ Verify: `cargo nextest run --test validation`
 
 ### `peers:a-table-fault-writes-its-listed-message` — A table fault writes its listed message
 
-When a check of the peers table's own shape fails, the implementation MUST write the message text and exit with the code that [the peer table messages](../reference/diagnostics.md#peer-table-messages) show. The validation domain owns the check catalog, and that list is the one statement of the message text.
+When a check of the peers table's own shape fails, or the view runs against a plan with no table, the implementation MUST write the message text and exit with the code that [the peer table messages](../reference/diagnostics.md#peer-table-messages) show. The validation domain owns the check catalog, and that list is the one statement of the message text.
 
 #### Scenario: A url carries credentials
 
