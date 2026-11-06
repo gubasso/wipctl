@@ -61,16 +61,16 @@
         "spec-driven-docs": "spec-driven-docs"
       },
       "locked": {
-        "lastModified": 1793893643,
-        "narHash": "sha256-RhbrnhE7/qk+N6OgJo2e3B1KD8yYaFP35wJxrCW1TuU=",
+        "lastModified": 1793967174,
+        "narHash": "sha256-D/ke1jU7XCB5CWKuePbt2JMGd+zKzFL9dJ40K6P/vZU=",
         "owner": "gubasso",
         "repo": "release-kit",
-        "rev": "69114718dca20f46697fb95dbcc561f1e9cbb505",
+        "rev": "ef42cbbfe9c01c4fa1811092fff99cd0bc2bfbcf",
         "type": "github"
       },
       "original": {
         "owner": "gubasso",
-        "ref": "v0.9.4",
+        "ref": "v0.9.5",
         "repo": "release-kit",
         "type": "github"
       }

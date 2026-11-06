@@ -91,17 +91,15 @@ repos:
   #   CHANGELOG.md                             release-plz
   #   SECURITY.md, .github/workflows/pr-title.yml,
   #   .github/workflows/release-plz.yml        rk, rendered whole
-  #   .release-kit/manifest.json,
-  #   .release-kit/config.toml                 rk, written whole
+  #   .release-kit/manifest.json               rk
   #   .github/workflows/release.yml            cargo-dist
   #   Cargo.lock, flake.lock                   cargo, nix
   #   .spec-driven-docs/, docs/.markdownlint-cli2.jsonc
   #                                            sdd, which verifies them byte
   #                                            for byte
   # Each tool excludes them in its own configuration: dprint.json,
-  # dprint.markdown.json, .markdownlint-cli2.jsonc, _typos.toml,
-  # .editorconfig-checker.json, and .taplo.toml; taplo skips Cargo.lock by
-  # itself. The fixers,
+  # dprint.markdown.json, .markdownlint-cli2.jsonc, _typos.toml, and
+  # .editorconfig-checker.json; taplo skips Cargo.lock by itself. The fixers,
   # no-emphasis, and the two link-form rules have no configuration, so each
   # takes its own exclude. The reading hooks keep them: the parsers and the
   # secret scans. The sdd gates run with `always_run` and read no filenames.
