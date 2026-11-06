@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.6.7](https://github.com/gubasso/wipctl/compare/v0.6.6...v0.6.7) - 2026-11-06
+
+### Other
+
+- *(release-kit)* take the payload to 0.9.4 and release in the devshell ([#73](https://github.com/gubasso/wipctl/pull/73))
+
 ## [0.6.6](https://github.com/gubasso/wipctl/compare/v0.6.5...v0.6.6) - 2026-11-05
 
 ### Other
