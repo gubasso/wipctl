@@ -112,31 +112,31 @@
     {
       "source": "templates/TEMPLATE-spec.md",
       "destination": "docs/specs/TEMPLATE-spec.md",
-      "sha256": "dda48e05b2245b6b1199dec3b8c6f16b86d0c955e8660d4d43aa0fcc92bfb5d2",
+      "sha256": "29834d58f1acd2c74264eefa9483202d0336b6e9aa5e3ef9fadc2406ae0b8f20",
       "baseline_sha256": "29834d58f1acd2c74264eefa9483202d0336b6e9aa5e3ef9fadc2406ae0b8f20"
     },
     {
       "source": "templates/TEMPLATE-adr.md",
       "destination": "docs/decisions/TEMPLATE-adr.md",
-      "sha256": "37ecdef6201b00983c816a03680890aad8f6f4fb643fec70ea029ac2dae1658f",
+      "sha256": "b45ab3ee147f64e8401c45b2a9b26a0501299758349abb8d2297919f0c308b28",
       "baseline_sha256": "b45ab3ee147f64e8401c45b2a9b26a0501299758349abb8d2297919f0c308b28"
     },
     {
       "source": "templates/TEMPLATE-agents-digest.md",
       "destination": "docs/reference/TEMPLATE-agents-digest.md",
-      "sha256": "14ca07309ac94599fcda015d2413cd67769a738b1b49f2a22b3a200e8d6c15fd",
+      "sha256": "a546d758cc142d41f94cb80ba699f6d96ffe91abf832444fb805382e451963f0",
       "baseline_sha256": "a546d758cc142d41f94cb80ba699f6d96ffe91abf832444fb805382e451963f0"
     },
     {
       "source": "templates/TEMPLATE-guide.md",
       "destination": "docs/guides/TEMPLATE-guide.md",
-      "sha256": "5cd5a28187840f74a681d8aa381f37310eaaff383bc3df39b343f0c88d7c7783",
+      "sha256": "80696d533a4a868a1c45ba718aec6153715870bb2c403614ff90ce9ecc752c04",
       "baseline_sha256": "80696d533a4a868a1c45ba718aec6153715870bb2c403614ff90ce9ecc752c04"
     },
     {
       "source": "templates/TEMPLATE-known-issue.md",
       "destination": "docs/reference/TEMPLATE-known-issue.md",
-      "sha256": "17175f356d71bf0b8b17fdf52403b4344dca37193811e2cb28975b95fbb6ceb3",
+      "sha256": "02776222f887ffb2ee95b139f08fb5f62c5dde580675eab963b6f03f8e70fb5a",
       "baseline_sha256": "02776222f887ffb2ee95b139f08fb5f62c5dde580675eab963b6f03f8e70fb5a"
     }
   ],
