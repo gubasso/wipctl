@@ -1,0 +1,3 @@
+# rk writes .release-kit/config.toml whole, in its own form, so taplo leaves
+# it alone. A generated file follows its generator.
+exclude = [".release-kit/config.toml"]
