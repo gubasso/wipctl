@@ -683,7 +683,7 @@ repos:
       # one line of the rendered release block in AGENTS.md that carries MUST.
       # The spec zone is excluded because it is the zone the keywords belong to.
       - id: requirement-keyword-zone
-        name: requirement keywords stay in the spec zone (docs-specs:requirement-keyword-stays-in-the-spec-zone)
+        name: requirement keywords stay in the spec zone (repository-docs:requirement-keyword-stays-in-the-spec-zone)
         entry: scripts/check-requirement-keywords
         language: system
         files: '^docs/.*\.(md|markdown)$'
@@ -1015,6 +1015,12 @@ repos:
         language: system
         always_run: true
         pass_filenames: false
+      - id: spec-trailing-section
+        name: 'spec trailing section'
+        entry: sdd gate spec-trailing-section
+        language: system
+        files: '^docs/specs/SPEC-[^/]*\.md$'
+        verbose: true
       - id: spec-verify-hooks-exist
         name: 'spec hook references exist'
         entry: sdd gate spec-verify-hooks-exist

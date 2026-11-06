@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Keep an uppercase requirement keyword inside the spec zone
-# (docs-specs:requirement-keyword-stays-in-the-spec-zone).
+# (repository-docs:requirement-keyword-stays-in-the-spec-zone).
 #
 # `docs/specs/` owns every binding rule, and each rule there carries an id, a
 # scenario, and a verification. The same sentence written in a guide, a chapter,
@@ -25,7 +25,7 @@ for file in "$@"; do
   [[ -f $file ]] || continue
 
   while IFS=$'\t' read -r lineno keyword; do
-    printf '%s:%s: %s binds a reader outside the spec zone (docs-specs:requirement-keyword-stays-in-the-spec-zone)\n' \
+    printf '%s:%s: %s binds a reader outside the spec zone (repository-docs:requirement-keyword-stays-in-the-spec-zone)\n' \
       "$file" "$lineno" "$keyword" >&2
     status=1
   done < <(
