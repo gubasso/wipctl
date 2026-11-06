@@ -1020,7 +1020,6 @@ repos:
         entry: sdd gate spec-trailing-section
         language: system
         files: '^docs/specs/SPEC-[^/]*\.md$'
-        verbose: true
       - id: spec-verify-hooks-exist
         name: 'spec hook references exist'
         entry: sdd gate spec-verify-hooks-exist
