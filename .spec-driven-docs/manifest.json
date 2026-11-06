@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "canon_version": "0.14.4",
+  "canon_version": "0.14.5",
   "canon_source": "https://github.com/gubasso/spec-driven-docs",
   "profile": "codebase",
   "docs_root": "docs",
@@ -22,7 +22,7 @@
     {
       "source": "_docs/specs/SPEC-budget-debt.md",
       "destination": "docs/specs/SPEC-budget-debt.md",
-      "sha256": "1b652c9984683d4732b748ad363d56232095dd5fe9c2d048fd4dab59a468d684",
+      "sha256": "9457b1b3a2645b92e34549cc6a28e62c10981b12813c8d1022cc9e519a817e0a",
       "baseline_sha256": "9457b1b3a2645b92e34549cc6a28e62c10981b12813c8d1022cc9e519a817e0a"
     },
     {
@@ -34,32 +34,32 @@
     {
       "source": "_docs/specs/SPEC-decision-records.md",
       "destination": "docs/specs/SPEC-decision-records.md",
-      "sha256": "833cae2f3a75f01c3f9d278354e70c06275f0f3e8aa428ebfb98b22197659638",
-      "baseline_sha256": "bbc0f6e7bff224bf0b0fc819e9cae9dba4fbe78721a429b4376046c7c01c2022"
+      "sha256": "26a701c060224fcd3d5b3ed2332973dd43b76d3b3b1c9f7741f986bec91217da",
+      "baseline_sha256": "26a701c060224fcd3d5b3ed2332973dd43b76d3b3b1c9f7741f986bec91217da"
     },
     {
       "source": "_docs/specs/SPEC-instance.md",
       "destination": "docs/specs/SPEC-instance.md",
-      "sha256": "56e554ed23228d66ea0d8b629b65e3436bfbeb3b6a90fa15972da48e48e9f9d5",
+      "sha256": "0aa1f9d0757984fea229e66c24f8f498bc3cba173a278dbc191842cd39306da1",
       "baseline_sha256": "0aa1f9d0757984fea229e66c24f8f498bc3cba173a278dbc191842cd39306da1"
     },
     {
       "source": "_docs/specs/SPEC-docs-format.md",
       "destination": "docs/specs/SPEC-docs-format.md",
-      "sha256": "6a0462ba74e75e10ce4a2bcc4416d5e6caad8359be408b7f478550dbd68c2fb3",
-      "baseline_sha256": "5ac87870d8dd095ae4d52704da297f91e53aca9c51532f1a1133fbc54fed4351"
+      "sha256": "79b88d85ecfaaa24b9940045113f7b7665dcfd1f5d8c0333f29f2e43fe9aee3e",
+      "baseline_sha256": "79b88d85ecfaaa24b9940045113f7b7665dcfd1f5d8c0333f29f2e43fe9aee3e"
     },
     {
       "source": "_docs/specs/SPEC-docs-foundations.md",
       "destination": "docs/specs/SPEC-docs-foundations.md",
-      "sha256": "3e6abb5726d76f929bbbd08ef53e44a1d79568e944bb9f75ad18aa6f705337db",
-      "baseline_sha256": "632106cc4e4c2a3e6b728407738fa609859f66ae47da175c39e3f7a59761f874"
+      "sha256": "a9f0d0c64c2db8075203e22ac931b4c42ace6e68c1f4381bd7acf295185aea73",
+      "baseline_sha256": "a9f0d0c64c2db8075203e22ac931b4c42ace6e68c1f4381bd7acf295185aea73"
     },
     {
       "source": "_docs/specs/SPEC-docs-specs.md",
       "destination": "docs/specs/SPEC-docs-specs.md",
-      "sha256": "e4ee2df6b832b99519de4bed1847a2652b38463ebaf1d9601e08f0770527cd9f",
-      "baseline_sha256": "1c0c3cf73d138eaa4de9943da37bbe2e459583ef2ac0d431ecff890f669c004b"
+      "sha256": "f8489383b2b504d05d1d0f80dff0508d434e108b1997d45e67e8734186ef0a6f",
+      "baseline_sha256": "f8489383b2b504d05d1d0f80dff0508d434e108b1997d45e67e8734186ef0a6f"
     },
     {
       "source": "_docs/specs/SPEC-comparison-docs.md",
@@ -76,32 +76,32 @@
     {
       "source": "_docs/specs/SPEC-spec-to-code.md",
       "destination": "docs/specs/SPEC-spec-to-code.md",
-      "sha256": "f0db7c9f67b236269de1624bae1153be85893bf48abaedd61af43cc93af1fcd5",
+      "sha256": "9dbc4cf57855073b75832342b85e0fd9865d14492e5af66c76b137199f795e6b",
       "baseline_sha256": "9dbc4cf57855073b75832342b85e0fd9865d14492e5af66c76b137199f795e6b"
     },
     {
       "source": "_docs/specs/SPEC-guides.md",
       "destination": "docs/specs/SPEC-guides.md",
-      "sha256": "20c6656e745037d41ca24479296f6ccfe54e3f1614cb460c57fe487797787e31",
-      "baseline_sha256": "20c6656e745037d41ca24479296f6ccfe54e3f1614cb460c57fe487797787e31"
+      "sha256": "9c1b2fd00fd54d91a087cfd0db49ca6df6e563367b368afffc124deced4e3ecf",
+      "baseline_sha256": "9c1b2fd00fd54d91a087cfd0db49ca6df6e563367b368afffc124deced4e3ecf"
     },
     {
       "source": "_docs/specs/SPEC-writing-style.md",
       "destination": "docs/specs/SPEC-writing-style.md",
-      "sha256": "72f36ffb29d6df4d798e73f075d54e4ca9ef9f950b77fbc4a74691f3d25564d8",
+      "sha256": "1d5555c5ba405294e2e7bac79f7b5796520e11a63a25ef15975abe14faa4e4a1",
       "baseline_sha256": "1d5555c5ba405294e2e7bac79f7b5796520e11a63a25ef15975abe14faa4e4a1"
     },
     {
       "source": "_docs/specs/SPEC-tracking.md",
       "destination": "docs/specs/SPEC-tracking.md",
-      "sha256": "1d06d5913a17c9ff071463e99f869ee5da5ef2488da5b9967c14fe689f3ed9ca",
-      "baseline_sha256": "b9cf7cffb7fc99191d5a6c8e7b741e5a1ee675b5f3da973b3c40247472079287"
+      "sha256": "758f350534c061fb6fb36b6385c2c25967c914bab4c169240d8370874e068d9f",
+      "baseline_sha256": "758f350534c061fb6fb36b6385c2c25967c914bab4c169240d8370874e068d9f"
     },
     {
       "source": "_docs/specs/SPEC-tracking/tracking.schema.json",
       "destination": "docs/specs/SPEC-tracking/tracking.schema.json",
-      "sha256": "fef4d042821345c8fb948e5c45e4b24ae5365b8d8bdf3a48f14c98a47e140bab",
-      "baseline_sha256": "fef4d042821345c8fb948e5c45e4b24ae5365b8d8bdf3a48f14c98a47e140bab"
+      "sha256": "5d07af8f6191b7039ec02d5d5ac674e2dfff0cdcce362c0ba5f81e08e9c43ded",
+      "baseline_sha256": "5d07af8f6191b7039ec02d5d5ac674e2dfff0cdcce362c0ba5f81e08e9c43ded"
     },
     {
       "source": "templates/TEMPLATE-tracking.yaml",
@@ -112,38 +112,38 @@
     {
       "source": "templates/TEMPLATE-spec.md",
       "destination": "docs/specs/TEMPLATE-spec.md",
-      "sha256": "dda48e05b2245b6b1199dec3b8c6f16b86d0c955e8660d4d43aa0fcc92bfb5d2",
-      "baseline_sha256": "dccb56bc2315c3c02cc7fd4a07eab5c4602e289a8c5078adab9135d036ff5216"
+      "sha256": "29834d58f1acd2c74264eefa9483202d0336b6e9aa5e3ef9fadc2406ae0b8f20",
+      "baseline_sha256": "29834d58f1acd2c74264eefa9483202d0336b6e9aa5e3ef9fadc2406ae0b8f20"
     },
     {
       "source": "templates/TEMPLATE-adr.md",
       "destination": "docs/decisions/TEMPLATE-adr.md",
-      "sha256": "37ecdef6201b00983c816a03680890aad8f6f4fb643fec70ea029ac2dae1658f",
+      "sha256": "b45ab3ee147f64e8401c45b2a9b26a0501299758349abb8d2297919f0c308b28",
       "baseline_sha256": "b45ab3ee147f64e8401c45b2a9b26a0501299758349abb8d2297919f0c308b28"
     },
     {
       "source": "templates/TEMPLATE-agents-digest.md",
       "destination": "docs/reference/TEMPLATE-agents-digest.md",
-      "sha256": "14ca07309ac94599fcda015d2413cd67769a738b1b49f2a22b3a200e8d6c15fd",
+      "sha256": "a546d758cc142d41f94cb80ba699f6d96ffe91abf832444fb805382e451963f0",
       "baseline_sha256": "a546d758cc142d41f94cb80ba699f6d96ffe91abf832444fb805382e451963f0"
     },
     {
       "source": "templates/TEMPLATE-guide.md",
       "destination": "docs/guides/TEMPLATE-guide.md",
-      "sha256": "5cd5a28187840f74a681d8aa381f37310eaaff383bc3df39b343f0c88d7c7783",
+      "sha256": "80696d533a4a868a1c45ba718aec6153715870bb2c403614ff90ce9ecc752c04",
       "baseline_sha256": "80696d533a4a868a1c45ba718aec6153715870bb2c403614ff90ce9ecc752c04"
     },
     {
       "source": "templates/TEMPLATE-known-issue.md",
       "destination": "docs/reference/TEMPLATE-known-issue.md",
-      "sha256": "17175f356d71bf0b8b17fdf52403b4344dca37193811e2cb28975b95fbb6ceb3",
+      "sha256": "02776222f887ffb2ee95b139f08fb5f62c5dde580675eab963b6f03f8e70fb5a",
       "baseline_sha256": "02776222f887ffb2ee95b139f08fb5f62c5dde580675eab963b6f03f8e70fb5a"
     }
   ],
   "integration_blocks": [
     {
       "path": ".pre-commit-config.yaml",
-      "marker_hash": "fdeac952064ba5e4333fb1bafa34600d433e09c3016b3303863b051d7f0fbf58"
+      "marker_hash": "bde5968ff16f551c66838abc9a2c3033c632c0ea5e020dcef214f806b8622e68"
     },
     {
       "path": "AGENTS.md",

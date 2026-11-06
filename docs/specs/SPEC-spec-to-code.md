@@ -68,12 +68,14 @@ Verify: `rg -n "^[[:space:]]*(#|//).*\bADR-[a-z0-9]" . --type-not md && exit 1 |
 
 ### `spec-to-code:a-suppression-names-its-case` — A suppression names its known-issue case
 
-Where a suppression masks a defect outside this repository, the author MUST name the `KI-<slug>` case at the suppression.
+Where a `KI-<slug>` case is cited outside the documentation root, the author MUST make that case resolve to a known-issue record.
 
-#### Scenario: A suppression names a case that no record defines
+The citation is the subject, not the suppression that carries it. This convention defines the `KI-` token and owns the records it resolves against. It defines no suppression syntax, so no gate here reads one. A suppression that names no case states its reason where its own linter reads one. `spec-to-code.md` names the lints that enforce that reason, and the case where a language has none.
+
+#### Scenario: A record is deleted while a suppression still cites it
 
 - GIVEN an expected failure whose reason is `KI-vendor-drops-the-body`
-- WHEN no record under known-issues carries that name
-- THEN the suppression fails, because a mask nobody can look up never gets removed
+- WHEN a commit deletes the record of that name
+- THEN the citation fails, because a mask nobody can look up never gets removed
 
 Verify: `pre-commit run suppression-names-its-case --all-files`

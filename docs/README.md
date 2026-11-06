@@ -29,6 +29,7 @@ One spec per domain, each requirement carrying a rule id, an example scenario, a
 - [SPEC-quality-gates.md](./specs/SPEC-quality-gates.md): what any implementation gates, and what it means to conform.
 - [SPEC-vocabulary.md](./specs/SPEC-vocabulary.md): how every public domain, concept, field, and field value names itself.
 - [SPEC-review.md](./specs/SPEC-review.md): the human review gate, holding every rule no command can decide.
+- [SPEC-repository-docs.md](./specs/SPEC-repository-docs.md): the rules this repository adds to the documentation convention it adopts.
 
 The shipped JSON Schemas live beside the spec that owns each shape, in the companion directory named for it.
 

@@ -14,7 +14,7 @@
     # `sdd`, the documentation gate, pinned at a release tag. `sdd self-depend
     # sync` moves the tag and the lock together, and `.envrc` runs it on entry.
     spec-driven-docs = {
-      url = "github:gubasso/spec-driven-docs/v0.14.4";
+      url = "github:gubasso/spec-driven-docs/v0.14.5";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
