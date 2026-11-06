@@ -42,7 +42,7 @@ Install the hooks once with `pre-commit install` inside the devShell. The commit
 Three workflows run outside the two stages:
 
 - `pr-title.yml` checks the title and the body of a pull request. Both exist only at the forge, so no hook can read them. The commit-msg hooks hold the same rules for each local commit message.
-- `release-plz.yml` verifies the package before it publishes, and the `publish-dry` hook runs the same check at the push stage with the devShell `cargo`. The workflow itself still takes its Rust toolchain and its `release-plz` binary from GitHub Actions, not from the devShell. This exception is temporary. It ends when release-kit renders `release-plz.yml` to run through the dev environment of the project, and this repository records its answer for that environment and takes that release.
+- `release-plz.yml` verifies the package before it publishes, with the toolchain and the `release-plz` binary of the devShell, and the `publish-dry` hook runs the same check at the push stage.
 - `release.yml` builds the release artifacts and runs no check of the code. The `dist-generate-check` hook holds it equal to `dist-workspace.toml`.
 
 ## Documentation

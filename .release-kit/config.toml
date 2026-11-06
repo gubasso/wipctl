@@ -15,27 +15,27 @@ technologies = [
 forge = "github" # P: github or gitlab; empty means the project has no forge, and an omitted key detects from the remote
 
 [profile.release]
-mode = "automatic"       # P: automatic, external, or none
-driver = "rust"          # P: the technology that states the version and takes the bot; automatic alone
-style = "trunk"          # P: trunk or lines; automatic alone
+mode = "automatic" # P: automatic, external, or none
+driver = "rust" # P: the technology that states the version and takes the bot; automatic alone
+style = "trunk" # P: trunk or lines; automatic alone
 line_prefix = "release/" # P: release-line branch prefix, rendered into the release triggers; automatic alone
 
 [git]
-trunk = "master"                  # P: the one permanent branch, rendered into every artifact naming it
+trunk = "master" # P: the one permanent branch, rendered into every artifact naming it
 checkout_mode = "linked-worktree" # P: linked-worktree or main-worktree, where a topic branch opens
-integration = "forge"             # P: local or forge, which authority moves an implementation onto the trunk
-merge_form = "squash"             # P: squash or rebase, how the commits of a branch reach the trunk
+integration = "forge" # P: local or forge, which authority moves an implementation onto the trunk
+merge_form = "squash" # P: squash or rebase, how the commits of a branch reach the trunk
 
 [capabilities]
-nix_packaging = true    # P: opt-in Nix capability
+nix_packaging = true # P: opt-in Nix capability
 reporting_policy = true # P: the landed vulnerability reporting policy
-scorecard = false       # P: opt-in OpenSSF Scorecard workflow, github only
-code_scanning = "off"   # P: opt-in code scanning provider: codeql, semgrep, or off
-workflow_guards = true  # P: opt-in workflow guards: the agent and commit policy lines, the glossary, the workflow hooks, merge-cleanup, and branch-reminder
+scorecard = false # P: opt-in OpenSSF Scorecard workflow, github only
+code_scanning = "off" # P: opt-in code scanning provider: codeql, semgrep, or off
+workflow_guards = true # P: opt-in workflow guards: the agent and commit policy lines, the glossary, the workflow hooks, merge-cleanup, and branch-reminder
 
 [security]
-advisories = ""          # N: project receiving vulnerability reports
-contact = ""             # P: one line naming who receives a report when the forge channel is unavailable; empty keeps the forge's own wording
+advisories = "" # N: project receiving vulnerability reports
+contact = "" # P: one line naming who receives a report when the forge channel is unavailable; empty keeps the forge's own wording
 response = "best-effort" # P: the acknowledgment window the policy promises: best-effort, 1 day, <n> days, 1 business day, or <n> business days
 
 [setup]
@@ -75,11 +75,23 @@ require_last_push_approval = false # F: floor false; true is stricter
 
 [protection.github]
 squash_title_source = "PR_TITLE" # F: invariant under the squash merge form, PR_TITLE
-squash_body_source = "PR_BODY"   # F: invariant under the squash merge form, PR_BODY
+squash_body_source = "PR_BODY" # F: invariant under the squash merge form, PR_BODY
 
 [protection.gitlab]
-merge_method = "ff"                 # F: invariant, linear history
-squash_option = "always"            # F: invariant, the squash git.merge_form names: always under squash, never under rebase
+merge_method = "ff" # F: invariant, linear history
+squash_option = "always" # F: invariant, the squash git.merge_form names: always under squash, never under rebase
 squash_commit_template = "%{title}" # F: invariant, references title and description
-push_access_level = 0               # F: invariant, the level git.integration names
-merge_access_level = 40             # F: floor thirty
+push_access_level = 0 # F: invariant, the level git.integration names
+merge_access_level = 40 # F: floor thirty
+
+[dev_environment]
+run = "nix develop --command"
+
+[[dev_environment.github.setup]]
+uses = "DeterminateSystems/nix-installer-action@90bb610b90bf290cad97484ba341453bd1cbefea"
+tag = "v19"
+
+[[dev_environment.github.cache]]
+uses = "DeterminateSystems/magic-nix-cache-action@565684385bcd71bad329742eefe8d12f2e765b39"
+tag = "v13"
+with = { use-flakehub = false, use-gha-cache = true }

@@ -1,6 +1,6 @@
 {
   "schema_version": 12,
-  "rk_version": "0.9.3",
+  "rk_version": "0.9.4",
   "origin": "adopt",
   "landed_at": "2026-09-06T02:40:51Z",
   "profile": {
@@ -32,7 +32,28 @@
     "security_contact": "",
     "security_response": "best-effort",
     "required_check": "",
-    "required_workflow": ""
+    "required_workflow": "",
+    "dev_environment": {
+      "run": "nix develop --command",
+      "github": {
+        "setup": [
+          {
+            "uses": "DeterminateSystems/nix-installer-action@90bb610b90bf290cad97484ba341453bd1cbefea",
+            "tag": "v19"
+          }
+        ],
+        "cache": [
+          {
+            "uses": "DeterminateSystems/magic-nix-cache-action@565684385bcd71bad329742eefe8d12f2e765b39",
+            "tag": "v13",
+            "with": {
+              "use-flakehub": false,
+              "use-gha-cache": true
+            }
+          }
+        ]
+      }
+    }
   },
   "files": [
     {
@@ -43,7 +64,7 @@
     {
       "destination": ".github/workflows/release-plz.yml",
       "kind": "rendered",
-      "sha256": "dae0bfc1282b30535df0a13562b0b3ea5b4ff59af63009301f5ee86a9406c968"
+      "sha256": "79da658646b7130115a79312425ab979942f3866b8087acf3692d993cd791c80"
     },
     {
       "destination": ".pre-commit-config.yaml",
