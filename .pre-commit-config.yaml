@@ -2,6 +2,12 @@
 # together run every check CI runs, and CI runs those two stages and nothing
 # beside them (quality-gates:the-local-stages-hold-every-ci-check).
 default_install_hook_types: [pre-commit, commit-msg, pre-push]
+# The node hook runs on the devShell nodejs. Without this line an empty
+# pre-commit cache can pick `default`, and nodeenv then fails on a prerelease
+# entry of the node index: "invalid literal for int() with base 10: '0-alpha'"
+# (2026-11-10).
+default_language_version:
+  node: system
 
 # A hook that names no `stages` inherits this, so the cheap tree-wide checks
 # (formatting, lints, editorconfig, spelling, markdown, secrets) run once, at
@@ -151,11 +157,12 @@ repos:
   # which the stdlib-based pretty-format-json cannot. check-json5 above stays the
   # syntax gate; dprint owns formatting. Config in the sibling `./dprint.json`
   # (plugin version pinned there). `language: system`, so dprint is supplied by
-  # the project's flake devShell (`pkgs.dprint`) — do not install it out-of-band;
-  # the devShell is the single provider. pre-commit only — git push may strip
+  # the project's flake devShell (`pkgs.dprint`), its one owner. pre-commit
+  # only — git push may strip
   # PATH, and formatting is already applied by commit time.
   - repo: local
     hooks:
+      # owner: devshell (no-hook-language) upstream dprint publishes no pre-commit hook.
       - id: dprint
         name: dprint fmt (json/jsonc)
         # --allow-no-files: dprint exits 14 when every path it receives is one its
@@ -168,21 +175,14 @@ repos:
 
   # --- EditorConfig ---
   #
-  # Local `language: system` off the devShell (`pkgs.editorconfig-checker`,
-  # which is 3.11.1 in nixpkgs — the same version this was pinned to). Upstream
-  # publishes only a `language: golang` id at this tag, with no `-system`
-  # variant, so the stanza is restated here rather than reused. Upstream's
-  # complete definition is `entry: editorconfig-checker` and nothing else: no
-  # args, no types, no pass_filenames. So the defaults it relies on are the
-  # defaults kept here — filenames are passed, and file selection stays
-  # `types: [file]` by omission. Everything below this line is ours, not
-  # upstream's.
-  - repo: local
+  # The upstream hook, `language: golang`: pre-commit builds it at the pinned
+  # rev. Upstream's definition is `entry: editorconfig-checker` and nothing
+  # else, so filenames are passed and file selection stays `types: [file]` by
+  # omission. Everything below the id is ours.
+  - repo: https://github.com/editorconfig-checker/editorconfig-checker
+    rev: v3.11.1
     hooks:
       - id: editorconfig-checker
-        name: run editorconfig-checker
-        entry: editorconfig-checker
-        language: system
         alias: ec
         # This hook enforces only what no other formatter owns: charset, line
         # endings, and trailing whitespace. Each disabled check below is
@@ -220,6 +220,7 @@ repos:
   # --- Rust: format & lint (auto-fix) ---
   - repo: local
     hooks:
+      # owner: devshell (project-environment) cargo fmt is part of the Rust toolchain that the devShell pins.
       - id: cargo-fmt
         name: cargo fmt
         entry: cargo fmt --all
@@ -227,6 +228,7 @@ repos:
         types: [rust]
         pass_filenames: false
 
+      # owner: devshell (project-environment) cargo clippy is part of the Rust toolchain and builds the crate.
       - id: clippy-fix
         name: clippy auto-fix
         entry: cargo clippy --fix --allow-dirty --allow-staged --all-features -- -W clippy::all
@@ -234,6 +236,7 @@ repos:
         types: [rust]
         pass_filenames: false
 
+      # owner: devshell (project-environment) cargo clippy is part of the Rust toolchain and builds the crate.
       - id: clippy-strict
         name: clippy gate
         entry: cargo clippy --all-targets --all-features -- -D warnings
@@ -241,6 +244,7 @@ repos:
         types: [rust]
         pass_filenames: false
 
+      # owner: devshell (no-hook-language) upstream taplo publishes no pre-commit hook.
       - id: taplo-format
         name: taplo format
         entry: taplo format
@@ -295,6 +299,7 @@ repos:
   #     `pre-commit` and `pre-push` profiles.
   - repo: local
     hooks:
+      # owner: devshell (project-environment) cargo nextest runs the test suite of the crate.
       - id: cargo-nextest-unit
         name: cargo nextest (unit tests)
         entry: cargo nextest run --profile pre-commit --all-features --no-tests=warn
@@ -303,6 +308,7 @@ repos:
         pass_filenames: false
         stages: [pre-commit]
 
+      # owner: devshell (project-environment) cargo nextest runs the test suite of the crate.
       - id: cargo-nextest-integration
         name: cargo nextest (integration tests)
         entry: cargo nextest run --profile pre-push --all-features --no-tests=warn
@@ -314,6 +320,7 @@ repos:
       # The release profile sets `lto`, `codegen-units`, and `strip`
       # (Cargo.toml), so a defect can break it and leave the debug build that
       # the tests use green. Pre-push, because it is a full optimized build.
+      # owner: devshell (project-environment) cargo build builds the crate.
       - id: cargo-build-release
         name: cargo build (release profile)
         entry: cargo build --release --all-features
@@ -328,6 +335,7 @@ repos:
       # package drops, or a build that fails only from the packaged copy, fails
       # here and not at release time. It reads the registry index, so it is a
       # networked check and runs at pre-push.
+      # owner: devshell (no-hook-language) a script of this repository that runs cargo.
       - id: publish-dry
         name: cargo publish --dry-run (the package builds)
         entry: scripts/publish-dry --allow-dirty
@@ -351,49 +359,31 @@ repos:
 
   # --- Spell check ---
   #
-  # Both `typos` and `committed` are wired as local `language: system` hooks off
-  # the flake devShell, because neither of upstream's own ids can install on
-  # this project's platform:
-  #
-  #   - the default ids are `language: python` and pull a PyPI binary wheel
-  #     whose ELF interpreter is hard-coded to /lib64/ld-linux-x86-64.so.2. A
-  #     Nix host has no /lib64, so the wheel cannot exec — and the error names a
-  #     file that does exist, so it reads as a corrupt cache, not a linkage
-  #     problem.
-  #   - the `-src` ids are `language: rust`, and pre-commit builds them with
-  #     `cargo install --path .` at the repo root. Both repositories are Cargo
-  #     workspaces, so that root is a virtual manifest and the install fails
-  #     with "found a virtual manifest ... instead of a package manifest".
-  #     Verified against crate-ci/typos at v1.49.0.
-  #
-  # So the devShell supplies both binaries, exactly as it already does for
-  # dprint, taplo, nixfmt, shfmt and shellcheck: one provider, named in
-  # flake.nix. The upstream revs are pinned in the comments below so a future
-  # bump has something to compare against.
+  # The upstream `language: python` hook. Its wheel holds a prebuilt binary that
+  # links the standard ELF loader, which the host supplies (nix-ld on a NixOS
+  # host). The `-src` ids stay unused: pre-commit builds them with
+  # `cargo install --path .`, which fails on the virtual workspace manifest at
+  # the upstream root (verified against crate-ci/typos at v1.49.0).
   #
   # typos is REPORT-ONLY here by construction. Upstream's default args are
-  # [--write-changes, --force-exclude], so anything that reuses them auto-fixes,
-  # and typos' auto-fix silently rewrites deliberate identifiers and error
-  # strings. Naming the entry explicitly means no default args are inherited at
-  # all. Fix real typos by hand; allowlist false positives in ./_typos.toml.
-  - repo: local
+  # [--write-changes, --force-exclude], and typos' auto-fix silently rewrites
+  # deliberate identifiers and error strings. `args:` replaces them whole, so
+  # no default arg is inherited. Fix real typos by hand; allowlist false
+  # positives in ./_typos.toml. The manifest names more stages than the commit
+  # stage, which win over default_stages, so `stages:` is explicit.
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.49.0
     hooks:
       - id: typos
-        name: typos (spelling, report-only)
-        entry: typos
-        language: system
         types: [text]
-        # --force-exclude is carried in `args:` rather than folded into `entry:`
-        # above. The two are identical at runtime — pre-commit runs entry, then
-        # args, then filenames — but an explicit `args:` is the machine-visible
-        # form of the invariant this hook depends on: that it never inherits
-        # upstream's [--write-changes, --force-exclude] and therefore never
-        # auto-fixes. `cog bootstrap-audit`'s typos-args-explicit requirement
-        # reads exactly this key, so the property is checked rather than only
-        # asserted in a comment. --force-exclude keeps `exclude:` honoured for
-        # filenames pre-commit passes explicitly.
+        # --force-exclude is carried in `args:` as the machine-visible form of
+        # the invariant this hook depends on: that it never inherits upstream's
+        # [--write-changes, --force-exclude] and therefore never auto-fixes.
+        # `cog bootstrap-audit`'s typos-args-explicit requirement reads exactly
+        # this key. --force-exclude keeps `exclude:` honoured for filenames
+        # pre-commit passes explicitly.
         args: [--force-exclude]
-        # upstream: https://github.com/crate-ci/typos (v1.49.0)
+        stages: [pre-commit]
   # --- Commit message length and punctuation (commit-msg stage) ---
   #
   # Narrowed on purpose. The Conventional Commits shape — the type and the
@@ -406,16 +396,14 @@ repos:
   # block checks.
   #
   # Policy lives in ./committed.toml, which committed discovers at the repo
-  # root, so this stanza only wires the stage and the message file. Local
-  # `language: system` for the same platform reason given above the typos hook.
-  # `--commit-file` is upstream's own arg and is what makes the hook read the
-  # message pre-commit hands it rather than scanning history.
-  - repo: local
+  # root, so this stanza only wires the stage and the message file. The
+  # upstream `language: python` hook, like typos above. `--commit-file` is
+  # upstream's own arg and is what makes the hook read the message pre-commit
+  # hands it rather than scanning history.
+  - repo: https://github.com/crate-ci/committed
+    rev: v1.1.11
     hooks:
       - id: committed
-        name: committed (conventional commit message)
-        entry: committed
-        language: system
         # Upstream's own args, carried over verbatim. --commit-file makes the
         # tool read the message file pre-commit appends after these, rather
         # than scanning history; --fixup and --wip let those two commit shapes
@@ -424,7 +412,6 @@ repos:
         stages: [commit-msg]
         always_run: true
         pass_filenames: true
-        # upstream: https://github.com/crate-ci/committed (v1.1.11)
 
   # --- A breaking change carries its adopter guidance (commit-msg stage) ---
   #
@@ -442,11 +429,11 @@ repos:
   # itself. The rule was stated in prose and gated by nothing, and two breaking
   # changes in a row missed it. This hook is the gate it was missing.
   #
-  # `language: system`; bash comes from the devShell like every other system
-  # hook. The script is repository tooling and is excluded from the published
+  # `language: system`; the script calls bash and grep from the host. The script is repository tooling and is excluded from the published
   # package, which is why the case suite skips when it is absent.
   - repo: local
     hooks:
+      # owner: host (no-hook-language) a script of this repository that calls only bash and grep.
       - id: breaking-change-carries-a-footer
         name: a breaking change carries its adopter guidance
         entry: scripts/check-breaking-footer
@@ -457,25 +444,23 @@ repos:
 
   # --- Secret scanning (commit stage) ---
   #
-  # `ripsecrets-system` is upstream's own sanctioned system variant: same
-  # entry, same args, same selectors as the default id, differing only in
-  # `language`. Reusing it rather than restating a local hook means upstream
-  # stays authoritative for `args: [--strict-ignore]`, `types: [text]` and
-  # `require_serial: true` — none of which are restated here, so none can drift
-  # out of sync on a future bump. nixpkgs `ripsecrets` is 0.1.11, matching the
-  # rev this repo was already pinned to.
+  # The upstream `language: rust` hook: pre-commit builds it with rustup, which
+  # downloads with the devShell curl. The system id served only because the
+  # devShell carried the binary, which no longer holds. Upstream stays
+  # authoritative for `args: [--strict-ignore]`, `types: [text]` and
+  # `require_serial: true`.
   #
   # Upstream sets no `stages`, so this inherits `default_stages` and scans
   # what each commit adds. gitleaks below scans the history at the push stage.
   - repo: https://github.com/sirwart/ripsecrets
     rev: v0.1.11
     hooks:
-      - id: ripsecrets-system
+      - id: ripsecrets
 
   # --- Heavy checks (pre-push only) ---
   #
-  # `gitleaks-system` for the binary, but the entry IS overridden, unlike
-  # ripsecrets above, and the two differences are deliberate:
+  # The upstream `language: golang` hook, but the entry IS overridden, unlike
+  # ripsecrets above, and the differences are deliberate:
   #
   #   - Upstream's entry is `gitleaks git --pre-commit --redact --staged
   #     --verbose`, which scans only what is staged. This hook runs at pre-push
@@ -483,15 +468,12 @@ repos:
   #     committed earlier and about to be published. So `--pre-commit` and
   #     `--staged` are dropped on purpose; `--redact` and `--verbose` are
   #     upstream's and are carried over into `args:`.
-  #   - `pass_filenames: false` is restated because upstream omits it on the
-  #     `-system` id alone — the `gitleaks` and `gitleaks-docker` stanzas both
-  #     set it, so the omission reads as an upstream oversight rather than
-  #     intent. Left at its default, pre-commit would append every staged
-  #     filename as a stray positional argument to `gitleaks git`.
+  #   - `pass_filenames: false` is restated so the history scan never takes
+  #     staged filenames as stray positional arguments to `gitleaks git`.
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.1
     hooks:
-      - id: gitleaks-system
+      - id: gitleaks
         entry: gitleaks git
         args: [--redact, --verbose]
         pass_filenames: false
@@ -499,25 +481,20 @@ repos:
 
   # --- Unused dependency detection ---
   #
-  # Local `language: system` off the devShell (`pkgs.cargo-machete`, 0.9.2 in
-  # nixpkgs, matching the pinned rev). Upstream publishes only a
-  # `language: rust` id, which pre-commit satisfies by building the tool from
-  # source into its own env. Its `types_or` and `pass_filenames` are carried
-  # over verbatim below — dropping `types_or` would run the whole-tree
-  # dependency scan on every commit touching any file at all.
-  - repo: local
+  # The upstream `language: rust` hook, which pre-commit builds from source into
+  # its own env. `types_or` is restated so the whole-tree dependency scan runs
+  # only on a change to a manifest or the lock file.
+  - repo: https://github.com/bnjbvr/cargo-machete
+    rev: v0.9.2
     hooks:
       - id: cargo-machete
-        name: cargo-machete (unused dependencies)
-        entry: cargo machete
-        language: system
         types_or: [cargo, cargo-lock]
         pass_filenames: false
         stages: [pre-push]
-        # upstream: https://github.com/bnjbvr/cargo-machete (v0.9.2)
 
   - repo: local
     hooks:
+      # owner: devshell (project-environment) cargo audit is a cargo subcommand that reads the lock file of the crate.
       - id: cargo-audit
         name: cargo audit
         entry: cargo audit
@@ -527,6 +504,7 @@ repos:
 
       # Note: licenses check omitted; requires deny.toml with an allow-list.
       # Add `licenses` to the check list after creating deny.toml in your project.
+      # owner: devshell (project-environment) cargo deny is a cargo subcommand that reads the lock file of the crate.
       - id: cargo-deny
         name: cargo deny
         entry: cargo deny check advisories bans sources
@@ -555,6 +533,7 @@ repos:
   # `dist generate` away.
   - repo: local
     hooks:
+      # owner: devshell (no-hook-language) cargo-dist publishes no pre-commit hook.
       - id: dist-generate-check
         name: dist generate --check (the release workflow matches its config)
         entry: dist generate --check
@@ -567,7 +546,9 @@ repos:
   # Every project carries a per-project flake devShell, so these run against its
   # Nix sources. Tools come from that devShell (nix develop / direnv) and run as
   # system hooks off PATH, like dprint/cargo-fmt. nixfmt (RFC 166, the
-  # nixpkgs-standard formatter) rewrites in place; statix and deadnix are
+  # nixpkgs-standard formatter) rewrites in place, and `nix fmt` runs the same
+  # nixfmt as the flake's formatter; deadnix runs as its upstream hook below.
+  # statix and deadnix are
   # report-only gates — fix by hand or allowlist. statix walks the tree itself,
   # so its scope/ignore lives in the sibling `./statix.toml`. `nix flake check`
   # evaluates the flake and builds its `checks` output, which is the package
@@ -575,12 +556,14 @@ repos:
   # input of that build.
   - repo: local
     hooks:
+      # owner: devshell (outside-caller) nix fmt runs the formatter of this flake, pkgs.nixfmt, so the hook runs the same one.
       - id: nixfmt
         name: nixfmt (format)
         entry: nixfmt
         language: system
         types: [nix]
         stages: [pre-commit]
+      # owner: devshell (no-hook-language) statix has no hook in a language that pre-commit builds.
       - id: statix
         name: statix (nix anti-patterns)
         entry: statix check
@@ -588,12 +571,7 @@ repos:
         types: [nix]
         pass_filenames: false
         stages: [pre-commit]
-      - id: deadnix
-        name: deadnix (dead code)
-        entry: deadnix --fail
-        language: system
-        types: [nix]
-        stages: [pre-commit]
+      # owner: host (no-hook-language) nix comes from the host and has no hook in a language that pre-commit builds.
       - id: nix-flake-check
         name: nix flake check (builds the package)
         entry: nix flake check
@@ -626,6 +604,7 @@ repos:
   # SATISFIES quality-gates:every-schema-validates-against-the-metaschema
   - repo: local
     hooks:
+      # owner: devshell (no-hook-language) a script of this repository that calls check-jsonschema, which the tests also run.
       - id: check-schemas
         name: schemas match the draft, and the fixture matches the schemas
         entry: scripts/check-schemas
@@ -650,6 +629,7 @@ repos:
   # preceding line, which makes an exception a recorded decision.
   - repo: local
     hooks:
+      # owner: host (no-hook-language) a script of this repository that calls only awk.
       - id: no-emphasis
         name: no bold or italics (docs-format:document-uses-structural-markdown-only)
         entry: scripts/check-emphasis
@@ -666,6 +646,7 @@ repos:
       # README files. This repository names its chapters for their subject, so
       # that selector reaches none of them. This hook holds the same budget over
       # the two zones whose documents are chapters.
+      # owner: host (no-hook-language) a script of this repository that calls only the shell.
       - id: chapter-line-cap
         name: chapter line cap (docs-format:chapter-stays-within-200-lines)
         entry: scripts/check-chapter-lines
@@ -682,6 +663,7 @@ repos:
       # this gate was written after came from a tree-wide pattern: it caught the
       # one line of the rendered release block in AGENTS.md that carries MUST.
       # The spec zone is excluded because it is the zone the keywords belong to.
+      # owner: host (no-hook-language) a script of this repository that calls only awk.
       - id: requirement-keyword-zone
         name: requirement keywords stay in the spec zone (repository-docs:requirement-keyword-stays-in-the-spec-zone)
         entry: scripts/check-requirement-keywords
@@ -707,11 +689,12 @@ repos:
   # never collides with the type's `dprint` hook.
   #
   # `language: system`, so dprint is supplied by the project's flake devShell
-  # (`pkgs.dprint`) — the same model as the json/nix hooks. Do not install it
-  # out-of-band; the devShell is the single provider. pre-commit only — git
-  # push may strip PATH and the format is already applied by commit time.
+  # (`pkgs.dprint`), its one owner, the same model as the json hook.
+  # pre-commit only — git push may strip PATH and the format is already
+  # applied by commit time.
   - repo: local
     hooks:
+      # owner: devshell (no-hook-language) upstream dprint publishes no pre-commit hook.
       - id: dprint-markdown
         name: dprint fmt (markdown)
         # --allow-no-files, for the same reason as the JSON hook above.
@@ -822,41 +805,46 @@ repos:
   # shipped artifact owes a commit-gate hook (docs/specs/SPEC-quality-gates.md),
   # so the gate is wired before the payload grows rather than after.
   #
-  # Both are `language: system` off the devShell (`pkgs.shellcheck`,
-  # `pkgs.shfmt`) rather than the usual hook repos, because both of those ship
-  # a prebuilt binary — shellcheck-py as a PyPI wheel, scop/pre-commit-shfmt as
-  # a downloaded upstream release — and neither can exec on a Nix host, the
-  # same linkage trap as typos above. The devShell already provides both, which
-  # is also this repository's stated model: one provider, named in flake.nix.
+  # Both take their upstream hooks, `language: python`, whose wheels carry
+  # static binaries: shellcheck-py and scop/pre-commit-shfmt.
   #
-  # `entry: shfmt -w` and nothing more, deliberately. shfmt reads .editorconfig
-  # natively, but ONLY while no parser or printer flag is given — pass even one
-  # and it silently ignores every EditorConfig file and reverts to its own
-  # defaults, the first of which is tabs. Verified with shfmt 3.13.1 against
-  # scripts/: bare `shfmt -d` is clean, while `-ci` or `-s` reintroduces a
-  # full-file retab diff. So the formatting options live in .editorconfig
-  # (indent_style, indent_size, switch_case_indent, shell_variant) and this
-  # entry carries only `-w`, which is a mode flag and does not disable
-  # resolution. `-ci` is not lost: `switch_case_indent = true` is its
-  # EditorConfig spelling. `-s` (simplify) is dropped outright — it has no
-  # EditorConfig property, and keeping it would cost correct indentation on
-  # every shell file in the repo to buy a style nicety.
-  - repo: local
+  # shfmt runs with upstream's own args, `[--write]`, and nothing more,
+  # deliberately. shfmt reads .editorconfig natively, but ONLY while no parser
+  # or printer flag is given — pass even one and it silently ignores every
+  # EditorConfig file and reverts to its own defaults, the first of which is
+  # tabs. So the formatting options live in .editorconfig (indent_style,
+  # indent_size, switch_case_indent, shell_variant). `-s` (simplify) has no
+  # EditorConfig property and stays dropped. The manifest names pre-push as
+  # well, which wins over default_stages, so `stages:` is explicit.
+  # deadnix publishes a rust hook, which pre-commit builds; its manifest
+  # carries --fail and the nix file type.
+  - repo: https://github.com/astro/deadnix
+    rev: v1.3.2
+    hooks:
+      - id: deadnix
+        stages: [pre-commit]
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.13.1-1
     hooks:
       - id: shfmt
-        name: shfmt (format)
-        entry: shfmt -w
-        language: system
         types: [shell]
         stages: [pre-commit]
-
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
+    hooks:
       - id: shellcheck
-        name: shellcheck (static analysis)
-        entry: shellcheck
-        language: system
         types: [shell]
         require_serial: true
         stages: [pre-commit]
+  - repo: local
+    hooks:
+      # A flake holds no language library: a package belongs to the manifest
+      # of its stack, and the devShell keeps the toolchain.
+      - id: no-language-library-in-flake
+        name: a flake holds no language library
+        language: pygrep
+        entry: '^(?!\s*#).*(withPackages|python3[0-9]*Packages\.|pythonPackages\.|nodePackages\.|perlPackages\.)'
+        files: '(^|/)flake\.nix$|(^|/)nix/.*\.nix$'
 # BEGIN spec-driven-docs managed
   - repo: local
     hooks:

@@ -27,7 +27,7 @@ direnv allow   # loads the devShell on entering the directory
 nix develop    # or enter it ad hoc
 ```
 
-Checks live in the pre-commit hooks and the `justfile`, and nowhere else. Every tool they call comes from the devShell. Run each one through it:
+Checks live in the pre-commit hooks and the `justfile`, and nowhere else. Each tool has one owner: pre-commit builds the hook tools it can, and the devShell supplies the rest. Run each check through the devShell:
 
 ```bash
 nix develop --command just lint        # the commit stage
