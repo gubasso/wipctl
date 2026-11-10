@@ -38,6 +38,14 @@ github-attestations-phase = "host"
 # in the same phase; cargo-dist's documentation asks for this pairing outright.
 github-release = "host"
 
+# dist 0.32.0 builds aarch64-apple-darwin on macos-14 by default, and
+# GitHub no longer serves that label to public repositories: the job is
+# cancelled with "The configuration 'macos-14-arm64-us-default' is not
+# supported". macos-15 is the pinned arm64 label GitHub lists now.
+# KI-dist-default-arm-mac-runner-retired holds the case and its retire condition.
+[dist.github-custom-runners]
+aarch64-apple-darwin = "macos-15"
+
 # The build that signs is itself pinned by digest: cargo-dist references
 # these actions by movable tag unless told otherwise, and the attest step
 # is among them, so a moved tag could swap the code that mints the
