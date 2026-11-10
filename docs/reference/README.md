@@ -16,4 +16,5 @@ Exact values a reader looks up: formats, grammars, field lists, tables, and orde
 - [verb-mechanics.md](./verb-mechanics.md): the move preflight, the peer walk, the reconciliation cases, the batch run, the rename write set, and the slot repair.
 - [views.md](./views.md): the glyph tiers, and the peer view.
 - [tracking.yaml](./tracking.yaml): the registry of facts that expire.
+- [known-issues/](./known-issues/): the outside defects that this project works around, one `KI-<slug>.md` record each.
 - [TEMPLATE-agents-digest.md](./TEMPLATE-agents-digest.md) and [TEMPLATE-known-issue.md](./TEMPLATE-known-issue.md): the templates the documentation tool seeds.

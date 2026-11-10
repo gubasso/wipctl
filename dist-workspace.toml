@@ -42,6 +42,7 @@ github-release = "host"
 # GitHub no longer serves that label to public repositories: the job is
 # cancelled with "The configuration 'macos-14-arm64-us-default' is not
 # supported". macos-15 is the pinned arm64 label GitHub lists now.
+# KI-dist-default-arm-mac-runner-retired holds the case and its retire condition.
 [dist.github-custom-runners]
 aarch64-apple-darwin = "macos-15"
 
