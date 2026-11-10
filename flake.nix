@@ -54,6 +54,9 @@
         );
     in
     {
+      # `nix fmt` and the nixfmt hook run the same nixfmt.
+      formatter = forAllSystems (pkgs: pkgs.nixfmt);
+
       devShells = forAllSystems (pkgs: {
         default = pkgs.mkShell {
           packages = [
@@ -66,31 +69,28 @@
             pkgs.cargo-deny
             pkgs.cargo-audit
             pkgs.cargo-nextest
-            pkgs.cargo-machete # unused-dependency gate, pre-push stage
 
             # Gate entry points. The justfile is the single caller of every
             # check; pre-commit is the commit- and push-stage gate.
             pkgs.just
             pkgs.pre-commit
 
-            # `language: system` pre-commit hooks get no environment of their
-            # own and resolve off PATH, so the devShell is the only thing that
-            # can supply them.
+            # The tools of the hooks that keep `language: system`, each named
+            # with its owner in .pre-commit-config.yaml. A hook tool that
+            # pre-commit can build (typos, committed, shellcheck, shfmt,
+            # ripsecrets, gitleaks, editorconfig-checker, cargo-machete,
+            # deadnix) is pinned there, and a language library never enters
+            # this shell.
             pkgs.taplo # TOML formatting (Cargo.toml, deny.toml, taplo.toml)
             pkgs.dprint # JSON + markdown formatting
-            pkgs.shellcheck # install.sh / uninstall.sh / install-common.sh
-            pkgs.shfmt # the same shell payload, formatting side
-            pkgs.typos # spell check; the upstream hook ids do not run here
-            pkgs.committed # commit-message shape, same reason
-            pkgs.gawk # scripts/check-emphasis
             # scripts/check-schemas: the draft 2020-12 metaschema check and the
             # instance check over the two-plan fixture. It reads TOML, YAML,
             # and JSON instances, which is what the record is written in.
             # SATISFIES quality-gates:every-schema-validates-against-the-metaschema
             pkgs.check-jsonschema
-            pkgs.ripsecrets # secret scan, pre-commit stage
-            pkgs.gitleaks # secret scan, pre-push stage
-            pkgs.editorconfig-checker # charset / EOL / trailing whitespace
+            # rustup-init, which pre-commit runs to build the rust hooks
+            # (ripsecrets, cargo-machete, deadnix), downloads with curl.
+            pkgs.curl
 
             # Nix quality tools for this flake itself — the repository owes its
             # own toolchain a gate for every artifact it ships, this one
@@ -98,7 +98,6 @@
             # SATISFIES quality-gates:every-artifact-carries-a-toolchain-pin
             pkgs.nixfmt # RFC 166 formatter; nixfmt-rfc-style is a deprecated alias
             pkgs.statix
-            pkgs.deadnix
 
             # markdownlint-cli2 stays on pre-commit's own node env — its
             # `markdownlint-rule-relative-links` rule has no nixpkgs
@@ -121,11 +120,6 @@
             # `sdd` from the spec-driven-docs flake input, at the pinned tag.
             # Same one-provider rule as `rk` above.
             spec-driven-docs.packages.${pkgs.stdenv.hostPlatform.system}.default
-
-            # The record is kept in git and the transition commit is specified
-            # against it; the journey test drives a real checkout.
-            # SATISFIES attachment:git-is-the-only-version-control
-            pkgs.git
           ];
           # native deps for -sys crates, uncomment as needed:
           # buildInputs = [ pkgs.openssl ];
