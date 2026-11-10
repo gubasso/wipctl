@@ -624,8 +624,8 @@ repos:
   # reads the file as the author wrote it, so it should report on the author's
   # own line numbers rather than on a reflowed paragraph.
   #
-  # `language: system`; bash and awk come from the devShell like every other
-  # system hook. The escape hatch is `<!-- allow-emphasis: <reason> -->` on the
+  # `language: system`; bash and awk are host tools, and each hook names its
+  # owner below. The escape hatch is `<!-- allow-emphasis: <reason> -->` on the
   # preceding line, which makes an exception a recorded decision.
   - repo: local
     hooks:
