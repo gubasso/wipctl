@@ -31,7 +31,7 @@
     "repo": "gubasso/wipctl",
     "security_contact": "",
     "security_response": "best-effort",
-    "required_check": "",
+    "required_check": "gate",
     "required_workflow": "",
     "dev_environment": {
       "run": "nix develop --command",
