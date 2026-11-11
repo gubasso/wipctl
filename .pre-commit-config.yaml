@@ -379,9 +379,8 @@ repos:
         # --force-exclude is carried in `args:` as the machine-visible form of
         # the invariant this hook depends on: that it never inherits upstream's
         # [--write-changes, --force-exclude] and therefore never auto-fixes.
-        # `cog bootstrap-audit`'s typos-args-explicit requirement reads exactly
-        # this key. --force-exclude keeps `exclude:` honoured for filenames
-        # pre-commit passes explicitly.
+        # --force-exclude keeps `exclude:` honoured for filenames pre-commit
+        # passes explicitly.
         args: [--force-exclude]
         stages: [pre-commit]
   # --- Commit message length and punctuation (commit-msg stage) ---
@@ -747,8 +746,7 @@ repos:
   # pre-commit silently falls back to downloading a generic-glibc node (~150 MB
   # per env, and one that cannot exec at all on a Nix host). Leave it unset when
   # the project may have no node installed: `system` has nothing to point at
-  # then, while the downloaded runtime works. See
-  # `cog skill-refs path pre-commit/hook-language-resolution.md`.
+  # then, while the downloaded runtime works.
   #
   # Both markdownlint entries therefore stay pre-commit-managed even though
   # nixpkgs does package markdownlint-cli2. The blocker is not the linter, it

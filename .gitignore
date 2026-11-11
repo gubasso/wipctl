@@ -4,7 +4,7 @@
 # markdownlint-cli2 deps, when run outside pre-commit
 node_modules/
 
-# --- cog gitignore (rust) ---
+# --- gitignore (rust) ---
 # Rust
 /target/
 **/*.rs.bk
