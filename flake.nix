@@ -124,7 +124,9 @@
           # native deps for -sys crates, uncomment as needed:
           # buildInputs = [ pkgs.openssl ];
           # nativeBuildInputs = [ pkgs.pkg-config ];
-          shellHook = ''echo "wipctl dev shell ready (rust $(rustc --version | cut -d' ' -f2))"'';
+          # The greeting goes to stderr, so `nix develop --command <tool> > file`
+          # captures only the tool's output, as the `dist-plan` CI job needs.
+          shellHook = ''echo "wipctl dev shell ready (rust $(rustc --version | cut -d' ' -f2))" >&2'';
         };
       });
 
