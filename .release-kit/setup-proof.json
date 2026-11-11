@@ -1,7 +1,7 @@
 {
   "schema": "rk.setup-proof/1",
   "rk_version": "0.9.8",
-  "verified_at": "2026-11-11T18:20:07Z",
+  "verified_at": "2026-11-11T20:31:50Z",
   "subject": {
     "target": {
       "bot_app_id": "",
@@ -15,7 +15,7 @@
       "protection": "{\"trunk_ruleset\":\"master-protection\",\"safety_ruleset\":null,\"tag_ruleset\":\"release-tags\",\"lines_ruleset\":\"release-lines\",\"title_check\":\"pr-title\",\"tag_pattern\":\"refs/tags/v*\",\"bypass_actors\":[],\"allowed_merge_methods\":[\"squash\"],\"strict_required_status_checks\":true,\"owned_trunk_rules\":[\"deletion\",\"non_fast_forward\",\"pull_request\",\"required_status_checks\"],\"required_approving_review_count\":0,\"dismiss_stale_reviews_on_push\":false,\"require_code_owner_review\":false,\"require_last_push_approval\":false,\"github\":{\"squash_title_source\":\"PR_TITLE\",\"squash_body_source\":\"PR_BODY\"},\"gitlab\":{\"merge_method\":\"ff\",\"squash_option\":\"always\",\"squash_commit_template\":\"%{title}\",\"push_access_level\":0,\"merge_access_level\":40}}",
       "release_lines": "false",
       "repo": "gubasso/wipctl",
-      "required_check": "",
+      "required_check": "gate",
       "required_workflow": "",
       "retired_branches": "[\"main\",\"develop\"]",
       "safety_ruleset": "master-safety",
@@ -126,7 +126,7 @@
       }
     ]
   },
-  "subject_digest": "ac09302ed5ea69125eb8a1b37ff52c6ed0cdd4df6ace7c05d3bcc7bcfc6045b6",
+  "subject_digest": "ad41d649bc2036f44b1e7680e9ec13112f69fa6ba53e8a40792bc8f8e3fd5fea",
   "steps": [
     {
       "name": "package-check",
