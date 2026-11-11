@@ -17,6 +17,17 @@
       url = "github:gubasso/spec-driven-docs/v0.15.1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # The store guard of the canon (exobrain): `exobrain store-guard --daily`
+    # in .envrc warns about working-tree copies in the Nix store.
+    exobrain-tech = {
+      url = "github:gubasso/exobrain-tech/v1.0.0";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        # Its rk and sdd serve only its own devShell, so it takes these.
+        release-kit.follows = "release-kit";
+        spec-driven-docs.follows = "spec-driven-docs";
+      };
+    };
   };
 
   # Three outputs. The development shell pins the toolchain every gate runs on;
@@ -30,6 +41,7 @@
       rust-overlay,
       release-kit,
       spec-driven-docs,
+      exobrain-tech,
       ...
     }:
     let
@@ -120,6 +132,11 @@
             # `sdd` from the spec-driven-docs flake input, at the pinned tag.
             # Same one-provider rule as `rk` above.
             spec-driven-docs.packages.${pkgs.stdenv.hostPlatform.system}.default
+          ]
+          # exobrain, the store guard that .envrc runs once a day. exobrain-tech
+          # builds it for x86_64-linux alone, so the other systems keep their shell.
+          ++ pkgs.lib.optionals (pkgs.stdenv.hostPlatform.system == "x86_64-linux") [
+            exobrain-tech.packages.${pkgs.stdenv.hostPlatform.system}.default
           ];
           # native deps for -sys crates, uncomment as needed:
           # buildInputs = [ pkgs.openssl ];
