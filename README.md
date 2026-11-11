@@ -45,6 +45,8 @@ Three workflows run outside the two stages:
 - `release-plz.yml` verifies the package before it publishes, with the toolchain and the `release-plz` binary of the devShell, and the `publish-dry` hook runs the same check at the push stage.
 - `release.yml` builds the release artifacts and runs no check of the code. The `dist-generate-check` hook holds it equal to `dist-workspace.toml`.
 
+One check of `ci.yml` runs only in CI. The `dist-build` job builds every target of `dist-workspace.toml` before a merge, each one on the runner that `dist plan` names for it. The macOS and Windows targets need runners of their own operating system, which no local hook has. A target that fails to build then fails the pull request, not the release after its tag exists. The `dist-plan` job only computes the matrix for `dist-build`.
+
 ## Documentation
 
 Everything about the product lives under [docs/](./docs/README.md), organised by reader need. There are guides for task sequences, specs for binding rules, explanation for the method and the design, and decisions for why. The spec zone is the normative specification this build conforms to. `AGENTS.md` states how the two relate while the build is under way.
