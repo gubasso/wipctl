@@ -6,10 +6,12 @@
 # being entered a second time per recipe.
 #
 # The gates themselves live in `.pre-commit-config.yaml` and the `justfile`;
-# nothing here re-implements a check. CI runs the commit stage and the push
-# stage and nothing beside them, so a push that passed its hooks passes CI
-# (quality-gates:the-local-stages-hold-every-ci-check). Adding a gate means
-# adding a hook, not editing this file.
+# nothing here re-implements a check. CI runs the commit stage, the push stage,
+# and one check that only CI can run, so a push that passed its hooks passes CI
+# (quality-gates:the-local-stages-hold-every-ci-check). That check is
+# `dist-build`, which builds every release target on its own runner, and
+# README.md lists it with its reason. Adding a gate means adding a hook, not
+# editing this file.
 #
 # Hardening upgrade: pin each action to a full commit SHA and let Dependabot
 # raise the bumps. Left on major tags because unattended SHA pins rot.
@@ -97,6 +99,79 @@ jobs:
           SKIP: no-commit-to-branch,rk-worktree-location
         run: nix develop --command just dev='' lint-push
 
+  # The release targets, as dist plans them. `dist plan` reads
+  # dist-workspace.toml and emits the build matrix that the tag's `release.yml`
+  # builds from, so `dist-build` below builds exactly what a release builds.
+  # The `dist-generate-check` hook of the push stage already holds
+  # `release.yml` equal to what the pin generates, so this job does not repeat
+  # that proof.
+  dist-plan:
+    runs-on: ubuntu-latest
+    outputs:
+      plan: ${{ steps.plan.outputs.plan }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - name: the configuration produces a viable release
+        id: plan
+        # The devshell greets on stderr, so the file holds the plan alone.
+        run: |
+          set -euo pipefail
+          nix develop --command dist plan --output-format=json > plan-dist-manifest.json
+          echo "plan=$(jq -c . plan-dist-manifest.json)" >> "$GITHUB_OUTPUT"
+
+  # Every release target, built before a merge. A target that the code cannot
+  # build fails the request here, instead of failing the release after
+  # release-plz already pushed its tag. The macOS and Windows targets need
+  # their own runners, and Nix runs on neither Windows nor every matrix
+  # runner, so each job installs dist the way the generated `release.yml`
+  # does and proves the pin of dist-workspace.toml.
+  dist-build:
+    needs: dist-plan
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.dist-plan.outputs.plan).ci.github.artifacts_matrix }}
+    runs-on: ${{ matrix.runner }}
+    container: ${{ matrix.container && matrix.container.image || null }}
+    steps:
+      - name: enable windows longpaths
+        run: git config --global core.longpaths true
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: recursive
+      - name: install Rust where the container has none
+        if: ${{ matrix.container }}
+        run: |
+          if ! command -v cargo > /dev/null 2>&1; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+            echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          fi
+      - name: install dist
+        run: ${{ matrix.install_dist.run }}
+      - name: dist runs at the configured pin
+        shell: bash
+        run: |
+          set -euo pipefail
+          pin="$(grep -m1 '^cargo-dist-version' dist-workspace.toml | cut -d'"' -f2)"
+          [ -n "$pin" ] || { echo "dist-workspace.toml names no cargo-dist-version"; exit 1; }
+          dist --version | grep -Fq "$pin"
+      - name: install the system packages the target needs
+        run: |
+          ${{ matrix.packages_install }}
+      - name: build the matrix target
+        env:
+          DIST_ARGS: ${{ matrix.dist_args }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # shellcheck disable=SC2086
+          dist build $DIST_ARGS
+
   # The one check the trunk's protection requires. `rk setup step protect-trunk`
   # takes exactly one project check name beside `pr-title`, so a workflow with
   # several jobs needs one job that stands for all of them. Without it only the
@@ -109,7 +184,7 @@ jobs:
   # Running always and asserting each result reports a real failure instead.
   gate:
     if: always()
-    needs: [lint, lint-push]
+    needs: [lint, lint-push, dist-plan, dist-build]
     runs-on: ubuntu-latest
     steps:
       - name: every job succeeded
