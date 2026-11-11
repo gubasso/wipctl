@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.6.9](https://github.com/gubasso/wipctl/compare/v0.6.8...v0.6.9) - 2026-11-11
+
+### Other
+
+- *(release-kit)* land 0.9.8 and build every dist target pre-merge ([#84](https://github.com/gubasso/wipctl/pull/84))
+
 ## [0.6.8](https://github.com/gubasso/wipctl/compare/v0.6.7...v0.6.8) - 2026-11-10
 
 ### Other
