@@ -8,13 +8,13 @@
     # The project's own `rk`, pinned at a release tag. `rk self-depend sync` moves
     # the tag and the lock together, and `.envrc` runs it on directory entry.
     release-kit = {
-      url = "github:gubasso/release-kit/v0.9.8";
+      url = "github:gubasso/release-kit/v0.9.15";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # `sdd`, the documentation gate, pinned at a release tag. `sdd self-depend
     # sync` moves the tag and the lock together, and `.envrc` runs it on entry.
     spec-driven-docs = {
-      url = "github:gubasso/spec-driven-docs/v0.15.1";
+      url = "github:gubasso/spec-driven-docs/v0.17.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # The store guard of the canon (exobrain): `exobrain store-guard --daily`

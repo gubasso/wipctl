@@ -1,6 +1,6 @@
 {
   "schema_version": 12,
-  "rk_version": "0.9.8",
+  "rk_version": "0.9.15",
   "origin": "adopt",
   "landed_at": "2026-09-06T02:40:51Z",
   "profile": {
@@ -32,7 +32,6 @@
     "security_contact": "",
     "security_response": "best-effort",
     "required_check": "gate",
-    "required_workflow": "",
     "dev_environment": {
       "run": "nix develop --command",
       "github": {
@@ -59,23 +58,23 @@
     {
       "destination": ".github/workflows/pr-title.yml",
       "kind": "rendered",
-      "sha256": "972336ac17d76fa11d785a8dfb381b3bdc7dc8af318ae9225a4855c08bc1b13c"
+      "sha256": "0ee43c01d0036757935e4398d4c793b925ce37cbdef78baee48a8d7f0bd7146e"
     },
     {
       "destination": ".github/workflows/release-plz.yml",
       "kind": "rendered",
-      "sha256": "4f3c70758e378bdd022b7a2aeffc588540b6d66cb01938c82192a4548af1b530"
+      "sha256": "c330d17117d9f5bb9dc9595fd8a66627cf08f18606b4dc32d4e38e1243dc89c0"
     },
     {
       "destination": ".pre-commit-config.yaml",
       "kind": "rendered",
-      "sha256": "e9237abf8add500c9ec751e0aefe2005c7eda470c047c1a7d2be0f13650e63e1",
+      "sha256": "335626cf73f765942b1043e83a0cd6eb992efdc7888433a4c6f1c66dd0621417",
       "placement": "region"
     },
     {
       "destination": "AGENTS.md",
       "kind": "rendered",
-      "sha256": "68aff6f88f758755ce2d066d6bcbdba5562589bdc7945db4e6e8cab3ef1ae5c3",
+      "sha256": "efb65372771a20c77cba5a4f6c04b89c3464df4ce4843073360eea54345b22db",
       "placement": "region"
     },
     {
@@ -107,7 +106,7 @@
   ],
   "pins": {
     "attest": "4",
-    "cargo-dist": "0.32.0",
+    "cargo-dist": "0.34.0",
     "checkout": "4",
     "conventional-pre-commit": "4.5.0",
     "create-github-app-token": "3",
