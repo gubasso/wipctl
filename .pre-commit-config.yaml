@@ -1,11 +1,13 @@
 # All three hook types are installed. The commit stage and the push stage
 # together run every check CI runs, and CI runs those two stages and nothing
 # beside them (quality-gates:the-local-stages-hold-every-ci-check).
+# The host supplies the hook runner prek (host-requirements.toml). This is the
+# oldest prek that runs this file: https://prek.j178.dev/reference/configuration/#minimum_prek_version
+minimum_prek_version: "0.5.7"
 default_install_hook_types: [pre-commit, commit-msg, pre-push]
-# The node hook runs on the devShell nodejs. Without this line an empty
-# pre-commit cache can pick `default`, and nodeenv then fails on a prerelease
-# entry of the node index: "invalid literal for int() with base 10: '0-alpha'"
-# (2026-11-10).
+# The node hook runs on the devShell nodejs. Under `system` the hook runner
+# downloads no node of its own:
+# https://prek.j178.dev/reference/language-support/#toolchain-management-and-language_version
 default_language_version:
   node: system
 
@@ -82,7 +84,7 @@ repos:
 # END release-kit
   # --- Housekeeping (auto-fix where possible) ---
   #
-  # Deliberately left as a pre-commit-managed python env, not converted to
+  # Deliberately left as a python env that the hook runner manages, not converted to
   # `language: system` like the tool hooks below. These are not distributed
   # tools with a devShell package behind them — they are ~12 small scripts
   # inside one python package, and converting them would mean writing 12 local
@@ -176,7 +178,7 @@ repos:
 
   # --- EditorConfig ---
   #
-  # The upstream hook, `language: golang`: pre-commit builds it at the pinned
+  # The upstream hook, `language: golang`: the hook runner builds it at the pinned
   # rev. Upstream's definition is `entry: editorconfig-checker` and nothing
   # else, so filenames are passed and file selection stays `types: [file]` by
   # omission. Everything below the id is ours.
@@ -362,9 +364,8 @@ repos:
   #
   # The upstream `language: python` hook. Its wheel holds a prebuilt binary that
   # links the standard ELF loader, which the host supplies (nix-ld on a NixOS
-  # host). The `-src` ids stay unused: pre-commit builds them with
-  # `cargo install --path .`, which fails on the virtual workspace manifest at
-  # the upstream root (verified against crate-ci/typos at v1.49.0).
+  # host). The `-src` ids stay unused: they compile typos from source with
+  # cargo, where the wheel needs no build.
   #
   # typos is REPORT-ONLY here by construction. Upstream's default args are
   # [--write-changes, --force-exclude], and typos' auto-fix silently rewrites
@@ -380,8 +381,8 @@ repos:
         # --force-exclude is carried in `args:` as the machine-visible form of
         # the invariant this hook depends on: that it never inherits upstream's
         # [--write-changes, --force-exclude] and therefore never auto-fixes.
-        # --force-exclude keeps `exclude:` honoured for filenames pre-commit
-        # passes explicitly.
+        # --force-exclude keeps `exclude:` honoured for filenames the hook
+        # runner passes explicitly.
         args: [--force-exclude]
         stages: [pre-commit]
   # --- Commit message length and punctuation (commit-msg stage) ---
@@ -398,14 +399,14 @@ repos:
   # Policy lives in ./committed.toml, which committed discovers at the repo
   # root, so this stanza only wires the stage and the message file. The
   # upstream `language: python` hook, like typos above. `--commit-file` is
-  # upstream's own arg and is what makes the hook read the message pre-commit
-  # hands it rather than scanning history.
+  # upstream's own arg and is what makes the hook read the message the hook
+  # runner hands it rather than scanning history.
   - repo: https://github.com/crate-ci/committed
     rev: v1.1.11
     hooks:
       - id: committed
         # Upstream's own args, carried over verbatim. --commit-file makes the
-        # tool read the message file pre-commit appends after these, rather
+        # tool read the message file the hook runner appends after these, rather
         # than scanning history; --fixup and --wip let those two commit shapes
         # through, since they are squashed before they land.
         args: [--fixup, --wip, --commit-file]
@@ -444,8 +445,8 @@ repos:
 
   # --- Secret scanning (commit stage) ---
   #
-  # The upstream `language: rust` hook: pre-commit builds it with rustup, which
-  # downloads with the devShell curl. The system id served only because the
+  # The upstream `language: rust` hook, which the hook runner builds with cargo
+  # install. The system id served only because the
   # devShell carried the binary, which no longer holds. Upstream stays
   # authoritative for `args: [--strict-ignore]`, `types: [text]` and
   # `require_serial: true`.
@@ -481,7 +482,7 @@ repos:
 
   # --- Unused dependency detection ---
   #
-  # The upstream `language: rust` hook, which pre-commit builds from source into
+  # The upstream `language: rust` hook, which the hook runner builds from source into
   # its own env. `types_or` is restated so the whole-tree dependency scan runs
   # only on a change to a manifest or the lock file.
   - repo: https://github.com/bnjbvr/cargo-machete
@@ -563,7 +564,7 @@ repos:
         language: system
         types: [nix]
         stages: [pre-commit]
-      # owner: devshell (no-hook-language) statix has no hook in a language that pre-commit builds.
+      # owner: devshell (no-hook-language) statix has no hook in a language that the hook runner builds.
       - id: statix
         name: statix (nix anti-patterns)
         entry: statix check
@@ -571,7 +572,7 @@ repos:
         types: [nix]
         pass_filenames: false
         stages: [pre-commit]
-      # owner: host (no-hook-language) nix comes from the host and has no hook in a language that pre-commit builds.
+      # owner: host (no-hook-language) nix comes from the host and has no hook in a language that the hook runner builds.
       - id: nix-flake-check
         name: nix flake check (builds the package)
         entry: nix flake check
@@ -715,7 +716,7 @@ repos:
   # which file is meant, and the link silently rots when a file moves. Require an
   # explicit prefix: ./name, ../dir/name, or a multi-segment path dir/name.
   # Fragment-only (#...), root-absolute (/...), and URL links pass. pygrep is
-  # built into pre-commit — no external dependency, no companion file.
+  # built into the hook runner — no external dependency, no companion file.
   - repo: local
     hooks:
       - id: no-bare-relative-links
@@ -741,15 +742,12 @@ repos:
   # the sibling ./.markdownlint-cli2.jsonc. Uses the node variant.
   #
   # `additional_dependencies` rules out `language: system` (there would be no env
-  # to install the rule into), so this hook uses pre-commit's own node env. Add
-  # `language_version: system` when the project's node comes from a nix profile,
-  # mise, asdf or nvm — all under $HOME, which `lang_base.exe_exists` rejects, so
-  # pre-commit silently falls back to downloading a generic-glibc node (~150 MB
-  # per env, and one that cannot exec at all on a Nix host). Leave it unset when
-  # the project may have no node installed: `system` has nothing to point at
-  # then, while the downloaded runtime works.
+  # to install the rule into), so this hook uses a node env that the hook runner
+  # builds. `language_version: system` takes the devShell node and downloads
+  # none; the hook runner's own download is a generic-glibc node that cannot
+  # exec on a Nix host.
   #
-  # Both markdownlint entries therefore stay pre-commit-managed even though
+  # Both markdownlint entries therefore stay managed by the hook runner, though
   # nixpkgs does package markdownlint-cli2. The blocker is not the linter, it
   # is the custom rule: `markdownlint-rule-relative-links` is an npm package
   # with no nixpkgs derivation, and `additional_dependencies` is the only
@@ -764,11 +762,9 @@ repos:
       - id: markdownlint-cli2
         additional_dependencies: ['markdownlint-rule-relative-links']
         # Load-bearing here: this project's node comes from the flake devShell
-        # (`pkgs.nodejs`). Without this line pre-commit probes for node via
-        # `lang_base.exe_exists`, which rejects any interpreter under $HOME —
-        # true for a user nix profile, mise, asdf or nvm — falls back to
-        # `default`, and downloads a generic-glibc node that cannot exec on a
-        # Nix host. `system` uses the node already on PATH.
+        # (`pkgs.nodejs`). `system` uses the node already on PATH and
+        # downloads none; without it the hook runner can download a
+        # generic-glibc node that cannot exec on a Nix host.
         language_version: system
 
   # --- ADR heading shape (MD043; docs/decisions only) ---
@@ -815,7 +811,7 @@ repos:
   # indent_size, switch_case_indent, shell_variant). `-s` (simplify) has no
   # EditorConfig property and stays dropped. The manifest names pre-push as
   # well, which wins over default_stages, so `stages:` is explicit.
-  # deadnix publishes a rust hook, which pre-commit builds; its manifest
+  # deadnix publishes a rust hook, which the hook runner builds; its manifest
   # carries --fail and the nix file type.
   - repo: https://github.com/astro/deadnix
     rev: v1.3.2
@@ -845,11 +841,18 @@ repos:
         entry: '^(?!\s*#).*(withPackages|python3[0-9]*Packages\.|pythonPackages\.|nodePackages\.|perlPackages\.)'
         files: '(^|/)flake\.nix$|(^|/)nix/.*\.nix$'
   # A flake reference reads the git tree of a checkout, never a path copy of
-  # the whole folder into the Nix store. The hook is published by exobrain-tech.
+  # the whole folder into the Nix store. A flake holds no git hook runner, and
+  # host-requirements.toml parses whenever it changes. The three hooks are
+  # published by exobrain-tech.
   - repo: https://github.com/gubasso/exobrain-tech
-    rev: v1.0.0
+    rev: v1.1.0
     hooks:
       - id: no-path-flake-reference
+      - id: no-hook-runner-in-flake
+      # owner: devshell (no-hook-language) exobrain-tech publishes this hook
+      # only as system. It runs exobrain host-check --parse-only from the flake
+      # devShell each time host-requirements.toml changes.
+      - id: host-requirements
 # BEGIN spec-driven-docs managed
   - repo: local
     hooks:

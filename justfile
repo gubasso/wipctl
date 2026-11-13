@@ -3,6 +3,13 @@
 # when the caller is already inside the devshell (CI does this).
 dev := "nix develop --command"
 
+# The global host tools, checked once before any recipe runs. just evaluates
+# every top-level assignment first, so a missing tool stops the run with the
+# checker's message. The list lives in host-requirements.toml, and the checker
+# comes from the devShell, so it runs through the same prefix as every recipe.
+# A recipe that alone uses a host tool checks it as its first line.
+_host := shell(dev + " exobrain host-check nix git")
+
 # List available recipes.
 default:
 	@just --list
@@ -11,12 +18,14 @@ default:
 
 # Run the commit-stage gate (formatting and lints, as the hooks define them).
 lint:
-	{{dev}} pre-commit run --all-files --show-diff-on-failure
+	{{dev}} exobrain host-check prek
+	{{dev}} prek run --all-files --show-diff-on-failure
 
 # Run the push-stage gate: the integration tests, the release build, the package
 # build and verification, and the dependency, history, and networked checks.
 lint-push:
-	{{dev}} pre-commit run --hook-stage pre-push --all-files --show-diff-on-failure
+	{{dev}} exobrain host-check prek
+	{{dev}} prek run --hook-stage pre-push --all-files --show-diff-on-failure
 
 # Run the schema gate: every shipped schema against the draft, and the fixture
 # against the schemas that govern it.

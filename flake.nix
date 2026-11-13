@@ -22,7 +22,7 @@
     # The store guard of the canon (exobrain): `exobrain store-guard --daily`
     # in .envrc warns about working-tree copies in the Nix store.
     exobrain-tech = {
-      url = "github:gubasso/exobrain-tech/v1.0.0";
+      url = "github:gubasso/exobrain-tech/v1.1.0";
       inputs = {
         nixpkgs.follows = "nixpkgs";
         # Its rk and sdd serve only its own devShell, so it takes these.
@@ -107,14 +107,15 @@
               pkgs.cargo-audit
               pkgs.cargo-nextest
 
-              # Gate entry points. The justfile is the single caller of every
-              # check; pre-commit is the commit- and push-stage gate.
+              # Gate entry point. The justfile is the single caller of every
+              # check. The git hook runner prek, which runs the commit- and
+              # push-stage gate, is not here: the host supplies it beside git
+              # (host-requirements.toml).
               pkgs.just
-              pkgs.pre-commit
 
               # The tools of the hooks that keep `language: system`, each named
               # with its owner in .pre-commit-config.yaml. A hook tool that
-              # pre-commit can build (typos, committed, shellcheck, shfmt,
+              # the hook runner can build (typos, committed, shellcheck, shfmt,
               # ripsecrets, gitleaks, editorconfig-checker, cargo-machete,
               # deadnix) is pinned there, and a language library never enters
               # this shell.
@@ -125,9 +126,6 @@
               # and JSON instances, which is what the record is written in.
               # SATISFIES quality-gates:every-schema-validates-against-the-metaschema
               pkgs.check-jsonschema
-              # rustup-init, which pre-commit runs to build the rust hooks
-              # (ripsecrets, cargo-machete, deadnix), downloads with curl.
-              pkgs.curl
 
               # Nix quality tools for this flake itself — the repository owes its
               # own toolchain a gate for every artifact it ships, this one
@@ -136,14 +134,16 @@
               pkgs.nixfmt # RFC 166 formatter; nixfmt-rfc-style is a deprecated alias
               pkgs.statix
 
-              # markdownlint-cli2 stays on pre-commit's own node env — its
-              # `markdownlint-rule-relative-links` rule has no nixpkgs
-              # derivation, and `additional_dependencies` is the only thing that
-              # can install it, so converting the hook would silently drop the
-              # relative-links check. Its `language_version: system` then sources
-              # node from HERE; absent this package pre-commit downloads a
-              # generic-glibc node whose ELF interpreter
-              # (/lib64/ld-linux-x86-64.so.2) does not exist on a Nix host.
+              # markdownlint-cli2 stays on a node env that the hook runner
+              # builds — its `markdownlint-rule-relative-links` rule has no
+              # nixpkgs derivation, and `additional_dependencies` is the only
+              # thing that can install it, so converting the hook would silently
+              # drop the relative-links check. Its `language_version: system`
+              # then sources node from HERE, and under `system` prek downloads
+              # none: its own download is a generic-glibc node whose ELF
+              # interpreter (/lib64/ld-linux-x86-64.so.2) does not exist on a
+              # Nix host.
+              # https://prek.j178.dev/reference/language-support/#toolchain-management-and-language_version
               pkgs.nodejs
 
               # Release path to crates.io.
