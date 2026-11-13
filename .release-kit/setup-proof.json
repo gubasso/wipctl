@@ -1,7 +1,7 @@
 {
   "schema": "rk.setup-proof/1",
-  "rk_version": "0.9.8",
-  "verified_at": "2026-11-11T20:31:50Z",
+  "rk_version": "0.9.15",
+  "verified_at": "2026-11-13T15:07:59Z",
   "subject": {
     "target": {
       "bot_app_id": "",
@@ -16,7 +16,6 @@
       "release_lines": "false",
       "repo": "gubasso/wipctl",
       "required_check": "gate",
-      "required_workflow": "",
       "retired_branches": "[\"main\",\"develop\"]",
       "safety_ruleset": "master-safety",
       "tag_ruleset": "release-tags",
@@ -105,11 +104,9 @@
         "stance": "applicable"
       },
       {
-        "name": "auto-merge",
-        "proves": "a request may merge itself once its required checks pass",
-        "prerequisites": [
-          "default-branch"
-        ],
+        "name": "merge-on-order",
+        "proves": "no release request stands armed to merge itself",
+        "prerequisites": [],
         "stance": "applicable"
       },
       {
@@ -126,7 +123,7 @@
       }
     ]
   },
-  "subject_digest": "ad41d649bc2036f44b1e7680e9ec13112f69fa6ba53e8a40792bc8f8e3fd5fea",
+  "subject_digest": "3478c94dde907e3d4832d8f159fbe9c4c1efbd6caeb515e43308b97927976524",
   "steps": [
     {
       "name": "package-check",
@@ -177,7 +174,7 @@
       "state": "skipped"
     },
     {
-      "name": "auto-merge",
+      "name": "merge-on-order",
       "state": "satisfied"
     },
     {

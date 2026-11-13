@@ -5,16 +5,18 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
-    # The project's own `rk`, pinned at a release tag. `rk self-depend sync` moves
-    # the tag and the lock together, and `.envrc` runs it on directory entry.
+    # The project's own `rk`, pinned at a release tag. The operator moves the
+    # tag and the lock together with the sync verb of rk, run from a shell.
+    # `.envrc` only warns when a newer release is out.
     release-kit = {
-      url = "github:gubasso/release-kit/v0.9.8";
+      url = "github:gubasso/release-kit/v0.9.15";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # `sdd`, the documentation gate, pinned at a release tag. `sdd self-depend
-    # sync` moves the tag and the lock together, and `.envrc` runs it on entry.
+    # `sdd`, the documentation gate, pinned at a release tag. The operator moves
+    # the tag and the lock together with the sync verb of sdd, run from a shell.
+    # `.envrc` only warns when a newer release is out.
     spec-driven-docs = {
-      url = "github:gubasso/spec-driven-docs/v0.15.1";
+      url = "github:gubasso/spec-driven-docs/v0.17.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # The store guard of the canon (exobrain): `exobrain store-guard --daily`
@@ -69,83 +71,107 @@
       # `nix fmt` and the nixfmt hook run the same nixfmt.
       formatter = forAllSystems (pkgs: pkgs.nixfmt);
 
-      devShells = forAllSystems (pkgs: {
-        default = pkgs.mkShell {
-          packages = [
-            # Reads channel + components + targets straight from
-            # rust-toolchain.toml, which stays the single home for the version.
-            (pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml)
+      devShells = forAllSystems (
+        pkgs:
+        let
+          # dist-workspace.toml pins cargo-dist 0.34.0, the release that
+          # release-kit seeds. nixpkgs carries 0.32.0, so the flake builds the
+          # pinned release over the nixpkgs package. Drop the override once
+          # nixpkgs carries the pin.
+          cargo-dist = pkgs.cargo-dist.overrideAttrs (
+            finalAttrs: _prev: {
+              version = "0.34.0";
+              src = pkgs.fetchFromGitHub {
+                owner = "axodotdev";
+                repo = "cargo-dist";
+                rev = "v${finalAttrs.version}";
+                hash = "sha256-u0Ux0V6Jdeq/1uwSu9+8sm/KGAg3RbWQph/UdL2IMZU=";
+              };
+              cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
+                inherit (finalAttrs) pname version src;
+                hash = "sha256-sOLAyXEOGGnKNeEtPbjYjuJK/d71nluj2MsHNIuuLvQ=";
+              };
+            }
+          );
+        in
+        {
+          default = pkgs.mkShell {
+            packages = [
+              # Reads channel + components + targets straight from
+              # rust-toolchain.toml, which stays the single home for the version.
+              (pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml)
 
-            # Rust quality gates: `cargo fmt --check` and `cargo clippy` come
-            # from the toolchain's components above; these are the rest.
-            pkgs.cargo-deny
-            pkgs.cargo-audit
-            pkgs.cargo-nextest
+              # Rust quality gates: `cargo fmt --check` and `cargo clippy` come
+              # from the toolchain's components above; these are the rest.
+              pkgs.cargo-deny
+              pkgs.cargo-audit
+              pkgs.cargo-nextest
 
-            # Gate entry points. The justfile is the single caller of every
-            # check; pre-commit is the commit- and push-stage gate.
-            pkgs.just
-            pkgs.pre-commit
+              # Gate entry points. The justfile is the single caller of every
+              # check; pre-commit is the commit- and push-stage gate.
+              pkgs.just
+              pkgs.pre-commit
 
-            # The tools of the hooks that keep `language: system`, each named
-            # with its owner in .pre-commit-config.yaml. A hook tool that
-            # pre-commit can build (typos, committed, shellcheck, shfmt,
-            # ripsecrets, gitleaks, editorconfig-checker, cargo-machete,
-            # deadnix) is pinned there, and a language library never enters
-            # this shell.
-            pkgs.taplo # TOML formatting (Cargo.toml, deny.toml, taplo.toml)
-            pkgs.dprint # JSON + markdown formatting
-            # scripts/check-schemas: the draft 2020-12 metaschema check and the
-            # instance check over the two-plan fixture. It reads TOML, YAML,
-            # and JSON instances, which is what the record is written in.
-            # SATISFIES quality-gates:every-schema-validates-against-the-metaschema
-            pkgs.check-jsonschema
-            # rustup-init, which pre-commit runs to build the rust hooks
-            # (ripsecrets, cargo-machete, deadnix), downloads with curl.
-            pkgs.curl
+              # The tools of the hooks that keep `language: system`, each named
+              # with its owner in .pre-commit-config.yaml. A hook tool that
+              # pre-commit can build (typos, committed, shellcheck, shfmt,
+              # ripsecrets, gitleaks, editorconfig-checker, cargo-machete,
+              # deadnix) is pinned there, and a language library never enters
+              # this shell.
+              pkgs.taplo # TOML formatting (Cargo.toml, deny.toml, taplo.toml)
+              pkgs.dprint # JSON + markdown formatting
+              # scripts/check-schemas: the draft 2020-12 metaschema check and the
+              # instance check over the two-plan fixture. It reads TOML, YAML,
+              # and JSON instances, which is what the record is written in.
+              # SATISFIES quality-gates:every-schema-validates-against-the-metaschema
+              pkgs.check-jsonschema
+              # rustup-init, which pre-commit runs to build the rust hooks
+              # (ripsecrets, cargo-machete, deadnix), downloads with curl.
+              pkgs.curl
 
-            # Nix quality tools for this flake itself — the repository owes its
-            # own toolchain a gate for every artifact it ships, this one
-            # included.
-            # SATISFIES quality-gates:every-artifact-carries-a-toolchain-pin
-            pkgs.nixfmt # RFC 166 formatter; nixfmt-rfc-style is a deprecated alias
-            pkgs.statix
+              # Nix quality tools for this flake itself — the repository owes its
+              # own toolchain a gate for every artifact it ships, this one
+              # included.
+              # SATISFIES quality-gates:every-artifact-carries-a-toolchain-pin
+              pkgs.nixfmt # RFC 166 formatter; nixfmt-rfc-style is a deprecated alias
+              pkgs.statix
 
-            # markdownlint-cli2 stays on pre-commit's own node env — its
-            # `markdownlint-rule-relative-links` rule has no nixpkgs
-            # derivation, and `additional_dependencies` is the only thing that
-            # can install it, so converting the hook would silently drop the
-            # relative-links check. Its `language_version: system` then sources
-            # node from HERE; absent this package pre-commit downloads a
-            # generic-glibc node whose ELF interpreter
-            # (/lib64/ld-linux-x86-64.so.2) does not exist on a Nix host.
-            pkgs.nodejs
+              # markdownlint-cli2 stays on pre-commit's own node env — its
+              # `markdownlint-rule-relative-links` rule has no nixpkgs
+              # derivation, and `additional_dependencies` is the only thing that
+              # can install it, so converting the hook would silently drop the
+              # relative-links check. Its `language_version: system` then sources
+              # node from HERE; absent this package pre-commit downloads a
+              # generic-glibc node whose ELF interpreter
+              # (/lib64/ld-linux-x86-64.so.2) does not exist on a Nix host.
+              pkgs.nodejs
 
-            # Release path to crates.io.
-            pkgs.release-plz
-            pkgs.cargo-release # scripts/release cargo-release-dry
-            pkgs.cargo-dist # invoked as `dist`
-            # `rk` from this flake, at the pinned tag. One provider: a host
-            # install of release-kit beside this would serve a second version.
-            release-kit.packages.${pkgs.stdenv.hostPlatform.system}.default
+              # Release path to crates.io.
+              pkgs.release-plz
+              pkgs.cargo-release # scripts/release cargo-release-dry
+              cargo-dist # invoked as `dist`, built above at the pinned version
+              # `rk` from this flake, at the pinned tag. One provider: a host
+              # install of release-kit beside this would serve a second version.
+              release-kit.packages.${pkgs.stdenv.hostPlatform.system}.default
 
-            # `sdd` from the spec-driven-docs flake input, at the pinned tag.
-            # Same one-provider rule as `rk` above.
-            spec-driven-docs.packages.${pkgs.stdenv.hostPlatform.system}.default
-          ]
-          # exobrain, the store guard that .envrc runs once a day. exobrain-tech
-          # builds it for x86_64-linux alone, so the other systems keep their shell.
-          ++ pkgs.lib.optionals (pkgs.stdenv.hostPlatform.system == "x86_64-linux") [
-            exobrain-tech.packages.${pkgs.stdenv.hostPlatform.system}.default
-          ];
-          # native deps for -sys crates, uncomment as needed:
-          # buildInputs = [ pkgs.openssl ];
-          # nativeBuildInputs = [ pkgs.pkg-config ];
-          # The greeting goes to stderr, so `nix develop --command <tool> > file`
-          # captures only the tool's output, as the `dist-plan` CI job needs.
-          shellHook = ''echo "wipctl dev shell ready (rust $(rustc --version | cut -d' ' -f2))" >&2'';
-        };
-      });
+              # `sdd` from the spec-driven-docs flake input, at the pinned tag.
+              # Same one-provider rule as `rk` above.
+              spec-driven-docs.packages.${pkgs.stdenv.hostPlatform.system}.default
+            ]
+            # exobrain, the store guard that .envrc runs once a day. exobrain-tech
+            # builds it for x86_64-linux alone, so the other systems keep their shell.
+            ++ pkgs.lib.optionals (pkgs.stdenv.hostPlatform.system == "x86_64-linux") [
+              exobrain-tech.packages.${pkgs.stdenv.hostPlatform.system}.default
+            ];
+            # native deps for -sys crates, uncomment as needed:
+            # buildInputs = [ pkgs.openssl ];
+            # nativeBuildInputs = [ pkgs.pkg-config ];
+            # The greeting goes to stderr, so `nix develop --command <tool> > file`
+            # captures only the tool's output, as the `dist-plan` CI job needs.
+            shellHook = ''echo "wipctl dev shell ready (rust $(rustc --version | cut -d' ' -f2))" >&2'';
+          };
+        }
+      );
 
       # `nix/package.nix` reads Cargo.toml and builds from the committed
       # Cargo.lock; release-kit seeds it and reports drift, and this project
