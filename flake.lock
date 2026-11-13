@@ -14,16 +14,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1794417935,
-        "narHash": "sha256-tHYPUSvVvoXH4DtAt7HnLrS2rxeEWJ5agNuX7fJWJXQ=",
+        "lastModified": 1794516221,
+        "narHash": "sha256-Do+oDsgnh7Ox0zEtQDUan8ggqTQtMBYA+KEUAB39f5s=",
         "owner": "gubasso",
         "repo": "exobrain-tech",
-        "rev": "9abb55d665bc8c7b515e1bcc4cbfaeeb5410fa40",
+        "rev": "ac439a3c1e34c7b0382d8146c49ad6b8b3e925bd",
         "type": "github"
       },
       "original": {
         "owner": "gubasso",
-        "ref": "v1.0.0",
+        "ref": "v1.1.0",
         "repo": "exobrain-tech",
         "type": "github"
       }

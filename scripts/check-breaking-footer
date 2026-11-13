@@ -16,8 +16,8 @@
 # Usage:
 #   scripts/check-breaking-footer <commit message file>
 #
-# The gate reads the message alone. It takes the file pre-commit hands a
-# commit-msg hook, and it judges no other input.
+# The gate reads the message alone. It takes the file the hook runner hands
+# a commit-msg hook, and it judges no other input.
 set -euo pipefail
 
 if (($# != 1)); then

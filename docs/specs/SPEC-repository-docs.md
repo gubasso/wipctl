@@ -16,7 +16,7 @@ The author MUST keep every uppercase requirement keyword inside a spec under `do
 - WHEN a reader looks for what binds them
 - THEN the sentence binds while carrying no rule ID, no scenario, and no verification, so it reads as gated while nothing decides it, and the gate rejects the document
 
-Verify: `pre-commit run requirement-keyword-zone --all-files`
+Verify: `prek run requirement-keyword-zone --all-files`
 
 ### `repository-docs:a-placeholder-carries-no-value` — A placeholder carries no value
 

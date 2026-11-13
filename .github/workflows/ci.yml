@@ -48,11 +48,18 @@ jobs:
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
-      - name: Cache pre-commit environments
-        uses: actions/cache@v6
+      # The host supplies the hook runner, so CI installs it here, at the
+      # version the dev hosts run. The action caches the hook environments
+      # under ~/.cache/prek itself, keyed on the configuration. v3 publishes
+      # no moving major tag, so the tag is exact. The checksum is the release's
+      # x86_64-unknown-linux-gnu archive, which the bundled table predates.
+      # https://github.com/j178/prek-action#inputs
+      - name: Install prek
+        uses: j178/prek-action@v3.1.0
         with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          install-only: true
+          prek-version: '0.5.10'
+          sha256: '5c832a9ccd0855b7c054320d8921d90165a37459d3ac175923bdf121ff1aa9b1'
       - name: Cache cargo
         uses: actions/cache@v6
         with:
@@ -81,11 +88,18 @@ jobs:
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
-      - name: Cache pre-commit environments
-        uses: actions/cache@v6
+      # The host supplies the hook runner, so CI installs it here, at the
+      # version the dev hosts run. The action caches the hook environments
+      # under ~/.cache/prek itself, keyed on the configuration. v3 publishes
+      # no moving major tag, so the tag is exact. The checksum is the release's
+      # x86_64-unknown-linux-gnu archive, which the bundled table predates.
+      # https://github.com/j178/prek-action#inputs
+      - name: Install prek
+        uses: j178/prek-action@v3.1.0
         with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          install-only: true
+          prek-version: '0.5.10'
+          sha256: '5c832a9ccd0855b7c054320d8921d90165a37459d3ac175923bdf121ff1aa9b1'
       - name: Cache cargo
         uses: actions/cache@v6
         with:

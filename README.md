@@ -27,7 +27,7 @@ direnv allow   # loads the devShell on entering the directory
 nix develop    # or enter it ad hoc
 ```
 
-Checks live in the pre-commit hooks and the `justfile`, and nowhere else. Each tool has one owner: pre-commit builds the hook tools it can, and the devShell supplies the rest. Run each check through the devShell:
+Checks live in the git hooks and the `justfile`, and nowhere else. Each tool has one owner: the hook runner prek builds the hook tools it can, and the devShell supplies the rest. The host tools, prek among them, are listed in [host-requirements.toml](./host-requirements.toml). Run each check through the devShell:
 
 ```bash
 nix develop --command just lint        # the commit stage
@@ -37,7 +37,7 @@ nix develop --command just check-all   # both stages, the run that equals CI
 
 In a shell that direnv loaded, run the same recipes directly, or with `direnv exec . just <recipe>` from outside.
 
-Install the hooks once with `pre-commit install` inside the devShell. The commit stage runs the cheap checks: formatting, lints, spelling, the documentation gates, the unit tests, and the secret scan. The push stage runs the costly ones: the integration tests, the release build, the package build, the package verification, and the dependency, history, and networked checks. The push stage repeats none of the commit stage. CI runs the two stages and nothing beside them, so a push that passed its hooks passes CI. [docs/specs/SPEC-quality-gates.md](./docs/specs/SPEC-quality-gates.md) states what this repository owes every artifact it ships, and it binds any change that adds one.
+Install the hooks once with `prek install` inside the devShell. The commit stage runs the cheap checks: formatting, lints, spelling, the documentation gates, the unit tests, and the secret scan. The push stage runs the costly ones: the integration tests, the release build, the package build, the package verification, and the dependency, history, and networked checks. The push stage repeats none of the commit stage. CI runs the two stages and nothing beside them, so a push that passed its hooks passes CI. [docs/specs/SPEC-quality-gates.md](./docs/specs/SPEC-quality-gates.md) states what this repository owes every artifact it ships, and it binds any change that adds one.
 
 Three workflows run outside the two stages:
 
