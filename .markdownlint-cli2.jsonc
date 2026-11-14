@@ -92,6 +92,9 @@
     // whole, so both follow their generator. Source: the dev-environment rule
     // of nix-secrets (home/apps/claude-session/rules/dev-environment.md).
     "CHANGELOG.md",
-    "SECURITY.md"
+    "SECURITY.md",
+    // rk and sdd land the agent skills byte for byte, so the landing owns them.
+    ".claude/skills/**",
+    ".agents/skills/**"
   ]
 }
