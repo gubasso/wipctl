@@ -15,7 +15,8 @@ Nd = "Nd"
 # home/apps/claude-session/rules/dev-environment.md): release-plz writes
 # CHANGELOG.md, rk writes SECURITY.md, the landing record, and two workflows,
 # cargo-dist writes release.yml, sdd installs .spec-driven-docs/ and
-# docs/.markdownlint-cli2.jsonc, and cargo and nix write the lock files. The
+# docs/.markdownlint-cli2.jsonc, rk and sdd land .claude/skills/ and
+# .agents/skills/, and cargo and nix write the lock files. The
 # hook passes --force-exclude, so this list also holds for the files that
 # pre-commit hands it.
 [files]
@@ -27,6 +28,8 @@ extend-exclude = [
   "/.github/workflows/release-plz.yml",
   "/.github/workflows/release.yml",
   "/.spec-driven-docs/",
+  "/.claude/skills/",
+  "/.agents/skills/",
   "/docs/.markdownlint-cli2.jsonc",
   "Cargo.lock",
   "flake.lock",
