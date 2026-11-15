@@ -106,8 +106,12 @@ repos:
   #   .spec-driven-docs/, docs/.markdownlint-cli2.jsonc
   #                                            sdd, which verifies them byte
   #                                            for byte
-  #   .claude/skills/, .agents/skills/         rk and sdd, which land the
-  #                                            agent skills byte for byte
+  #   rk-setup/, rk-release/, sdd-setup/, sdd-write-docs/
+  #   under .claude/skills/ and .agents/skills/
+  #                                            rk and sdd, which land these
+  #                                            skill packages byte for byte;
+  #                                            any other skill there stays
+  #                                            under the checks
   # Each tool excludes them in its own configuration: dprint.json,
   # dprint.markdown.json, .markdownlint-cli2.jsonc, _typos.toml, and
   # .editorconfig-checker.json; taplo skips Cargo.lock by itself. The fixers,
@@ -123,10 +127,10 @@ repos:
     hooks:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
-        exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml|docs/\.markdownlint-cli2\.jsonc)$|^\.spec-driven-docs/|^\.(claude|agents)/skills/|(^|/)(Cargo|flake)\.lock$'
+        exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml|docs/\.markdownlint-cli2\.jsonc)$|^\.spec-driven-docs/|^\.(claude|agents)/skills/(rk-setup|rk-release|sdd-setup|sdd-write-docs)/|(^|/)(Cargo|flake)\.lock$'
         stages: [pre-commit]
       - id: end-of-file-fixer
-        exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml|docs/\.markdownlint-cli2\.jsonc)$|^\.spec-driven-docs/|^\.(claude|agents)/skills/|(^|/)(Cargo|flake)\.lock$'
+        exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml|docs/\.markdownlint-cli2\.jsonc)$|^\.spec-driven-docs/|^\.(claude|agents)/skills/(rk-setup|rk-release|sdd-setup|sdd-write-docs)/|(^|/)(Cargo|flake)\.lock$'
         stages: [pre-commit]
       - id: check-added-large-files
         args: ['--maxkb=16384']
@@ -642,7 +646,7 @@ repos:
         # that tool's text, not this repository's prose, so the rule stops at
         # its boundary. Editing inside it is what `sdd verify` refuses. The
         # generated CHANGELOG.md and SECURITY.md follow their generator.
-        exclude: '^\.spec-driven-docs/|^\.(claude|agents)/skills/|^(CHANGELOG|SECURITY)\.md$'
+        exclude: '^\.spec-driven-docs/|^\.(claude|agents)/skills/(rk-setup|rk-release|sdd-setup|sdd-write-docs)/|^(CHANGELOG|SECURITY)\.md$'
         pass_filenames: true
 
       # The delivered chapter gate selects numbered chapters, catalogs, and
@@ -726,13 +730,13 @@ repos:
         language: pygrep
         types: [markdown]
         entry: '\]\((?!https?://|ftp://|mailto:|tel:|/|#|\.\.?/)[^)/\s:]+\.[A-Za-z0-9]+(?:#[^)]*)?\)'
-        exclude: '^\.(claude|agents)/skills/|^(CHANGELOG|SECURITY)\.md$'
+        exclude: '^\.(claude|agents)/skills/(rk-setup|rk-release|sdd-setup|sdd-write-docs)/|^(CHANGELOG|SECURITY)\.md$'
       - id: no-bare-relative-link-defs
         name: markdown link definitions must be explicit (./, ../, or a path)
         language: pygrep
         types: [markdown]
         entry: '^\s*\[[^\]]+\]:\s+(?!https?://|ftp://|mailto:|tel:|/|#|\.\.?/|<)[^\s/:#]+\.[A-Za-z0-9]+'
-        exclude: '^\.(claude|agents)/skills/|^(CHANGELOG|SECURITY)\.md$'
+        exclude: '^\.(claude|agents)/skills/(rk-setup|rk-release|sdd-setup|sdd-write-docs)/|^(CHANGELOG|SECURITY)\.md$'
 
   # --- Markdown lint (style gate + ordered-list renumber autofix) ---
   #

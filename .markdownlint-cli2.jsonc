@@ -94,7 +94,13 @@
     "CHANGELOG.md",
     "SECURITY.md",
     // rk and sdd land the agent skills byte for byte, so the landing owns them.
-    ".claude/skills/**",
-    ".agents/skills/**"
+    ".claude/skills/rk-setup/**",
+    ".claude/skills/rk-release/**",
+    ".claude/skills/sdd-setup/**",
+    ".claude/skills/sdd-write-docs/**",
+    ".agents/skills/rk-setup/**",
+    ".agents/skills/rk-release/**",
+    ".agents/skills/sdd-setup/**",
+    ".agents/skills/sdd-write-docs/**"
   ]
 }

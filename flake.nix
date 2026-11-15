@@ -9,26 +9,32 @@
     # tag and the lock together with the sync verb of rk, run from a shell.
     # `.envrc` only warns when a newer release is out.
     release-kit = {
-      url = "github:gubasso/release-kit/v0.10.0";
+      url = "github:gubasso/release-kit/v0.10.1";
       # rk's own flake pins an earlier rk and an sdd for its own development.
       # The empty follows drops the nested rk, and the sdd follows the one
-      # below, so the lock carries one rk and one sdd.
+      # below, so the lock carries one rk and one sdd. Its exobrain-tech and
+      # rust-overlay follow the root ones, so no nested copy stays.
       inputs = {
         nixpkgs.follows = "nixpkgs";
         release-kit.follows = "";
         spec-driven-docs.follows = "spec-driven-docs";
+        exobrain-tech.follows = "exobrain-tech";
+        rust-overlay.follows = "rust-overlay";
       };
     };
     # `sdd`, the documentation gate, pinned at a release tag. The operator moves
     # the tag and the lock together with the sync verb of sdd, run from a shell.
     # `.envrc` only warns when a newer release is out.
     spec-driven-docs = {
-      url = "github:gubasso/spec-driven-docs/v0.18.0";
-      # The same for sdd: no nested sdd, and its rk follows the one above.
+      url = "github:gubasso/spec-driven-docs/v0.18.1";
+      # The same for sdd: no nested sdd, its rk follows the one above, and its
+      # exobrain-tech and rust-overlay follow the root ones.
       inputs = {
         nixpkgs.follows = "nixpkgs";
         spec-driven-docs.follows = "";
         release-kit.follows = "release-kit";
+        exobrain-tech.follows = "exobrain-tech";
+        rust-overlay.follows = "rust-overlay";
       };
     };
     # The store guard of the canon (exobrain): `exobrain store-guard --daily`

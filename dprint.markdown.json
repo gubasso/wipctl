@@ -18,8 +18,14 @@
     "CHANGELOG.md",
     "SECURITY.md",
     "docs/**/TEMPLATE-*.md",
-    ".claude/skills/**",
-    ".agents/skills/**"
+    ".claude/skills/rk-setup/**",
+    ".claude/skills/rk-release/**",
+    ".claude/skills/sdd-setup/**",
+    ".claude/skills/sdd-write-docs/**",
+    ".agents/skills/rk-setup/**",
+    ".agents/skills/rk-release/**",
+    ".agents/skills/sdd-setup/**",
+    ".agents/skills/sdd-write-docs/**"
   ],
   "plugins": [
     "https://plugins.dprint.dev/markdown-0.22.1.wasm"
