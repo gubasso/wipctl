@@ -12,13 +12,14 @@
       url = "github:gubasso/release-kit/v0.10.1";
       # rk's own flake pins an earlier rk and an sdd for its own development.
       # The empty follows drops the nested rk, and the sdd follows the one
-      # below, so the lock carries one rk and one sdd. Its exobrain-tech and
-      # rust-overlay follow the root ones, so no nested copy stays.
+      # below, so the lock carries one rk and one sdd. Its rust-overlay follows
+      # the root one. Its exobrain-tech serves only its own devShell, and the
+      # host supplies exobrain, so the empty follows drops it too.
       inputs = {
         nixpkgs.follows = "nixpkgs";
         release-kit.follows = "";
         spec-driven-docs.follows = "spec-driven-docs";
-        exobrain-tech.follows = "exobrain-tech";
+        exobrain-tech.follows = "";
         rust-overlay.follows = "rust-overlay";
       };
     };
@@ -27,25 +28,14 @@
     # `.envrc` only warns when a newer release is out.
     spec-driven-docs = {
       url = "github:gubasso/spec-driven-docs/v0.18.1";
-      # The same for sdd: no nested sdd, its rk follows the one above, and its
-      # exobrain-tech and rust-overlay follow the root ones.
+      # The same for sdd: no nested sdd, its rk follows the one above, its
+      # rust-overlay follows the root one, and it takes no exobrain-tech.
       inputs = {
         nixpkgs.follows = "nixpkgs";
         spec-driven-docs.follows = "";
         release-kit.follows = "release-kit";
-        exobrain-tech.follows = "exobrain-tech";
+        exobrain-tech.follows = "";
         rust-overlay.follows = "rust-overlay";
-      };
-    };
-    # The store guard of the canon (exobrain): `exobrain store-guard --daily`
-    # in .envrc warns about working-tree copies in the Nix store.
-    exobrain-tech = {
-      url = "github:gubasso/exobrain-tech/v1.1.0";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        # Its rk and sdd serve only its own devShell, so it takes these.
-        release-kit.follows = "release-kit";
-        spec-driven-docs.follows = "spec-driven-docs";
       };
     };
   };
@@ -61,7 +51,6 @@
       rust-overlay,
       release-kit,
       spec-driven-docs,
-      exobrain-tech,
       ...
     }:
     let
@@ -128,7 +117,8 @@
               # Gate entry point. The justfile is the single caller of every
               # check. The git hook runner prek, which runs the commit- and
               # push-stage gate, is not here: the host supplies it beside git
-              # (host-requirements.toml).
+              # (host-requirements.toml). The host supplies the exobrain CLI the
+              # same way, which the hooks, the justfile, and .envrc call.
               pkgs.just
 
               # The tools of the hooks that keep `language: system`, each named
@@ -175,11 +165,6 @@
               # `sdd` from the spec-driven-docs flake input, at the pinned tag.
               # Same one-provider rule as `rk` above.
               spec-driven-docs.packages.${pkgs.stdenv.hostPlatform.system}.default
-            ]
-            # exobrain, the store guard that .envrc runs once a day. exobrain-tech
-            # builds it for x86_64-linux alone, so the other systems keep their shell.
-            ++ pkgs.lib.optionals (pkgs.stdenv.hostPlatform.system == "x86_64-linux") [
-              exobrain-tech.packages.${pkgs.stdenv.hostPlatform.system}.default
             ];
             # native deps for -sys crates, uncomment as needed:
             # buildInputs = [ pkgs.openssl ];
