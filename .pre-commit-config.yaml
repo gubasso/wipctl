@@ -194,7 +194,7 @@ repos:
   # else, so filenames are passed and file selection stays `types: [file]` by
   # omission. Everything below the id is ours.
   - repo: https://github.com/editorconfig-checker/editorconfig-checker
-    rev: v3.11.1
+    rev: v4.0.2
     hooks:
       - id: editorconfig-checker
         alias: ec
@@ -391,7 +391,7 @@ repos:
   # positives in ./_typos.toml. The manifest names pre-push too, which wins
   # over default_stages, so `stages:` is explicit.
   - repo: https://github.com/crate-ci/typos
-    rev: v1.49.0
+    rev: v1.52.2
     hooks:
       - id: typos
         # --force-exclude is carried in `args:` as the machine-visible form of
@@ -418,7 +418,7 @@ repos:
   # --commit-file makes the tool read the message file the hook runner hands
   # it rather than scanning history.
   - repo: https://github.com/crate-ci/committed
-    rev: v1.1.11
+    rev: v1.1.12
     hooks:
       - id: committed
         stages: [commit-msg]
@@ -495,7 +495,7 @@ repos:
   # the whole workspace only when a manifest or the lock file changes. It
   # declares no stages, and the scan is costly, so it runs at push.
   - repo: https://github.com/bnjbvr/cargo-machete
-    rev: v0.9.2
+    rev: v0.10.1
     hooks:
       - id: cargo-machete
         stages: [pre-push]
@@ -863,12 +863,12 @@ repos:
     hooks:
       - id: deadnix
   - repo: https://github.com/scop/pre-commit-shfmt
-    rev: v3.13.1-1
+    rev: v3.14.1-1
     hooks:
       - id: shfmt
         stages: [pre-commit, pre-merge-commit]
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.11.0.1
+    rev: v0.11.0.1-1
     hooks:
       - id: shellcheck
   - repo: local
@@ -882,17 +882,20 @@ repos:
         files: '(^|/)flake\.nix$|(^|/)nix/.*\.nix$'
   # A flake reference reads the git tree of a checkout, never a path copy of
   # the whole folder into the Nix store. A flake holds no git hook runner, and
-  # host-requirements.toml parses whenever it changes. The three hooks are
-  # published by exobrain-tech.
+  # host-requirements.toml parses whenever it changes. The rev of each
+  # repository of the common, rust, bash, and nix reference sets follows the
+  # copy of the set at the rev of this entry, which `exobrain hooks sync` alone
+  # moves. The four hooks are published by exobrain-tech.
   - repo: https://github.com/gubasso/exobrain-tech
-    rev: v1.1.0
+    rev: v1.2.0
     hooks:
       - id: no-path-flake-reference
       - id: no-hook-runner-in-flake
-      # owner: devshell (no-hook-language) exobrain-tech publishes this hook
-      # only as system. It runs exobrain host-check --parse-only from the flake
-      # devShell each time host-requirements.toml changes.
+      # owner: host (host-tool) exobrain-tech publishes this hook only as system, and it runs exobrain host-check --parse-only from the host, which host-requirements.toml lists.
       - id: host-requirements
+      # owner: host (host-tool) exobrain-tech publishes this hook only as system, and it runs exobrain hooks check from the host, which host-requirements.toml lists.
+      - id: hook-revisions
+        args: [--set, common, --set, rust, --set, bash, --set, nix]
 # BEGIN spec-driven-docs managed
   - repo: local
     hooks:
