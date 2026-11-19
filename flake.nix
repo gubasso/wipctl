@@ -9,17 +9,15 @@
     # tag and the lock together with the sync verb of rk, run from a shell.
     # `.envrc` only warns when a newer release is out.
     release-kit = {
-      url = "github:gubasso/release-kit/v0.10.1";
+      url = "github:gubasso/release-kit/v0.10.3";
       # rk's own flake pins an earlier rk and an sdd for its own development.
       # The empty follows drops the nested rk, and the sdd follows the one
       # below, so the lock carries one rk and one sdd. Its rust-overlay follows
-      # the root one. Its exobrain-tech serves only its own devShell, and the
-      # host supplies exobrain, so the empty follows drops it too.
+      # the root one.
       inputs = {
         nixpkgs.follows = "nixpkgs";
         release-kit.follows = "";
         spec-driven-docs.follows = "spec-driven-docs";
-        exobrain-tech.follows = "";
         rust-overlay.follows = "rust-overlay";
       };
     };
@@ -28,8 +26,10 @@
     # `.envrc` only warns when a newer release is out.
     spec-driven-docs = {
       url = "github:gubasso/spec-driven-docs/v0.18.1";
-      # The same for sdd: no nested sdd, its rk follows the one above, its
-      # rust-overlay follows the root one, and it takes no exobrain-tech.
+      # The same for sdd: no nested sdd, its rk follows the one above, and its
+      # rust-overlay follows the root one. Its exobrain-tech serves only its
+      # own devShell, and the host supplies exobrain, so the empty follows
+      # drops it.
       inputs = {
         nixpkgs.follows = "nixpkgs";
         spec-driven-docs.follows = "";
