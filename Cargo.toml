@@ -62,6 +62,16 @@ exclude = [
 
 [dev-dependencies]
 
+# Line tables for the crates of this project, so a backtrace keeps the file and
+# the line of each frame, and no debug information for the dependencies. A
+# debugger needs full debug information for one command:
+# cargo test --config 'profile.dev.debug="full"' --config 'profile.dev.package."*".debug="full"'
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+debug = false
+
 [profile.release]
 lto = "thin"
 codegen-units = 1
