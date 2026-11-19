@@ -60,6 +60,23 @@ jobs:
           install-only: true
           prek-version: '0.5.10'
           sha256: '5c832a9ccd0855b7c054320d8921d90165a37459d3ac175923bdf121ff1aa9b1'
+      # The host supplies the exobrain CLI, which the hooks hook-revisions and
+      # host-requirements and the justfile call, so CI installs it here. The
+      # tag is the rev of the exobrain-tech entry of .pre-commit-config.yaml,
+      # so that entry stays the one pin. The step checks the GitHub artifact
+      # attestation that the exobrain-tech release workflow signs. yq and gh
+      # come with the runner.
+      - name: Install the exobrain CLI of the pinned exobrain-tech tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(yq '.repos[] | select(.repo | test("/exobrain-tech(\.git)?/?$")) | .rev' .pre-commit-config.yaml)
+          asset=exobrain-x86_64-unknown-linux-gnu.tar.xz
+          gh release download "$tag" --repo gubasso/exobrain-tech --pattern "$asset" --dir "$RUNNER_TEMP"
+          gh attestation verify "$RUNNER_TEMP/$asset" --repo gubasso/exobrain-tech
+          mkdir -p "$RUNNER_TEMP/exobrain"
+          tar -xJf "$RUNNER_TEMP/$asset" -C "$RUNNER_TEMP/exobrain" --strip-components=1
+          echo "$RUNNER_TEMP/exobrain" >> "$GITHUB_PATH"
       - name: Cache cargo
         uses: actions/cache@v6
         with:
@@ -100,6 +117,23 @@ jobs:
           install-only: true
           prek-version: '0.5.10'
           sha256: '5c832a9ccd0855b7c054320d8921d90165a37459d3ac175923bdf121ff1aa9b1'
+      # The host supplies the exobrain CLI, which the hooks hook-revisions and
+      # host-requirements and the justfile call, so CI installs it here. The
+      # tag is the rev of the exobrain-tech entry of .pre-commit-config.yaml,
+      # so that entry stays the one pin. The step checks the GitHub artifact
+      # attestation that the exobrain-tech release workflow signs. yq and gh
+      # come with the runner.
+      - name: Install the exobrain CLI of the pinned exobrain-tech tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(yq '.repos[] | select(.repo | test("/exobrain-tech(\.git)?/?$")) | .rev' .pre-commit-config.yaml)
+          asset=exobrain-x86_64-unknown-linux-gnu.tar.xz
+          gh release download "$tag" --repo gubasso/exobrain-tech --pattern "$asset" --dir "$RUNNER_TEMP"
+          gh attestation verify "$RUNNER_TEMP/$asset" --repo gubasso/exobrain-tech
+          mkdir -p "$RUNNER_TEMP/exobrain"
+          tar -xJf "$RUNNER_TEMP/$asset" -C "$RUNNER_TEMP/exobrain" --strip-components=1
+          echo "$RUNNER_TEMP/exobrain" >> "$GITHUB_PATH"
       - name: Cache cargo
         uses: actions/cache@v6
         with:
