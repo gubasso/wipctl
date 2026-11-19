@@ -134,6 +134,9 @@
               # and JSON instances, which is what the record is written in.
               # SATISFIES quality-gates:every-schema-validates-against-the-metaschema
               pkgs.check-jsonschema
+              # The link check of the push stage. Upstream lychee publishes no
+              # hook in a language that the hook runner builds (lychee.toml).
+              pkgs.lychee
 
               # Nix quality tools for this flake itself — the repository owes its
               # own toolchain a gate for every artifact it ships, this one

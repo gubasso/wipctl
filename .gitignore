@@ -24,3 +24,6 @@ rustc-ice-*.txt
 /.envrc.local
 /result
 /result-*
+
+# The cache of the lychee link check (lychee.toml).
+.lycheecache
