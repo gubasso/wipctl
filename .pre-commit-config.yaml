@@ -1,6 +1,7 @@
 # Four hook types are installed. The commit stage and the push stage
 # together run every check CI runs, and CI runs those two stages and nothing
-# beside them (quality-gates:the-local-stages-hold-every-ci-check). The
+# beside them (quality-gates:the-local-stages-hold-every-ci-check). CI leaves
+# out each hook of the group local-only, whose comment states why. The
 # pre-merge-commit stage is the integration gate that `rk integrate` runs, and
 # it repeats the commit stage on the merge.
 # The host supplies the hook runner prek (host-requirements.toml). This is the
@@ -576,8 +577,11 @@ repos:
     rev: lychee-v0.24.2
     hooks:
       # owner: devshell (no-hook-language) upstream lychee offers only script, docker_image, and system ids.
+      # local-only: an outside site answers a CI runner with a block or a
+      # timeout that it does not give a developer host.
       - id: lychee-system
         stages: [pre-push]
+        groups: [local-only]
         types: [markdown]
         args: [--no-progress]
   # --- Nix: format (auto-fix) + lint (gate) ---
