@@ -19,6 +19,12 @@ schema = 1
 [tools.prek]
 version = "*"
 
+# Path-scoped: .envrc routes each rustc call through kache. CI enters the
+# devshell without direnv and builds without it, so no recipe that CI runs
+# checks it. The host configuration owns its one version, because two versions
+# of kache must never share one cache, so this file names no requirement.
+[tools.kache]
+
 # Path-scoped: the hooks host-requirements and hook-revisions, the justfile
 # host check, and .envrc. 1.2.0 is the first release that carries
 # `exobrain hooks check`, which hook-revisions runs.
