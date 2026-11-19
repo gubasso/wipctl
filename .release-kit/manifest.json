@@ -1,6 +1,6 @@
 {
   "schema_version": 12,
-  "rk_version": "0.10.1",
+  "rk_version": "0.10.3",
   "origin": "adopt",
   "landed_at": "2026-09-06T02:40:51Z",
   "profile": {
@@ -258,7 +258,7 @@
     {
       "destination": ".pre-commit-config.yaml",
       "kind": "rendered",
-      "sha256": "335626cf73f765942b1043e83a0cd6eb992efdc7888433a4c6f1c66dd0621417",
+      "sha256": "fa722a065bb7636c2a24c3737d78ef0ac999b15c9c2887e962ac2b6233651337",
       "placement": "region"
     },
     {
