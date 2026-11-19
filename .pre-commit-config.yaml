@@ -82,21 +82,16 @@ repos:
         entry: rk status --check --target .
         files: '^(\.github/workflows/|\.gitlab-ci\.yml$|\.gitlab/ci/|AGENTS\.md$|\.release-kit/|\.pre-commit-config\.yaml$|release-plz\.toml$|dist-workspace\.toml$|cliff\.toml$|VERSION$)'
 # END release-kit
-  # --- Housekeeping (auto-fix where possible) ---
+  # --- Housekeeping: the prek built-in hooks ---
   #
-  # Deliberately left as a python env that the hook runner manages, not converted to
-  # `language: system` like the tool hooks below. These are not distributed
-  # tools with a devShell package behind them — they are ~12 small scripts
-  # inside one python package, and converting them would mean writing 12 local
-  # stanzas and hand-carrying each upstream `types`, `args` and
-  # `pass_filenames`. That is 12 chances to silently drop a selector, bought
-  # for nothing: the env is pure python, has no binary to link wrongly, and costs
-  # about a second to build once.
+  # prek runs these in its own binary: no clone, no environment, and no `rev`.
+  # They take the place of the hooks of pre-commit/pre-commit-hooks and of the
+  # check-json5 repository. Where a built-in judges less than its upstream hook
+  # by default, its arguments restore the upstream behavior:
+  # https://prek.j178.dev/0.5.7/reference/built-in-hooks/
   #
   # A generated file follows its generator, and no hook here rewrites or judges
-  # it. Source: the dev-environment rule of nix-secrets
-  # (home/apps/claude-session/rules/dev-environment.md). The generated files
-  # and their generators:
+  # its form. The generated files and their generators:
   #   CHANGELOG.md                             release-plz
   #   SECURITY.md, .github/workflows/pr-title.yml,
   #   .github/workflows/release-plz.yml        rk, rendered whole
@@ -119,46 +114,53 @@ repos:
   # takes its own exclude. The reading hooks keep them: the parsers and the
   # secret scans. The sdd gates run with `always_run` and read no filenames.
   #
-  # Five of these ids set `stages: [pre-commit, pre-push, manual]` in their own
-  # manifest, and a manifest `stages` wins over `default_stages`. Each of the
-  # five names the commit stage here, so the push stage repeats none of them.
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
+  # The fixers name their stages, because their upstream manifests declare
+  # pre-push too and a fixer never runs at push.
+  - repo: builtin
     hooks:
+      # The argument keeps a Markdown hard break.
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
+        stages: [pre-commit, pre-merge-commit]
         exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml|docs/\.markdownlint-cli2\.jsonc)$|^\.spec-driven-docs/|^\.(claude|agents)/skills/(rk-setup|rk-release|sdd-setup|sdd-write-docs)/|(^|/)(Cargo|flake)\.lock$'
-        stages: [pre-commit]
       - id: end-of-file-fixer
+        stages: [pre-commit, pre-merge-commit]
         exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml|docs/\.markdownlint-cli2\.jsonc)$|^\.spec-driven-docs/|^\.(claude|agents)/skills/(rk-setup|rk-release|sdd-setup|sdd-write-docs)/|(^|/)(Cargo|flake)\.lock$'
-        stages: [pre-commit]
+      # The default `auto` keeps the most frequent ending of a file, so a file
+      # that holds only CRLF passes. `--fix=lf` holds every file to LF.
+      - id: mixed-line-ending
+        args: [--fix=lf]
+        exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml|docs/\.markdownlint-cli2\.jsonc)$|^\.spec-driven-docs/|^\.(claude|agents)/skills/(rk-setup|rk-release|sdd-setup|sdd-write-docs)/|(^|/)(Cargo|flake)\.lock$'
       - id: check-added-large-files
-        args: ['--maxkb=16384']
-        stages: [pre-commit]
+        args: [--maxkb=2048]
+        stages: [pre-commit, pre-merge-commit]
       - id: check-case-conflict
+      # Without the argument the hook passes outside a merge or a rebase, so a
+      # marker that a resolved conflict left behind lands unseen.
       - id: check-merge-conflict
-        args: ['--assume-in-merge']
-      - id: check-shebang-scripts-are-executable
-        stages: [pre-commit]
+        args: [--assume-in-merge]
       - id: check-symlinks
-      - id: check-toml
-      - id: check-yaml
-      - id: check-xml
       - id: destroyed-symlinks
-        stages: [pre-commit]
-      - id: detect-private-key
-      # - id: no-commit-to-branch
-
-  # Left managed: check-json5 is the one tool here with no nixpkgs package, so
-  # the devShell has nothing to provide. It is a pure-python console script
-  # over a single dependency (json5), with no binary to link wrongly, so the
-  # managed venv is cheap and correct. Packaging it locally would be the only
-  # way to convert this one, and it is not worth a derivation.
-  - repo: https://github.com/maresb/check-json5
-    rev: v1.0.1
-    hooks:
+        stages: [pre-commit, pre-merge-commit]
+      - id: check-executables-have-shebangs
+        stages: [pre-commit, pre-merge-commit]
+      - id: check-shebang-scripts-are-executable
+        stages: [pre-commit, pre-merge-commit]
+      # prek accepts an unknown tag unless it gets --disallow-unknown-tags. The
+      # upstream hook refuses one while it loads the file.
+      - id: check-yaml
+        args: [--disallow-unknown-tags]
+      - id: check-toml
+      - id: check-xml
+      # check-json5 parses JSON with comments and trailing commas, so it does
+      # not refuse a commented .json configuration such as dprint.json or a
+      # .jsonc file. `types` resets the filter of the built-in to every file,
+      # and `types_or` selects json, json5, and jsonc. It is the syntax gate
+      # only: dprint below owns the layout.
       - id: check-json5
-        exclude: '[-.]lock\.json$'
+        types: [file]
+        types_or: [json, json5, jsonc]
+      - id: detect-private-key
 
   # --- JSON / JSONC formatter: dprint (comment-safe autofix) ---
   #
