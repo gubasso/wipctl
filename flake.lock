@@ -1,33 +1,5 @@
 {
   "nodes": {
-    "exobrain-tech": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "release-kit": [
-          "release-kit"
-        ],
-        "rust-overlay": "rust-overlay",
-        "spec-driven-docs": [
-          "spec-driven-docs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1794516221,
-        "narHash": "sha256-Do+oDsgnh7Ox0zEtQDUan8ggqTQtMBYA+KEUAB39f5s=",
-        "owner": "gubasso",
-        "repo": "exobrain-tech",
-        "rev": "ac439a3c1e34c7b0382d8146c49ad6b8b3e925bd",
-        "type": "github"
-      },
-      "original": {
-        "owner": "gubasso",
-        "ref": "v1.1.0",
-        "repo": "exobrain-tech",
-        "type": "github"
-      }
-    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1786599213,
@@ -46,9 +18,7 @@
     },
     "release-kit": {
       "inputs": {
-        "exobrain-tech": [
-          "exobrain-tech"
-        ],
+        "exobrain-tech": [],
         "nixpkgs": [
           "nixpkgs"
         ],
@@ -77,17 +47,15 @@
     },
     "root": {
       "inputs": {
-        "exobrain-tech": "exobrain-tech",
         "nixpkgs": "nixpkgs",
         "release-kit": "release-kit",
-        "rust-overlay": "rust-overlay_2",
+        "rust-overlay": "rust-overlay",
         "spec-driven-docs": "spec-driven-docs"
       }
     },
     "rust-overlay": {
       "inputs": {
         "nixpkgs": [
-          "exobrain-tech",
           "nixpkgs"
         ]
       },
@@ -105,31 +73,9 @@
         "type": "github"
       }
     },
-    "rust-overlay_2": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1786680812,
-        "narHash": "sha256-5lDFwethgqSULdupYl3Eu5n80jfcbb85gSJX/jb58GQ=",
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "rev": "f1dcc7e4ea4fdb6d8f276face22f353832b161e3",
-        "type": "github"
-      },
-      "original": {
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "type": "github"
-      }
-    },
     "spec-driven-docs": {
       "inputs": {
-        "exobrain-tech": [
-          "exobrain-tech"
-        ],
+        "exobrain-tech": [],
         "nixpkgs": [
           "nixpkgs"
         ],

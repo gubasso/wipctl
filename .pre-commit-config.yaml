@@ -1,10 +1,12 @@
-# All three hook types are installed. The commit stage and the push stage
+# Four hook types are installed. The commit stage and the push stage
 # together run every check CI runs, and CI runs those two stages and nothing
-# beside them (quality-gates:the-local-stages-hold-every-ci-check).
+# beside them (quality-gates:the-local-stages-hold-every-ci-check). The
+# pre-merge-commit stage is the integration gate that `rk integrate` runs, and
+# it repeats the commit stage on the merge.
 # The host supplies the hook runner prek (host-requirements.toml). This is the
 # oldest prek that runs this file: https://prek.j178.dev/reference/configuration/#minimum_prek_version
 minimum_prek_version: "0.5.7"
-default_install_hook_types: [pre-commit, commit-msg, pre-push]
+default_install_hook_types: [pre-commit, commit-msg, pre-push, pre-merge-commit]
 # The node hook runs on the devShell nodejs. Under `system` the hook runner
 # downloads no node of its own:
 # https://prek.j178.dev/reference/language-support/#toolchain-management-and-language_version
@@ -13,12 +15,14 @@ default_language_version:
 
 # A hook that names no `stages` inherits this, so the cheap tree-wide checks
 # (formatting, lints, editorconfig, spelling, markdown, secrets) run once, at
-# the commit stage. The push stage holds only the costly checks, the tests,
-# builds, and networked checks a hook names `pre-push` for, and repeats none of
-# the commit stage. Without this line the default is every stage, which would
-# also drag the checks into commit-msg, where they are handed the message file
-# and match nothing. `committed` opts back into commit-msg explicitly.
-default_stages: [pre-commit]
+# the commit stage, and again at the integration gate. The push stage holds
+# only the costly checks, the tests, builds, and networked checks a hook names
+# `pre-push` for, and repeats none of the commit stage. Without this line the
+# default is every stage, which would also drag the checks into commit-msg,
+# where they are handed the message file and match nothing. `committed` opts
+# back into commit-msg explicitly. A manifest that declares its own `stages`
+# wins over this line, so each such hook below states its stages.
+default_stages: [pre-commit, pre-merge-commit]
 
 repos:
 # BEGIN release-kit
@@ -82,21 +86,16 @@ repos:
         entry: rk status --check --target .
         files: '^(\.github/workflows/|\.gitlab-ci\.yml$|\.gitlab/ci/|AGENTS\.md$|\.release-kit/|\.pre-commit-config\.yaml$|release-plz\.toml$|dist-workspace\.toml$|cliff\.toml$|VERSION$)'
 # END release-kit
-  # --- Housekeeping (auto-fix where possible) ---
+  # --- Housekeeping: the prek built-in hooks ---
   #
-  # Deliberately left as a python env that the hook runner manages, not converted to
-  # `language: system` like the tool hooks below. These are not distributed
-  # tools with a devShell package behind them — they are ~12 small scripts
-  # inside one python package, and converting them would mean writing 12 local
-  # stanzas and hand-carrying each upstream `types`, `args` and
-  # `pass_filenames`. That is 12 chances to silently drop a selector, bought
-  # for nothing: the env is pure python, has no binary to link wrongly, and costs
-  # about a second to build once.
+  # prek runs these in its own binary: no clone, no environment, and no `rev`.
+  # They take the place of the hooks of pre-commit/pre-commit-hooks and of the
+  # check-json5 repository. Where a built-in judges less than its upstream hook
+  # by default, its arguments restore the upstream behavior:
+  # https://prek.j178.dev/0.5.7/reference/built-in-hooks/
   #
   # A generated file follows its generator, and no hook here rewrites or judges
-  # it. Source: the dev-environment rule of nix-secrets
-  # (home/apps/claude-session/rules/dev-environment.md). The generated files
-  # and their generators:
+  # its form. The generated files and their generators:
   #   CHANGELOG.md                             release-plz
   #   SECURITY.md, .github/workflows/pr-title.yml,
   #   .github/workflows/release-plz.yml        rk, rendered whole
@@ -119,46 +118,53 @@ repos:
   # takes its own exclude. The reading hooks keep them: the parsers and the
   # secret scans. The sdd gates run with `always_run` and read no filenames.
   #
-  # Five of these ids set `stages: [pre-commit, pre-push, manual]` in their own
-  # manifest, and a manifest `stages` wins over `default_stages`. Each of the
-  # five names the commit stage here, so the push stage repeats none of them.
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
+  # The fixers name their stages, because their upstream manifests declare
+  # pre-push too and a fixer never runs at push.
+  - repo: builtin
     hooks:
+      # The argument keeps a Markdown hard break.
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
+        stages: [pre-commit, pre-merge-commit]
         exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml|docs/\.markdownlint-cli2\.jsonc)$|^\.spec-driven-docs/|^\.(claude|agents)/skills/(rk-setup|rk-release|sdd-setup|sdd-write-docs)/|(^|/)(Cargo|flake)\.lock$'
-        stages: [pre-commit]
       - id: end-of-file-fixer
+        stages: [pre-commit, pre-merge-commit]
         exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml|docs/\.markdownlint-cli2\.jsonc)$|^\.spec-driven-docs/|^\.(claude|agents)/skills/(rk-setup|rk-release|sdd-setup|sdd-write-docs)/|(^|/)(Cargo|flake)\.lock$'
-        stages: [pre-commit]
+      # The default `auto` keeps the most frequent ending of a file, so a file
+      # that holds only CRLF passes. `--fix=lf` holds every file to LF.
+      - id: mixed-line-ending
+        args: [--fix=lf]
+        exclude: '^(CHANGELOG\.md|SECURITY\.md|\.release-kit/manifest\.json|\.github/workflows/(pr-title|release-plz|release)\.yml|docs/\.markdownlint-cli2\.jsonc)$|^\.spec-driven-docs/|^\.(claude|agents)/skills/(rk-setup|rk-release|sdd-setup|sdd-write-docs)/|(^|/)(Cargo|flake)\.lock$'
       - id: check-added-large-files
-        args: ['--maxkb=16384']
-        stages: [pre-commit]
+        args: [--maxkb=2048]
+        stages: [pre-commit, pre-merge-commit]
       - id: check-case-conflict
+      # Without the argument the hook passes outside a merge or a rebase, so a
+      # marker that a resolved conflict left behind lands unseen.
       - id: check-merge-conflict
-        args: ['--assume-in-merge']
-      - id: check-shebang-scripts-are-executable
-        stages: [pre-commit]
+        args: [--assume-in-merge]
       - id: check-symlinks
-      - id: check-toml
-      - id: check-yaml
-      - id: check-xml
       - id: destroyed-symlinks
-        stages: [pre-commit]
-      - id: detect-private-key
-      # - id: no-commit-to-branch
-
-  # Left managed: check-json5 is the one tool here with no nixpkgs package, so
-  # the devShell has nothing to provide. It is a pure-python console script
-  # over a single dependency (json5), with no binary to link wrongly, so the
-  # managed venv is cheap and correct. Packaging it locally would be the only
-  # way to convert this one, and it is not worth a derivation.
-  - repo: https://github.com/maresb/check-json5
-    rev: v1.0.1
-    hooks:
+        stages: [pre-commit, pre-merge-commit]
+      - id: check-executables-have-shebangs
+        stages: [pre-commit, pre-merge-commit]
+      - id: check-shebang-scripts-are-executable
+        stages: [pre-commit, pre-merge-commit]
+      # prek accepts an unknown tag unless it gets --disallow-unknown-tags. The
+      # upstream hook refuses one while it loads the file.
+      - id: check-yaml
+        args: [--disallow-unknown-tags]
+      - id: check-toml
+      - id: check-xml
+      # check-json5 parses JSON with comments and trailing commas, so it does
+      # not refuse a commented .json configuration such as dprint.json or a
+      # .jsonc file. `types` resets the filter of the built-in to every file,
+      # and `types_or` selects json, json5, and jsonc. It is the syntax gate
+      # only: dprint below owns the layout.
       - id: check-json5
-        exclude: '[-.]lock\.json$'
+        types: [file]
+        types_or: [json, json5, jsonc]
+      - id: detect-private-key
 
   # --- JSON / JSONC formatter: dprint (comment-safe autofix) ---
   #
@@ -166,9 +172,9 @@ repos:
   # which the stdlib-based pretty-format-json cannot. check-json5 above stays the
   # syntax gate; dprint owns formatting. Config in the sibling `./dprint.json`
   # (plugin version pinned there). `language: system`, so dprint is supplied by
-  # the project's flake devShell (`pkgs.dprint`), its one owner. pre-commit
-  # only — git push may strip
-  # PATH, and formatting is already applied by commit time.
+  # the project's flake devShell (`pkgs.dprint`), its one owner. It runs at the
+  # commit stage, never at push: git push may strip PATH, and formatting is
+  # already applied by commit time.
   - repo: local
     hooks:
       # owner: devshell (no-hook-language) upstream dprint publishes no pre-commit hook.
@@ -180,7 +186,6 @@ repos:
         language: system
         files: '\.(json|jsonc|json5)$'
         pass_filenames: true
-        stages: [pre-commit]
 
   # --- EditorConfig ---
   #
@@ -189,7 +194,7 @@ repos:
   # else, so filenames are passed and file selection stays `types: [file]` by
   # omission. Everything below the id is ours.
   - repo: https://github.com/editorconfig-checker/editorconfig-checker
-    rev: v3.11.1
+    rev: v4.0.2
     hooks:
       - id: editorconfig-checker
         alias: ec
@@ -217,8 +222,6 @@ repos:
           - -disable-insert-final-newline
           - -disable-indent-size
           - -disable-max-line-length
-          - '-exclude'
-          - 'LICENSE'
         # Markdown is excluded: editorconfig-checker can't parse it — it flags
         # fenced-code-block interiors and the odd-width ordered-list
         # continuations CommonMark/dprint use (e.g. `1. ` -> 3 spaces), and
@@ -226,15 +229,17 @@ repos:
         # owned by dprint + markdownlint-cli2 when those hooks are layered in.
         exclude: '\.md$'
 
-  # --- Rust: format & lint (auto-fix) ---
+  # --- Rust: format & lint ---
   - repo: local
     hooks:
+      # A check, not a fix: a hook that rewrites a file leaves the staged copy
+      # behind, so `cargo fmt --check` fails and the author formats.
       # owner: devshell (project-environment) cargo fmt is part of the Rust toolchain that the devShell pins.
       - id: cargo-fmt
-        name: cargo fmt
-        entry: cargo fmt --all
+        name: cargo fmt check
+        entry: cargo fmt --check
         language: system
-        types: [rust]
+        files: '(\.rs|(^|/)Cargo\.(toml|lock)|^rust-toolchain\.toml)$'
         pass_filenames: false
 
       # owner: devshell (project-environment) cargo clippy is part of the Rust toolchain and builds the crate.
@@ -245,12 +250,14 @@ repos:
         types: [rust]
         pass_filenames: false
 
+      # --all-targets lints the tests too, so a lint in a test fails at commit
+      # and not first in CI.
       # owner: devshell (project-environment) cargo clippy is part of the Rust toolchain and builds the crate.
-      - id: clippy-strict
-        name: clippy gate
+      - id: cargo-clippy
+        name: cargo clippy
         entry: cargo clippy --all-targets --all-features -- -D warnings
         language: system
-        types: [rust]
+        files: '(\.rs|(^|/)Cargo\.(toml|lock)|^(rust-toolchain|clippy)\.toml)$'
         pass_filenames: false
 
       # owner: devshell (no-hook-language) upstream taplo publishes no pre-commit hook.
@@ -306,6 +313,11 @@ repos:
   #   - `cargo nextest` from the devShell (`flake.nix`)
   #   - the sibling `.config/nextest.toml` at the repo root, defining the
   #     `pre-commit` and `pre-push` profiles.
+  #
+  # project: the two tiers stand in for the single `cargo-nextest` hook of the
+  # reference set, which runs the whole suite at push. That hook would repeat
+  # the unit tests of the commit stage at push, which
+  # quality-gates:the-local-stages-hold-every-ci-check forbids.
   - repo: local
     hooks:
       # owner: devshell (project-environment) cargo nextest runs the test suite of the crate.
@@ -315,7 +327,6 @@ repos:
         language: system
         types: [rust]
         pass_filenames: false
-        stages: [pre-commit]
 
       # owner: devshell (project-environment) cargo nextest runs the test suite of the crate.
       - id: cargo-nextest-integration
@@ -377,20 +388,19 @@ repos:
   # [--write-changes, --force-exclude], and typos' auto-fix silently rewrites
   # deliberate identifiers and error strings. `args:` replaces them whole, so
   # no default arg is inherited. Fix real typos by hand; allowlist false
-  # positives in ./_typos.toml. The manifest names more stages than the commit
-  # stage, which win over default_stages, so `stages:` is explicit.
+  # positives in ./_typos.toml. The manifest names pre-push too, which wins
+  # over default_stages, so `stages:` is explicit.
   - repo: https://github.com/crate-ci/typos
-    rev: v1.49.0
+    rev: v1.52.2
     hooks:
       - id: typos
-        types: [text]
         # --force-exclude is carried in `args:` as the machine-visible form of
         # the invariant this hook depends on: that it never inherits upstream's
         # [--write-changes, --force-exclude] and therefore never auto-fixes.
         # --force-exclude keeps `exclude:` honoured for filenames the hook
         # runner passes explicitly.
         args: [--force-exclude]
-        stages: [pre-commit]
+        stages: [pre-commit, pre-merge-commit]
   # --- Commit message length and punctuation (commit-msg stage) ---
   #
   # Narrowed on purpose. The Conventional Commits shape — the type and the
@@ -403,22 +413,15 @@ repos:
   # block checks.
   #
   # Policy lives in ./committed.toml, which committed discovers at the repo
-  # root, so this stanza only wires the stage and the message file. The
-  # upstream `language: python` hook, like typos above. `--commit-file` is
-  # upstream's own arg and is what makes the hook read the message the hook
-  # runner hands it rather than scanning history.
+  # root, so this stanza only wires the stage. The upstream `language: python`
+  # hook, like typos above, with its own args (--fixup --wip --commit-file):
+  # --commit-file makes the tool read the message file the hook runner hands
+  # it rather than scanning history.
   - repo: https://github.com/crate-ci/committed
-    rev: v1.1.11
+    rev: v1.1.12
     hooks:
       - id: committed
-        # Upstream's own args, carried over verbatim. --commit-file makes the
-        # tool read the message file the hook runner appends after these, rather
-        # than scanning history; --fixup and --wip let those two commit shapes
-        # through, since they are squashed before they land.
-        args: [--fixup, --wip, --commit-file]
         stages: [commit-msg]
-        always_run: true
-        pass_filenames: true
 
   # --- A breaking change carries its adopter guidance (commit-msg stage) ---
   #
@@ -474,29 +477,27 @@ repos:
   #     to scan history, which is the thing a staged scan cannot see: a secret
   #     committed earlier and about to be published. So `--pre-commit` and
   #     `--staged` are dropped on purpose; `--redact` and `--verbose` are
-  #     upstream's and are carried over into `args:`.
+  #     upstream's and stay, and `--no-banner` keeps the log short.
   #   - `pass_filenames: false` is restated so the history scan never takes
   #     staged filenames as stray positional arguments to `gitleaks git`.
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.1
     hooks:
       - id: gitleaks
-        entry: gitleaks git
-        args: [--redact, --verbose]
+        entry: gitleaks git --redact --verbose --no-banner
         pass_filenames: false
         stages: [pre-push]
 
   # --- Unused dependency detection ---
   #
-  # The upstream `language: rust` hook, which the hook runner builds from source into
-  # its own env. `types_or` is restated so the whole-tree dependency scan runs
-  # only on a change to a manifest or the lock file.
+  # The upstream `language: rust` hook, which the hook runner builds from source
+  # into its own env. Its manifest passes no file names and runs the scan of
+  # the whole workspace only when a manifest or the lock file changes. It
+  # declares no stages, and the scan is costly, so it runs at push.
   - repo: https://github.com/bnjbvr/cargo-machete
-    rev: v0.9.2
+    rev: v0.10.1
     hooks:
       - id: cargo-machete
-        types_or: [cargo, cargo-lock]
-        pass_filenames: false
         stages: [pre-push]
 
   - repo: local
@@ -509,13 +510,14 @@ repos:
         pass_filenames: false
         stages: [pre-push]
 
-      # Note: licenses check omitted; requires deny.toml with an allow-list.
-      # Add `licenses` to the check list after creating deny.toml in your project.
+      # deny.toml holds the policy of all four checks: advisories, bans,
+      # sources, and licenses.
       # owner: devshell (project-environment) cargo deny is a cargo subcommand that reads the lock file of the crate.
       - id: cargo-deny
         name: cargo deny
-        entry: cargo deny check advisories bans sources
+        entry: cargo deny check
         language: system
+        files: '((^|/)Cargo\.(toml|lock)|^deny\.toml)$'
         pass_filenames: false
         stages: [pre-push]
 
@@ -548,6 +550,23 @@ repos:
         files: '^(dist-workspace\.toml|\.github/workflows/release\.yml)$'
         pass_filenames: false
         stages: [pre-push]
+
+  # --- Link check (pre-push only) ---
+  #
+  # A networked check, so it runs at push. lychee.toml holds every setting, and
+  # git ignores its cache file .lycheecache. The default `lychee` id is a
+  # `script` hook that downloads a release binary during the run, and fails in
+  # an offline or sandboxed shell. The devShell supplies lychee, and the rev
+  # pins only the hook definition. `prek update` moves this rev to the
+  # pre-release tag `nightly`, so keep the latest release.
+  - repo: https://github.com/lycheeverse/lychee
+    rev: lychee-v0.24.2
+    hooks:
+      # owner: devshell (no-hook-language) upstream lychee offers only script, docker_image, and system ids.
+      - id: lychee-system
+        stages: [pre-push]
+        types: [markdown]
+        args: [--no-progress]
   # --- Nix: format (auto-fix) + lint (gate) ---
   #
   # Every project carries a per-project flake devShell, so these run against its
@@ -569,7 +588,6 @@ repos:
         entry: nixfmt
         language: system
         types: [nix]
-        stages: [pre-commit]
       # owner: devshell (no-hook-language) statix has no hook in a language that the hook runner builds.
       - id: statix
         name: statix (nix anti-patterns)
@@ -577,7 +595,6 @@ repos:
         language: system
         types: [nix]
         pass_filenames: false
-        stages: [pre-commit]
       # owner: host (no-hook-language) nix comes from the host and has no hook in a language that the hook runner builds.
       - id: nix-flake-check
         name: nix flake check (builds the package)
@@ -679,6 +696,27 @@ repos:
         exclude: '^docs/specs/'
         pass_filenames: true
 
+  # --- Table of contents of the specs ---
+  #
+  # md-toc rewrites the list between two `<!--TOC-->` markers, and leaves a
+  # file without the markers alone. It runs before dprint, so the formatter
+  # sees the list it wrote.
+  #   - -p writes in place.
+  #   - -c does not judge the coherence of the heading levels.
+  #   - --skip-lines 1 leaves the H1 title out of the list.
+  #   - -l 3, an option of the github parser, lists the H2 and H3 headings,
+  #     the sections and the rules.
+  # project: `files` holds it to the specs, the only documents that keep a
+  # TOC, and `exclude` skips the specs that sdd ships, because they keep the
+  # bytes that `sdd spec <name>` prints and `sdd verify` judges.
+  - repo: https://github.com/frnmst/md-toc
+    rev: 9.1.0
+    hooks:
+      - id: md-toc
+        args: [-p, -c, --skip-lines, '1', github, -l, '3']
+        files: '^docs/specs/SPEC-.*\.md$'
+        exclude: '^docs/specs/SPEC-(budget-debt|comparison-docs|decision-records|docs-format|docs-foundations|docs-specs|guides|instance|known-issues|spec-to-code|tracking|writing-policy|writing-style)\.md$'
+
   # --- Markdown: canonical format (dprint) + style gate (markdownlint) ---
   #
   # Universal overlay: every project carries docs/READMEs, so its markdown is
@@ -696,9 +734,9 @@ repos:
   # never collides with the type's `dprint` hook.
   #
   # `language: system`, so dprint is supplied by the project's flake devShell
-  # (`pkgs.dprint`), its one owner, the same model as the json hook.
-  # pre-commit only — git push may strip PATH and the format is already
-  # applied by commit time.
+  # (`pkgs.dprint`), its one owner, the same model as the json hook. It runs
+  # at the commit stage, never at push: git push may strip PATH and the format
+  # is already applied by commit time.
   - repo: local
     hooks:
       # owner: devshell (no-hook-language) upstream dprint publishes no pre-commit hook.
@@ -713,7 +751,6 @@ repos:
         # formatted by hand.
         exclude: '^AGENTS\.md$'
         pass_filenames: true
-        stages: [pre-commit]
 
   # --- Explicit relative links (ambiguity guard; pre-commit, local) ---
   #
@@ -815,28 +852,25 @@ repos:
   # EditorConfig file and reverts to its own defaults, the first of which is
   # tabs. So the formatting options live in .editorconfig (indent_style,
   # indent_size, switch_case_indent, shell_variant). `-s` (simplify) has no
-  # EditorConfig property and stays dropped. The manifest names pre-push as
-  # well, which wins over default_stages, so `stages:` is explicit.
+  # EditorConfig property and stays dropped. The shfmt manifest names pre-push
+  # as well, which wins over default_stages, so `stages:` is explicit. The
+  # shellcheck manifest names no stages, and its own `types: [shell]` and
+  # `require_serial: true` let shellcheck follow a sourced file.
   # deadnix publishes a rust hook, which the hook runner builds; its manifest
-  # carries --fail and the nix file type.
+  # carries --fail and the nix file type, and names no stages.
   - repo: https://github.com/astro/deadnix
     rev: v1.3.2
     hooks:
       - id: deadnix
-        stages: [pre-commit]
   - repo: https://github.com/scop/pre-commit-shfmt
-    rev: v3.13.1-1
+    rev: v3.14.1-1
     hooks:
       - id: shfmt
-        types: [shell]
-        stages: [pre-commit]
+        stages: [pre-commit, pre-merge-commit]
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.11.0.1
+    rev: v0.11.0.1-1
     hooks:
       - id: shellcheck
-        types: [shell]
-        require_serial: true
-        stages: [pre-commit]
   - repo: local
     hooks:
       # A flake holds no language library: a package belongs to the manifest
@@ -848,17 +882,20 @@ repos:
         files: '(^|/)flake\.nix$|(^|/)nix/.*\.nix$'
   # A flake reference reads the git tree of a checkout, never a path copy of
   # the whole folder into the Nix store. A flake holds no git hook runner, and
-  # host-requirements.toml parses whenever it changes. The three hooks are
-  # published by exobrain-tech.
+  # host-requirements.toml parses whenever it changes. The rev of each
+  # repository of the common, rust, bash, and nix reference sets follows the
+  # copy of the set at the rev of this entry, which `exobrain hooks sync` alone
+  # moves. The four hooks are published by exobrain-tech.
   - repo: https://github.com/gubasso/exobrain-tech
-    rev: v1.1.0
+    rev: v1.2.0
     hooks:
       - id: no-path-flake-reference
       - id: no-hook-runner-in-flake
-      # owner: devshell (no-hook-language) exobrain-tech publishes this hook
-      # only as system. It runs exobrain host-check --parse-only from the flake
-      # devShell each time host-requirements.toml changes.
+      # owner: host (host-tool) exobrain-tech publishes this hook only as system, and it runs exobrain host-check --parse-only from the host, which host-requirements.toml lists.
       - id: host-requirements
+      # owner: host (host-tool) exobrain-tech publishes this hook only as system, and it runs exobrain hooks check from the host, which host-requirements.toml lists.
+      - id: hook-revisions
+        args: [--set, common, --set, rust, --set, bash, --set, nix]
 # BEGIN spec-driven-docs managed
   - repo: local
     hooks:
