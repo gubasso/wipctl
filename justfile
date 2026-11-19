@@ -10,8 +10,8 @@ filter := ""
 
 # The global host tools, checked once before any recipe runs. just evaluates
 # every top-level assignment first, so a missing tool stops the run with the
-# checker's message. The list lives in host-requirements.toml, and the checker
-# comes from the devShell, so it runs through the same prefix as every recipe.
+# checker's message. The list lives in host-requirements.toml. The checker
+# comes from the host, and it runs through the same prefix as every recipe.
 # A recipe that alone uses a host tool checks it as its first line.
 _host := shell(dev + " exobrain host-check nix git")
 
