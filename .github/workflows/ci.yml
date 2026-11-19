@@ -3,7 +3,10 @@
 # Every job enters the project's pinned Nix devshell once (`nix develop --command
 # just ...`) and then calls a justfile recipe. The justfile prefixes each recipe
 # with `nix develop --command` itself, so CI passes `dev=''` to stop the devshell
-# being entered a second time per recipe.
+# being entered a second time per recipe. Each gate recipe names its stage, and
+# CI passes `filter='--no-group local-only'`, so it runs every hook of the stage
+# except those that `.pre-commit-config.yaml` marks local-only, each with its
+# reason. No ci-only hook exists, so no job runs the manual stage.
 #
 # The gates themselves live in `.pre-commit-config.yaml` and the `justfile`;
 # nothing here re-implements a check. CI runs the commit stage, the push stage,
@@ -86,12 +89,7 @@ jobs:
             target
           key: cargo-lint-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
       - name: Lint
-        # CI commits nothing and its checkout is detached on the main
-        # worktree, so the two commit-time guards in the release-kit block
-        # would refuse every trunk checkout they sweep.
-        env:
-          SKIP: no-commit-to-branch,rk-worktree-location
-        run: nix develop --command just dev='' lint
+        run: nix develop --command just dev='' filter='--no-group local-only' lint
 
   # Push-stage gate: the integration tests, the release build, the package
   # build and verification, and the dependency, history, and networked checks
@@ -143,9 +141,7 @@ jobs:
             target
           key: cargo-lint-push-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
       - name: Push-stage gate
-        env:
-          SKIP: no-commit-to-branch,rk-worktree-location
-        run: nix develop --command just dev='' lint-push
+        run: nix develop --command just dev='' filter='--no-group local-only' lint-push
 
   # The release targets, as dist plans them. `dist plan` reads
   # dist-workspace.toml and emits the build matrix that the tag's `release.yml`

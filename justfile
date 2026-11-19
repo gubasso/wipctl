@@ -3,6 +3,11 @@
 # when the caller is already inside the devshell (CI does this).
 dev := "nix develop --command"
 
+# The hook group filter of the two gates. A local run keeps it empty, so it
+# runs every hook of the stage. CI passes `filter='--no-group local-only'`,
+# because each hook of that group states why CI cannot run it.
+filter := ""
+
 # The global host tools, checked once before any recipe runs. just evaluates
 # every top-level assignment first, so a missing tool stops the run with the
 # checker's message. The list lives in host-requirements.toml, and the checker
@@ -19,13 +24,13 @@ default:
 # Run the commit-stage gate (formatting and lints, as the hooks define them).
 lint:
 	{{dev}} exobrain host-check prek
-	{{dev}} prek run --all-files --show-diff-on-failure
+	{{dev}} prek run --stage pre-commit --all-files --show-diff-on-failure {{filter}}
 
 # Run the push-stage gate: the integration tests, the release build, the package
 # build and verification, and the dependency, history, and networked checks.
 lint-push:
 	{{dev}} exobrain host-check prek
-	{{dev}} prek run --hook-stage pre-push --all-files --show-diff-on-failure
+	{{dev}} prek run --stage pre-push --all-files --show-diff-on-failure {{filter}}
 
 # Run the schema gate: every shipped schema against the draft, and the fixture
 # against the schemas that govern it.
