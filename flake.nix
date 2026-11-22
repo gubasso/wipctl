@@ -5,9 +5,9 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
-    # The project's own `rk`, pinned at a release tag. The operator moves the
-    # tag and the lock together with the sync verb of rk, run from a shell.
-    # `.envrc` only warns when a newer release is out.
+    # The project's own `rk`, pinned at a release tag. `exobrain outdated` in
+    # `.envrc` only warns when a newer release is out. The operator moves the
+    # tag and the lock together with `flake-edit update release-kit`.
     release-kit = {
       url = "github:gubasso/release-kit/v0.10.3";
       # rk's own flake pins an earlier rk and an sdd for its own development.
@@ -21,9 +21,10 @@
         rust-overlay.follows = "rust-overlay";
       };
     };
-    # `sdd`, the documentation gate, pinned at a release tag. The operator moves
-    # the tag and the lock together with the sync verb of sdd, run from a shell.
-    # `.envrc` only warns when a newer release is out.
+    # `sdd`, the documentation gate, pinned at a release tag. `exobrain
+    # outdated` in `.envrc` only warns when a newer release is out. The operator
+    # moves the tag and the lock together with
+    # `flake-edit update spec-driven-docs`.
     spec-driven-docs = {
       url = "github:gubasso/spec-driven-docs/v0.18.1";
       # The same for sdd: no nested sdd, its rk follows the one above, and its
