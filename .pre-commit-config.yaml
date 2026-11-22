@@ -904,7 +904,7 @@ repos:
   # copy of the set at the rev of this entry, which `exobrain hooks sync` alone
   # moves. The four hooks are published by exobrain-tech.
   - repo: https://github.com/gubasso/exobrain-tech
-    rev: v1.2.0
+    rev: v2.0.0
     hooks:
       - id: no-path-flake-reference
       - id: no-hook-runner-in-flake
