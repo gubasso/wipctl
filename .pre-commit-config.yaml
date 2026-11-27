@@ -1053,7 +1053,6 @@ repos:
         language: system
         files: '^docs/(?:specs|decisions|guides|reference|explanation)/(?:.*/)?[^/]*\.md$'
         types: [markdown]
-        exclude: '^(?:.*/)?CHANGELOG\.md$'
       - id: spec-requirement-parts
         name: 'spec requirement parts'
         entry: sdd gate spec-requirement-parts
