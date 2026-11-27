@@ -26,7 +26,7 @@
     # moves the tag and the lock together with
     # `flake-edit update spec-driven-docs`.
     spec-driven-docs = {
-      url = "github:gubasso/spec-driven-docs/v0.18.1";
+      url = "github:gubasso/spec-driven-docs/v0.20.1";
       # The same for sdd: no nested sdd, its rk follows the one above, and its
       # rust-overlay follows the root one. Its exobrain-tech serves only its
       # own devShell, and the host supplies exobrain, so the empty follows
